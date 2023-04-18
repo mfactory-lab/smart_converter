@@ -73,8 +73,6 @@ pub struct LockTokens<'info> {
         mut,
         seeds = [User::SEED, authority.key().as_ref()],
         bump,
-        payer = authority,
-        space = User::SIZE,
     )]
     pub user: Box<Account<'info, User>>,
 
