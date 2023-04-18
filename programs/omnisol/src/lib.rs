@@ -22,4 +22,6 @@ pub enum ErrorCode {
     AlreadyPaused,
     #[msg("Already resumed")]
     AlreadyResumed,
+    #[msg("Pair still have locked tokens")]
+    StillRemainingLockedTokens,
 }
