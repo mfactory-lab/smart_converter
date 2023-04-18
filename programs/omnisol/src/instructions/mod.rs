@@ -7,6 +7,7 @@ pub mod update_pair;
 pub mod update_user_state;
 pub mod add_user_to_whitelist;
 pub mod lock_tokens;
+pub mod unlock_tokens;
 
 pub use add_manager::*;
 pub use update_manager::*;
@@ -17,3 +18,4 @@ pub use update_pair::*;
 pub use update_user_state::*;
 pub use add_user_to_whitelist::*;
 pub use lock_tokens::*;
+pub use unlock_tokens::*;

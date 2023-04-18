@@ -1,61 +1,65 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair}, ErrorCode};
+use crate::{state::{Manager, Admin, Pair}, ErrorCode, utils};
 use crate::state::User;
 
-/// The user can lock security tokens in special pair.
-/// After that pair authority mints utility tokens to user.
+/// The user can unlock security tokens in special pair.
+/// After that user burns utility tokens and gets locked tokens back.
 pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
 
-    let user_wallet = ctx.accounts.authority.key();
     let pair_authority_seeds = [pair.key().as_ref(), &[ctx.bumps["pair_authority"]]];
 
     if admin.is_platform_paused || manager.is_all_paused || pair.is_paused {
         return Err(ErrorCode::IsPaused.into());
     }
 
-    if user.user_wallet != user_wallet {
-        user.user_wallet = user_wallet;
-    }
-
     if user.is_blocked {
         return Err(ErrorCode::IsBlocked.into());
     }
 
-    // Transfer security token
-    token::transfer(
+    if user.locked_amount < amount {
+        return Err(ErrorCode::InsufficientLockedAmount.into());
+    }
+
+    // Burn utility tokens equals to `amount` * `ratio`
+    token::burn(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
-            token::Transfer {
-                from: ctx.accounts.source_a.to_account_info(),
-                to: ctx.accounts.destination_a.to_account_info(),
+            token::Burn {
+                mint: ctx.accounts.token_b.to_account_info(),
+                from: ctx.accounts.source_b.to_account_info(),
                 authority: ctx.accounts.authority.to_account_info(),
             },
-        ),
-        amount,
-    )?;
-
-    // Mint utility tokens equals to `amount` * `ratio`
-    token::mint_to(
-        CpiContext::new_with_signer(
-            ctx.accounts.token_program.to_account_info(),
-            token::MintTo {
-                mint: ctx.accounts.token_b.to_account_info(),
-                to: ctx.accounts.destination_b.to_account_info(),
-                authority: ctx.accounts.pair_authority.to_account_info(),
-            },
-            &[&pair_authority_seeds],
         ),
         amount * pair.ratio.num / pair.ratio.denom,
     )?;
 
-    user.locked_amount += amount;
-    pair.locked_amount += amount;
+    // Transfer security token
+    token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            token::Transfer {
+                from: ctx.accounts.source_a.to_account_info(),
+                to: ctx.accounts.destination_a.to_account_info(),
+                authority: ctx.accounts.pair_authority.to_account_info(),
+            },
+            &[&pair_authority_seeds],
+        ),
+        amount,
+    )?;
+
+    user.locked_amount -= amount;
+    pair.locked_amount -= amount;
+
+    if user.locked_amount == 0 {
+        // close the user account
+        utils::close(user.to_account_info(), ctx.accounts.authority.to_account_info())?;
+    }
 
     Ok(())
 }
@@ -66,7 +70,7 @@ pub struct LockTokens<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        init_if_needed,
+        mut,
         seeds = [User::SEED, authority.key().as_ref()],
         bump,
         payer = authority,
@@ -110,14 +114,14 @@ pub struct LockTokens<'info> {
     #[account(
         mut,
         associated_token::mint = token_a,
-        associated_token::authority = authority,
+        associated_token::authority = pair_authority,
     )]
     pub source_a: Account<'info, token::TokenAccount>,
 
     #[account(
         mut,
         associated_token::mint = token_a,
-        associated_token::authority = pair_authority,
+        associated_token::authority = authority,
     )]
     pub destination_a: Account<'info, token::TokenAccount>,
 
@@ -126,7 +130,7 @@ pub struct LockTokens<'info> {
         associated_token::mint = token_b,
         associated_token::authority = authority,
     )]
-    pub destination_b: Account<'info, token::TokenAccount>,
+    pub source_b: Account<'info, token::TokenAccount>,
 
     pub token_program: Program<'info, token::Token>,
     pub system_program: Program<'info, System>,

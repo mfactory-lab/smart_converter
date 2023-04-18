@@ -28,4 +28,6 @@ pub enum ErrorCode {
     IsBlocked,
     #[msg("User is already unblocked")]
     AlreadyUnblocked,
+    #[msg("Insufficient locked amount")]
+    InsufficientLockedAmount,
 }
