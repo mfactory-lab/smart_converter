@@ -3,12 +3,30 @@ use anchor_lang::prelude::*;
 use crate::state::{Manager, Admin};
 
 /// The admin can remove manager.
-pub fn handle(_ctx: Context<RemoveManager>) -> Result<()> {
+pub fn remove_manager(_ctx: Context<UpdateManager>) -> Result<()> {
+    Ok(())
+}
+
+/// The admin can pause all manager's pairs.
+pub fn pause_pairs(ctx: Context<UpdateManager>) -> Result<()> {
+    let manager = &mut ctx.accounts.manager;
+
+    manager.is_all_paused = true;
+
+    Ok(())
+}
+
+/// The admin can unpause all manager's pairs.
+pub fn unpause_pairs(ctx: Context<UpdateManager>) -> Result<()> {
+    let manager = &mut ctx.accounts.manager;
+
+    manager.is_all_paused = false;
+
     Ok(())
 }
 
 #[derive(Accounts)]
-pub struct RemoveManager<'info> {
+pub struct UpdateManager<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
