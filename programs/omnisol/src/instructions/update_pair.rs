@@ -2,9 +2,10 @@ use anchor_lang::prelude::*;
 use anchor_spl::token;
 
 use crate::{state::{Manager, Admin, Pair}, ErrorCode, utils};
+use crate::state::Ratio;
 
 /// The manager can remove pair.
-pub fn remove_pair(ctx: Context<UpdatePair>) -> Result<()> {
+pub fn remove(ctx: Context<UpdatePair>) -> Result<()> {
     let pair = &mut ctx.accounts.pair;
 
     if pair.locked_amount > 0 {
@@ -18,39 +19,30 @@ pub fn remove_pair(ctx: Context<UpdatePair>) -> Result<()> {
     Ok(())
 }
 
-/// The manager can pause pair.
-pub fn pause(ctx: Context<UpdatePair>) -> Result<()> {
+/// The manager can update pair.
+pub fn update(ctx: Context<UpdatePair>, data: UpdatePairData) -> Result<()> {
     let pair = &mut ctx.accounts.pair;
 
-    if pair.is_paused {
-        return Err(ErrorCode::IsPaused.into());
+    if let Some(is_paused) = data.is_paused {
+        pair.is_paused = is_paused;
     }
 
-    pair.is_paused = true;
+    if let Some(manager_wallet) = data.manager_wallet {
+        pair.manager_wallet = manager_wallet;
+    }
+
+    if let Some(ratio) = data.ratio {
+        pair.ratio = ratio
+    }
 
     Ok(())
 }
 
-/// The manager can resume pair.
-pub fn resume(ctx: Context<UpdatePair>) -> Result<()> {
-    let pair = &mut ctx.accounts.pair;
-
-    if !pair.is_paused {
-        return Err(ErrorCode::AlreadyResumed.into());
-    }
-
-    pair.is_paused = false;
-
-    Ok(())
-}
-
-/// The manager can set new manager authority.
-pub fn set_manager(ctx: Context<UpdatePair>, manager_wallet: Pubkey) -> Result<()> {
-    let pair = &mut ctx.accounts.pair;
-
-    pair.manager_wallet = manager_wallet;
-
-    Ok(())
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct UpdatePairData {
+    manager_wallet: Option<Pubkey>,
+    is_paused: Option<bool>,
+    ratio: Option<Ratio>,
 }
 
 #[derive(Accounts)]

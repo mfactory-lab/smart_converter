@@ -51,11 +51,19 @@ pub struct Pair {
     pub token_b: Pubkey,
     /// Amount of security tokens currently locked
     pub locked_amount: u64,
+    /// Ratio of token A to token B
+    pub ratio: Ratio,
     /// Indicates if pair is paused or not
     pub is_paused: bool,
 }
 
 impl Pair {
     pub const SEED: &'static [u8] = b"pair";
-    pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 1;
+    pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 16 + 1;
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct Ratio {
+    pub num: u64,
+    pub denom: u64,
 }

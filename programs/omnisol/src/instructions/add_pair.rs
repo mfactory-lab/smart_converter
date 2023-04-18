@@ -2,9 +2,10 @@ use anchor_lang::prelude::*;
 use anchor_spl::token;
 
 use crate::{state::{Manager, Admin, Pair}, ErrorCode};
+use crate::state::Ratio;
 
 /// The manager can add new pair.
-pub fn handle(ctx: Context<AddPair>) -> Result<()> {
+pub fn handle(ctx: Context<AddPair>, ratio: Ratio) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
     let pair = &mut ctx.accounts.pair;
     let pair_authority = ctx.accounts.pair_authority.key;
@@ -19,6 +20,7 @@ pub fn handle(ctx: Context<AddPair>) -> Result<()> {
     pair.manager_wallet = manager.authority;
     pair.token_a = token_a.key();
     pair.token_b = token_b.key();
+    pair.ratio = ratio;
 
     Ok(())
 }
