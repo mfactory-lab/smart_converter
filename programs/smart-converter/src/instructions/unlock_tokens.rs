@@ -1,18 +1,18 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair}, ErrorCode, utils};
-use crate::state::User;
+use crate::{state::{Manager, Admin, Pair, User}, ErrorCode, utils};
 
 /// The user can unlock security tokens in special pair.
 /// After that user burns utility tokens and gets locked tokens back.
-pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
+pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
 
-    let pair_authority_seeds = [pair.key().as_ref(), &[ctx.bumps["pair_authority"]]];
+    let pair_key = pair.key();
+    let pair_authority_seeds = [pair_key.as_ref(), &[ctx.bumps["pair_authority"]]];
 
     if admin.is_platform_paused || manager.is_all_paused || pair.is_paused {
         return Err(ErrorCode::IsPaused.into());
@@ -65,7 +65,7 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
 }
 
 #[derive(Accounts)]
-pub struct LockTokens<'info> {
+pub struct UnlockTokens<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 

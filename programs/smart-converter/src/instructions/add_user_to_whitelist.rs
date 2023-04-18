@@ -1,8 +1,6 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair}, ErrorCode};
-use crate::state::User;
+use crate::state::{Manager, User};
 
 /// The manager can add user to whitelist.
 /// After that user can unlock the whitelisted amount of tokens from any pair.

@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair}, ErrorCode};
-use crate::state::Ratio;
+use crate::{state::{Manager, Pair, Ratio}, ErrorCode};
 
 /// The manager can add new pair.
 pub fn handle(ctx: Context<AddPair>, ratio: Ratio) -> Result<()> {

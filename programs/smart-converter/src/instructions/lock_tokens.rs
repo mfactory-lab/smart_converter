@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair}, ErrorCode};
-use crate::state::User;
+use crate::{state::{Manager, Admin, Pair, User}, ErrorCode};
 
 /// The user can lock security tokens in special pair.
 /// After that pair authority mints utility tokens to user.
@@ -13,7 +12,8 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     let pair = &mut ctx.accounts.pair;
 
     let user_wallet = ctx.accounts.authority.key();
-    let pair_authority_seeds = [pair.key().as_ref(), &[ctx.bumps["pair_authority"]]];
+    let pair_key = pair.key();
+    let pair_authority_seeds = [pair_key.as_ref(), &[ctx.bumps["pair_authority"]]];
 
     if admin.is_platform_paused || manager.is_all_paused || pair.is_paused {
         return Err(ErrorCode::IsPaused.into());

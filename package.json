@@ -1,5 +1,5 @@
 {
-  "name": "omnisol",
+  "name": "smart-converter",
   "packageManager": "pnpm@7.13.0",
   "scripts": {
     "api:gen": "pnpm --filter=sdk run api:gen && eslint --fix --ext .ts ./packages/sdk/src/**",

@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair}, ErrorCode, utils};
-use crate::state::Ratio;
+use crate::{state::{Manager, Pair, Ratio}, ErrorCode, utils};
 
 /// The manager can remove pair.
 pub fn remove(ctx: Context<UpdatePair>) -> Result<()> {
