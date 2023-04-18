@@ -24,4 +24,8 @@ pub enum ErrorCode {
     AlreadyResumed,
     #[msg("Pair still have locked tokens")]
     StillRemainingLockedTokens,
+    #[msg("User is already blocked")]
+    AlreadyBlocked,
+    #[msg("User is already unblocked")]
+    AlreadyUnblocked,
 }
