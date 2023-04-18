@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{state::Admin, ErrorCode};
 
-/// The admin can add new manager.
+/// The admin can set new admin.
 pub fn handle(ctx: Context<SetAdmin>) -> Result<()> {
     let admin = &mut ctx.accounts.admin;
     let admin_wallet = ctx.accounts.admin_wallet.key();
