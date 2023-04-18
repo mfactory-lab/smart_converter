@@ -18,4 +18,8 @@ pub mod omnisol {
 pub enum ErrorCode {
     #[msg("Unauthorized action")]
     Unauthorized,
+    #[msg("Already paused")]
+    AlreadyPaused,
+    #[msg("Already resumed")]
+    AlreadyResumed,
 }

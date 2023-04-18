@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::state::{Manager, Admin};
+use crate::{state::{Manager, Admin}, ErrorCode};
 
 /// The admin can remove manager.
 pub fn remove_manager(_ctx: Context<UpdateManager>) -> Result<()> {
@@ -11,14 +11,22 @@ pub fn remove_manager(_ctx: Context<UpdateManager>) -> Result<()> {
 pub fn pause_pairs(ctx: Context<UpdateManager>) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
 
+    if manager.is_all_paused {
+        return Err(ErrorCode::AlreadyPaused.into());
+    }
+
     manager.is_all_paused = true;
 
     Ok(())
 }
 
 /// The admin can unpause all manager's pairs.
-pub fn unpause_pairs(ctx: Context<UpdateManager>) -> Result<()> {
+pub fn resume_pairs(ctx: Context<UpdateManager>) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
+
+    if !manager.is_all_paused {
+        return Err(ErrorCode::AlreadyResumed.into());
+    }
 
     manager.is_all_paused = false;
 
