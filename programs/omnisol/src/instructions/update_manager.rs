@@ -17,7 +17,7 @@ pub fn pause_pairs(ctx: Context<UpdateManager>) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
 
     if manager.is_all_paused {
-        return Err(ErrorCode::AlreadyPaused.into());
+        return Err(ErrorCode::IsPaused.into());
     }
 
     manager.is_all_paused = true;

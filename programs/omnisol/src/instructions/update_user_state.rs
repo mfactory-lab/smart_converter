@@ -9,7 +9,7 @@ pub fn block(ctx: Context<UpdateUser>) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
     if user.is_blocked {
-        return Err(ErrorCode::AlreadyBlocked.into());
+        return Err(ErrorCode::IsBlocked.into());
     }
 
     user.is_blocked = true;

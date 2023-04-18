@@ -7,7 +7,7 @@ pub fn pause(ctx: Context<ChangePlatformState>) -> Result<()> {
     let admin = &mut ctx.accounts.admin;
 
     if admin.is_platform_paused {
-        return Err(ErrorCode::AlreadyPaused.into());
+        return Err(ErrorCode::IsPaused.into());
     }
 
     admin.is_platform_paused = true;

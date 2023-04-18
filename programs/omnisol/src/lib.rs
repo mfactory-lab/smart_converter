@@ -18,14 +18,14 @@ pub mod omnisol {
 pub enum ErrorCode {
     #[msg("Unauthorized action")]
     Unauthorized,
-    #[msg("Already paused")]
-    AlreadyPaused,
+    #[msg("Paused")]
+    IsPaused,
     #[msg("Already resumed")]
     AlreadyResumed,
     #[msg("Pair still have locked tokens")]
     StillRemainingLockedTokens,
-    #[msg("User is already blocked")]
-    AlreadyBlocked,
+    #[msg("User is blocked")]
+    IsBlocked,
     #[msg("User is already unblocked")]
     AlreadyUnblocked,
 }

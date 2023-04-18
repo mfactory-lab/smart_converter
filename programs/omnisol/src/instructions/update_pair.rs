@@ -23,7 +23,7 @@ pub fn pause(ctx: Context<UpdatePair>) -> Result<()> {
     let pair = &mut ctx.accounts.pair;
 
     if pair.is_paused {
-        return Err(ErrorCode::AlreadyPaused.into());
+        return Err(ErrorCode::IsPaused.into());
     }
 
     pair.is_paused = true;
