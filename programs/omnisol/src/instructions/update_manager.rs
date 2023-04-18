@@ -1,9 +1,14 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::{Manager, Admin}, ErrorCode};
+use crate::{state::{Manager, Admin}, ErrorCode, utils};
 
 /// The admin can remove manager.
-pub fn remove_manager(_ctx: Context<UpdateManager>) -> Result<()> {
+pub fn remove_manager(ctx: Context<UpdateManager>) -> Result<()> {
+    let manager = &mut ctx.accounts.manager;
+
+    // close the manager account
+    utils::close(manager.to_account_info(), ctx.accounts.authority.to_account_info())?;
+
     Ok(())
 }
 
@@ -42,7 +47,6 @@ pub struct UpdateManager<'info> {
         mut,
         seeds = [Manager::SEED, manager_wallet.key().as_ref()],
         bump,
-        close = authority
     )]
     pub manager: Box<Account<'info, Manager>>,
 

@@ -1,14 +1,19 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair}, ErrorCode};
+use crate::{state::{Manager, Admin, Pair}, ErrorCode, utils};
 
 /// The manager can remove pair.
 pub fn remove_pair(ctx: Context<UpdatePair>) -> Result<()> {
-    if ctx.accounts.pair.locked_amount > 0 {
+    let pair = &mut ctx.accounts.pair;
+
+    if pair.locked_amount > 0 {
         msg!("Please, wait until all tokens will be unlocked");
         return Err(ErrorCode::StillRemainingLockedTokens.into());
     }
+
+    // close the pair account
+    utils::close(pair.to_account_info(), ctx.accounts.authority.to_account_info())?;
 
     Ok(())
 }
