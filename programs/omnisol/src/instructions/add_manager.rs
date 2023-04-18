@@ -31,8 +31,9 @@ pub struct AddManager<'info> {
 
     #[account(
         mut,
-        seeds = [Admin::SEED, authority.key().as_ref()],
+        seeds = [Admin::SEED],
         bump,
+        has_one = authority,
     )]
     pub admin: Box<Account<'info, Admin>>,
 
