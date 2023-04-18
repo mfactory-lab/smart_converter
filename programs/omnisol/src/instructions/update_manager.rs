@@ -45,7 +45,7 @@ pub struct UpdateManager<'info> {
     )]
     pub admin: Box<Account<'info, Admin>>,
 
-    /// CHECK: Address of manager wallet to remove
+    /// CHECK: Address of manager's wallet to update
     pub manager_wallet: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
