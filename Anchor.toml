@@ -12,10 +12,10 @@ cluster = "testnet"
 wallet = "~/.config/solana/id.json"
 
 [programs.localnet]
-omnisol = "DMG9gp5VHPVpA3bst6yhC4L4D4aZiUjUTibVQGvJzpjy"
+smart_converter = "BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH"
 
 [programs.devnet]
-omnisol = "DMG9gp5VHPVpA3bst6yhC4L4D4aZiUjUTibVQGvJzpjy"
+smart_converter = "BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH"
 
 [programs.testnet]
-omnisol = "DMG9gp5VHPVpA3bst6yhC4L4D4aZiUjUTibVQGvJzpjy"
+smart_converter = "BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH"

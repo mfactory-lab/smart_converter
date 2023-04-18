@@ -8,10 +8,10 @@ use anchor_lang::prelude::*;
 use crate::instructions::*;
 use crate::state::*;
 
-declare_id!("DMG9gp5VHPVpA3bst6yhC4L4D4aZiUjUTibVQGvJzpjy");
+declare_id!("BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH");
 
 #[program]
-pub mod omnisol {
+pub mod smart_converter {
     use super::*;
 
     pub fn add_manager(ctx: Context<AddManager>) -> Result<()> {

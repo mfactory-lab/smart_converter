@@ -1,5 +1,5 @@
 [package]
-name = "smart-converter"
+name = "smart_converter"
 version = "0.0.4"
 license = "Apache-2.0"
 description = "Smart-converter Program"

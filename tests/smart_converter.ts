@@ -9,7 +9,7 @@ const provider = new AnchorProvider(
   AnchorProvider.defaultOptions(),
 )
 
-describe('smart-converter', () => {
+describe('smart_converter', () => {
 
 })
 
