@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 #[account]
 pub struct Admin {
     /// Manager wallet address
-    pub manager: Pubkey,
+    pub admin_wallet: Pubkey,
     /// Indicates if platform is paused or not
     pub is_platform_paused: bool,
 }
@@ -16,7 +16,7 @@ impl Admin {
 #[account]
 pub struct Manager {
     /// Manager wallet address
-    pub manager: Pubkey,
+    pub manager_wallet: Pubkey,
     /// Indicates if manager's pairs are paused or not
     pub is_all_paused: bool,
 }
@@ -29,7 +29,7 @@ impl Manager {
 #[account]
 pub struct User {
     /// User wallet address
-    pub wallet: Pubkey,
+    pub user_wallet: Pubkey,
     /// Amount of security tokens currently locked by user
     pub locked_amount: u64,
     /// Indicates if user is blocked or not
@@ -44,7 +44,7 @@ impl User {
 #[account]
 pub struct Pair {
     /// Manager wallet address
-    pub manager: Pubkey,
+    pub manager_wallet: Pubkey,
     /// Security token mint address
     pub token_a: Pubkey,
     /// Utility token mint address

@@ -16,5 +16,6 @@ pub mod omnisol {
 
 #[error_code]
 pub enum ErrorCode {
-
+    #[msg("Unauthorized action")]
+    Unauthorized,
 }
