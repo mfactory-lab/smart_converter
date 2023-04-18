@@ -7,7 +7,7 @@ pub fn handle(ctx: Context<AddManager>) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
     let manager_wallet = ctx.accounts.manager_wallet.key();
 
-    manager.manager_wallet = manager_wallet;
+    manager.authority = manager_wallet;
 
     Ok(())
 }

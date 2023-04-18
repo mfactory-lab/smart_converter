@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 #[account]
 pub struct Admin {
     /// Manager wallet address
-    pub admin_wallet: Pubkey,
+    pub authority: Pubkey,
     /// Indicates if platform is paused or not
     pub is_platform_paused: bool,
 }
@@ -16,7 +16,7 @@ impl Admin {
 #[account]
 pub struct Manager {
     /// Manager wallet address
-    pub manager_wallet: Pubkey,
+    pub authority: Pubkey,
     /// Indicates if manager's pairs are paused or not
     pub is_all_paused: bool,
 }
