@@ -48,6 +48,7 @@ export const unlockTokensStruct = new beet.BeetArgsStruct<
  * @property [_writable_] sourceA
  * @property [_writable_] destinationA
  * @property [_writable_] sourceB
+ * @property [] clock
  * @category Instructions
  * @category UnlockTokens
  * @category generated
@@ -65,6 +66,7 @@ export interface UnlockTokensInstructionAccounts {
   sourceA: web3.PublicKey
   destinationA: web3.PublicKey
   sourceB: web3.PublicKey
+  clock: web3.PublicKey
   tokenProgram?: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -152,6 +154,11 @@ export function createUnlockTokensInstruction(
     {
       pubkey: accounts.sourceB,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clock,
+      isWritable: false,
       isSigner: false,
     },
     {

@@ -176,6 +176,7 @@ export class SmartConverterClient {
 
     const ix = createLockTokensInstruction(
       {
+        clock: SmartConverterClient.clock,
         admin,
         authority: payer,
         destinationA: props.destinationA,
@@ -383,6 +384,7 @@ export class SmartConverterClient {
 
     const ix = createUnlockTokensInstruction(
       {
+        clock: SmartConverterClient.clock,
         admin,
         authority: payer,
         destinationA: props.destinationA,

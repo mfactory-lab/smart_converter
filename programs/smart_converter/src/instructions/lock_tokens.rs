@@ -4,6 +4,7 @@ use anchor_spl::token;
 use crate::{
     state::{Admin, Manager, Pair, User},
     ErrorCode,
+    events::LockTokensEvent
 };
 
 /// The user can lock security tokens in special pair.
@@ -13,6 +14,7 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
+    let clock = &ctx.accounts.clock;
 
     let user_wallet = ctx.accounts.authority.key();
     let pair_key = pair.key();
@@ -59,6 +61,14 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
 
     user.locked_amount += amount;
     pair.locked_amount += amount;
+
+    emit!(LockTokensEvent {
+        pair: pair_key,
+        user: user.key(),
+        user_wallet: user_wallet,
+        amount,
+        timestamp: clock.unix_timestamp,
+    });
 
     Ok(())
 }
@@ -131,6 +141,7 @@ pub struct LockTokens<'info> {
     )]
     pub destination_b: Account<'info, token::TokenAccount>,
 
+    pub clock: Sysvar<'info, Clock>,
     pub token_program: Program<'info, token::Token>,
     pub system_program: Program<'info, System>,
 }

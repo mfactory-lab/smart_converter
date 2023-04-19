@@ -48,6 +48,7 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
  * @property [_writable_] sourceA
  * @property [_writable_] destinationA
  * @property [_writable_] destinationB
+ * @property [] clock
  * @category Instructions
  * @category LockTokens
  * @category generated
@@ -65,6 +66,7 @@ export interface LockTokensInstructionAccounts {
   sourceA: web3.PublicKey
   destinationA: web3.PublicKey
   destinationB: web3.PublicKey
+  clock: web3.PublicKey
   tokenProgram?: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -152,6 +154,11 @@ export function createLockTokensInstruction(
     {
       pubkey: accounts.destinationB,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.clock,
+      isWritable: false,
       isSigner: false,
     },
     {

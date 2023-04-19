@@ -223,6 +223,11 @@
           "isSigner": false
         },
         {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -327,6 +332,11 @@
         {
           "name": "sourceB",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -753,6 +763,68 @@
           }
         ]
       }
+    }
+  ],
+  "events": [
+    {
+      "name": "LockTokensEvent",
+      "fields": [
+        {
+          "name": "pair",
+          "type": "publicKey",
+          "index": true
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": true
+        },
+        {
+          "name": "userWallet",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "timestamp",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "UnlockTokensEvent",
+      "fields": [
+        {
+          "name": "pair",
+          "type": "publicKey",
+          "index": true
+        },
+        {
+          "name": "user",
+          "type": "publicKey",
+          "index": true
+        },
+        {
+          "name": "userWallet",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "amount",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "timestamp",
+          "type": "i64",
+          "index": false
+        }
+      ]
     }
   ],
   "errors": [

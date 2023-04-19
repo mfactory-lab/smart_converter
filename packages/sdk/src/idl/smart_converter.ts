@@ -223,6 +223,11 @@ export interface SmartConverter {
           'isSigner': false
         },
         {
+          'name': 'clock'
+          'isMut': false
+          'isSigner': false
+        },
+        {
           'name': 'tokenProgram'
           'isMut': false
           'isSigner': false
@@ -327,6 +332,11 @@ export interface SmartConverter {
         {
           'name': 'sourceB'
           'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'clock'
+          'isMut': false
           'isSigner': false
         },
         {
@@ -755,6 +765,68 @@ export interface SmartConverter {
       }
     },
   ]
+  'events': [
+    {
+      'name': 'LockTokensEvent'
+      'fields': [
+        {
+          'name': 'pair'
+          'type': 'publicKey'
+          'index': true
+        },
+        {
+          'name': 'user'
+          'type': 'publicKey'
+          'index': true
+        },
+        {
+          'name': 'userWallet'
+          'type': 'publicKey'
+          'index': false
+        },
+        {
+          'name': 'amount'
+          'type': 'u64'
+          'index': false
+        },
+        {
+          'name': 'timestamp'
+          'type': 'i64'
+          'index': false
+        },
+      ]
+    },
+    {
+      'name': 'UnlockTokensEvent'
+      'fields': [
+        {
+          'name': 'pair'
+          'type': 'publicKey'
+          'index': true
+        },
+        {
+          'name': 'user'
+          'type': 'publicKey'
+          'index': true
+        },
+        {
+          'name': 'userWallet'
+          'type': 'publicKey'
+          'index': false
+        },
+        {
+          'name': 'amount'
+          'type': 'u64'
+          'index': false
+        },
+        {
+          'name': 'timestamp'
+          'type': 'i64'
+          'index': false
+        },
+      ]
+    },
+  ]
   'errors': [
     {
       'code': 6000
@@ -1019,6 +1091,11 @@ export const IDL: SmartConverter = {
           isSigner: false,
         },
         {
+          name: 'clock',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'tokenProgram',
           isMut: false,
           isSigner: false,
@@ -1123,6 +1200,11 @@ export const IDL: SmartConverter = {
         {
           name: 'sourceB',
           isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'clock',
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1549,6 +1631,68 @@ export const IDL: SmartConverter = {
           },
         ],
       },
+    },
+  ],
+  events: [
+    {
+      name: 'LockTokensEvent',
+      fields: [
+        {
+          name: 'pair',
+          type: 'publicKey',
+          index: true,
+        },
+        {
+          name: 'user',
+          type: 'publicKey',
+          index: true,
+        },
+        {
+          name: 'userWallet',
+          type: 'publicKey',
+          index: false,
+        },
+        {
+          name: 'amount',
+          type: 'u64',
+          index: false,
+        },
+        {
+          name: 'timestamp',
+          type: 'i64',
+          index: false,
+        },
+      ],
+    },
+    {
+      name: 'UnlockTokensEvent',
+      fields: [
+        {
+          name: 'pair',
+          type: 'publicKey',
+          index: true,
+        },
+        {
+          name: 'user',
+          type: 'publicKey',
+          index: true,
+        },
+        {
+          name: 'userWallet',
+          type: 'publicKey',
+          index: false,
+        },
+        {
+          name: 'amount',
+          type: 'u64',
+          index: false,
+        },
+        {
+          name: 'timestamp',
+          type: 'i64',
+          index: false,
+        },
+      ],
     },
   ],
   errors: [

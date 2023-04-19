@@ -4,6 +4,7 @@ use anchor_spl::token;
 use crate::{
     state::{Admin, Manager, Pair, User},
     utils, ErrorCode,
+    events::UnlockTokensEvent,
 };
 
 /// The user can unlock security tokens in special pair.
@@ -13,6 +14,7 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
+    let clock = &ctx.accounts.clock;
 
     let pair_key = pair.key();
     let pair_authority_seeds = [pair_key.as_ref(), &[ctx.bumps["pair_authority"]]];
@@ -63,6 +65,14 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
         // close the user account
         utils::close(user.to_account_info(), ctx.accounts.authority.to_account_info())?;
     }
+
+    emit!(UnlockTokensEvent {
+        pair: pair_key,
+        user: user.key(),
+        user_wallet: ctx.accounts.authority.key(),
+        amount,
+        timestamp: clock.unix_timestamp,
+    });
 
     Ok(())
 }
@@ -133,6 +143,7 @@ pub struct UnlockTokens<'info> {
     )]
     pub source_b: Account<'info, token::TokenAccount>,
 
+    pub clock: Sysvar<'info, Clock>,
     pub token_program: Program<'info, token::Token>,
     pub system_program: Program<'info, System>,
 }
