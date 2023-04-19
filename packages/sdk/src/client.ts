@@ -65,7 +65,7 @@ export class SmartConverterClient {
   }
 
   // Functions that construct instructions using pre-generated sdk
-  async addManager(props: AddManagerProps) {
+  async addManager(props: ManagerProps) {
     const payer = this.wallet.publicKey
     const managerWallet = props.managerWallet
     const [manager] = await this.pda.manager(managerWallet)
@@ -141,7 +141,7 @@ export class SmartConverterClient {
     }
   }
 
-  async blockUser(props: BlockUserProps) {
+  async blockUser(props: UpdateUserProps) {
     const payer = this.wallet.publicKey
     const [manager] = await this.pda.manager(payer)
     const userWallet = props.userWallet
@@ -202,7 +202,7 @@ export class SmartConverterClient {
     }
   }
 
-  async pausePairs(props: PausePairsProps) {
+  async pausePairs(props: ManagerProps) {
     const payer = this.wallet.publicKey
     const managerWallet = props.managerWallet
     const [manager] = await this.pda.manager(managerWallet)
@@ -242,7 +242,7 @@ export class SmartConverterClient {
     }
   }
 
-  async removeManager(props: RemoveManagerProps) {
+  async removeManager(props: ManagerProps) {
     const payer = this.wallet.publicKey
     const managerWallet = props.managerWallet
     const [manager] = await this.pda.manager(managerWallet)
@@ -288,7 +288,7 @@ export class SmartConverterClient {
     }
   }
 
-  async resumePairs(props: ResumePairsProps) {
+  async resumePairs(props: ManagerProps) {
     const payer = this.wallet.publicKey
     const managerWallet = props.managerWallet
     const [manager] = await this.pda.manager(managerWallet)
@@ -348,7 +348,7 @@ export class SmartConverterClient {
     }
   }
 
-  async unblockUser(props: UnblockUserProps) {
+  async unblockUser(props: UpdateUserProps) {
     const payer = this.wallet.publicKey
     const userWallet = props.userWallet
     const [manager] = await this.pda.manager(payer)
@@ -484,10 +484,6 @@ interface SmartConverterClientProps {
   program: Program<typeof IDL>
 }
 
-interface AddManagerProps {
-  managerWallet: PublicKey
-}
-
 interface AddPairProps {
   tokenA: PublicKey
   tokenB: PublicKey
@@ -499,7 +495,7 @@ interface AddUserToWhitelistProps {
   amount: BN
 }
 
-interface BlockUserProps {
+interface UpdateUserProps {
   userWallet: PublicKey
 }
 
@@ -513,11 +509,7 @@ interface LockTokensProps {
   amount: BN
 }
 
-interface PausePairsProps {
-  managerWallet: PublicKey
-}
-
-interface RemoveManagerProps {
+interface ManagerProps {
   managerWallet: PublicKey
 }
 
@@ -526,16 +518,8 @@ interface RemovePairProps {
   tokenB: PublicKey
 }
 
-interface ResumePairsProps {
-  managerWallet: PublicKey
-}
-
 interface SetAdminProps {
   adminWallet: PublicKey
-}
-
-interface UnblockUserProps {
-  userWallet: PublicKey
 }
 
 interface UnlockTokensProps {
