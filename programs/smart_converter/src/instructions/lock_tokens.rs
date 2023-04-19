@@ -1,7 +1,10 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token;
 
-use crate::{state::{Manager, Admin, Pair, User}, ErrorCode};
+use crate::{
+    state::{Admin, Manager, Pair, User},
+    ErrorCode,
+};
 
 /// The user can lock security tokens in special pair.
 /// After that pair authority mints utility tokens to user.

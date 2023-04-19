@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::state::{Manager, Admin};
+use crate::state::{Admin, Manager};
 
 /// The admin can add new manager.
 pub fn handle(ctx: Context<AddManager>) -> Result<()> {

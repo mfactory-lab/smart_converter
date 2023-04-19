@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::{Manager, User}, ErrorCode};
+use crate::{
+    state::{Manager, User},
+    ErrorCode,
+};
 
 /// The manager can block user.
 pub fn block(ctx: Context<UpdateUser>) -> Result<()> {
