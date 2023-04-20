@@ -29,6 +29,7 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     }
 
     if pair.lock_fee > 0 {
+        // TODO maybe checked_div
         let fee = amount.saturating_div(1000).saturating_mul(pair.lock_fee as u64);
         msg!("Transfer deposit fee: {} lamports", fee);
 

@@ -38,7 +38,7 @@ export const addPairStruct = new beet.BeetArgsStruct<
  * Accounts required by the _addPair_ instruction
  *
  * @property [_writable_, **signer**] authority
- * @property [_writable_] manager
+ * @property [] manager
  * @property [_writable_] pair
  * @property [] pairAuthority
  * @property [_writable_] tokenA
@@ -89,7 +89,7 @@ export function createAddPairInstruction(
     },
     {
       pubkey: accounts.manager,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {

@@ -24,7 +24,7 @@ export const removeManagerStruct = new beet.BeetArgsStruct<{
  *
  * @property [_writable_, **signer**] authority
  * @property [_writable_] manager
- * @property [_writable_] admin
+ * @property [] admin
  * @property [] managerWallet
  * @category Instructions
  * @category RemoveManager
@@ -71,7 +71,7 @@ export function createRemoveManagerInstruction(
     },
     {
       pubkey: accounts.admin,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {

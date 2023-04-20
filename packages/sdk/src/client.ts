@@ -148,6 +148,7 @@ export class SmartConverterClient {
     return {
       tx,
       user,
+      whitelistedUserInfo,
     }
   }
 
@@ -179,6 +180,7 @@ export class SmartConverterClient {
     return {
       tx,
       user,
+      whitelistedUserInfo,
     }
   }
 
@@ -492,7 +494,7 @@ export class SmartConverterClient {
 
     return {
       tx,
-      manager,
+      pair,
     }
   }
 }

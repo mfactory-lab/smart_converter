@@ -22,7 +22,7 @@
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -43,7 +43,7 @@
         },
         {
           "name": "manager",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -468,7 +468,7 @@
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -499,7 +499,7 @@
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -530,7 +530,7 @@
         },
         {
           "name": "admin",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {

@@ -24,7 +24,7 @@ export const resumePairsStruct = new beet.BeetArgsStruct<{
  *
  * @property [_writable_, **signer**] authority
  * @property [_writable_] manager
- * @property [_writable_] admin
+ * @property [] admin
  * @property [] managerWallet
  * @category Instructions
  * @category ResumePairs
@@ -71,7 +71,7 @@ export function createResumePairsInstruction(
     },
     {
       pubkey: accounts.admin,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {

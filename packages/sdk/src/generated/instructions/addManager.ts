@@ -25,7 +25,7 @@ export const addManagerStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] authority
  * @property [] managerWallet
  * @property [_writable_] manager
- * @property [_writable_] admin
+ * @property [] admin
  * @category Instructions
  * @category AddManager
  * @category generated
@@ -76,7 +76,7 @@ export function createAddManagerInstruction(
     },
     {
       pubkey: accounts.admin,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {

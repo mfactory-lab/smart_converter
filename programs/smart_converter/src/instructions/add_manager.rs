@@ -30,7 +30,6 @@ pub struct AddManager<'info> {
     pub manager: Box<Account<'info, Manager>>,
 
     #[account(
-        mut,
         seeds = [Admin::SEED],
         bump,
         has_one = authority,

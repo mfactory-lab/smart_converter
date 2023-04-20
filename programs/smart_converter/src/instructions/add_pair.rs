@@ -8,7 +8,7 @@ use crate::{
 
 /// The manager can add new pair.
 pub fn handle(ctx: Context<AddPair>, ratio: Ratio) -> Result<()> {
-    let manager = &mut ctx.accounts.manager;
+    let manager = &ctx.accounts.manager;
     let pair = &mut ctx.accounts.pair;
     let pair_authority = ctx.accounts.pair_authority.key;
     let token_a = &ctx.accounts.token_a;
@@ -34,7 +34,6 @@ pub struct AddPair<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        mut,
         seeds = [Manager::SEED, authority.key().as_ref()],
         bump,
     )]

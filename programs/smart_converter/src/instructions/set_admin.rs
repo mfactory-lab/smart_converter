@@ -7,7 +7,7 @@ pub fn handle(ctx: Context<SetAdmin>) -> Result<()> {
     let admin = &mut ctx.accounts.admin;
     let admin_wallet = ctx.accounts.admin_wallet.key();
 
-    if admin.authority != Pubkey::default() || admin.authority != ctx.accounts.authority.key() {
+    if admin.authority != Pubkey::default() && admin.authority != ctx.accounts.authority.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 

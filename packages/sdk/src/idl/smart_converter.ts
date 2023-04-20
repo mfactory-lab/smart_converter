@@ -22,7 +22,7 @@ export interface SmartConverter {
         },
         {
           'name': 'admin'
-          'isMut': true
+          'isMut': false
           'isSigner': false
         },
         {
@@ -43,7 +43,7 @@ export interface SmartConverter {
         },
         {
           'name': 'manager'
-          'isMut': true
+          'isMut': false
           'isSigner': false
         },
         {
@@ -468,7 +468,7 @@ export interface SmartConverter {
         },
         {
           'name': 'admin'
-          'isMut': true
+          'isMut': false
           'isSigner': false
         },
         {
@@ -499,7 +499,7 @@ export interface SmartConverter {
         },
         {
           'name': 'admin'
-          'isMut': true
+          'isMut': false
           'isSigner': false
         },
         {
@@ -530,7 +530,7 @@ export interface SmartConverter {
         },
         {
           'name': 'admin'
-          'isMut': true
+          'isMut': false
           'isSigner': false
         },
         {
@@ -1045,7 +1045,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'admin',
-          isMut: true,
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1066,7 +1066,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'manager',
-          isMut: true,
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1491,7 +1491,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'admin',
-          isMut: true,
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1522,7 +1522,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'admin',
-          isMut: true,
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1553,7 +1553,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'admin',
-          isMut: true,
+          isMut: false,
           isSigner: false,
         },
         {
