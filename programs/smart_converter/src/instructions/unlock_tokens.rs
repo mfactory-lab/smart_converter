@@ -2,8 +2,8 @@ use anchor_lang::prelude::*;
 use anchor_spl::token;
 
 use crate::{
-    state::{Admin, Manager, Pair, User},
-    utils, ErrorCode,
+    state::{Admin, Manager, Pair, User, WhitelistedUserInfo},
+    ErrorCode,
     events::UnlockTokensEvent,
 };
 
@@ -11,6 +11,7 @@ use crate::{
 /// After that user burns utility tokens and gets locked tokens back.
 pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
+    let whitelisted_user_info = &mut ctx.accounts.whitelisted_user_info;
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
@@ -27,7 +28,7 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
         return Err(ErrorCode::IsBlocked.into());
     }
 
-    if user.locked_amount < amount {
+    if pair.locked_amount < amount {
         return Err(ErrorCode::InsufficientLockedAmount.into());
     }
 
@@ -58,13 +59,8 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
         amount,
     )?;
 
-    user.locked_amount -= amount;
+    whitelisted_user_info.locked_amount = whitelisted_user_info.locked_amount.saturating_sub(amount);
     pair.locked_amount -= amount;
-
-    if user.locked_amount == 0 {
-        // close the user account
-        utils::close(user.to_account_info(), ctx.accounts.authority.to_account_info())?;
-    }
 
     emit!(UnlockTokensEvent {
         pair: pair_key,
@@ -88,6 +84,13 @@ pub struct UnlockTokens<'info> {
         bump,
     )]
     pub user: Box<Account<'info, User>>,
+
+    #[account(
+        mut,
+        seeds = [WhitelistedUserInfo::SEED, authority.key().as_ref(), pair.key().as_ref()],
+        bump,
+    )]
+    pub whitelisted_user_info: Box<Account<'info, WhitelistedUserInfo>>,
 
     #[account(
         mut,

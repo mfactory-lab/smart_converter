@@ -22,8 +22,12 @@ pub mod smart_converter {
         add_pair::handle(ctx, ratio)
     }
 
-    pub fn add_user_to_whitelist(ctx: Context<WhitelistUser>, amount: u64) -> Result<()> {
-        add_user_to_whitelist::handle(ctx, amount)
+    pub fn add_user_to_whitelist(ctx: Context<AddUserToWhitelist>) -> Result<()> {
+        add_user_to_whitelist::handle(ctx)
+    }
+
+    pub fn remove_user_from_whitelist(ctx: Context<RemoveUserFromWhitelist>) -> Result<()> {
+        remove_user_from_whitelist::handle(ctx)
     }
 
     pub fn pause_platform(ctx: Context<ChangePlatformState>) -> Result<()> {

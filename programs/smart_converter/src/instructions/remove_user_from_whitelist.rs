@@ -3,21 +3,14 @@ use anchor_spl::token;
 
 use crate::state::{Manager, Pair, User, WhitelistedUserInfo};
 
-/// The manager can add user to whitelist for special pair.
-/// After that user can lock and unlock tokens from special pair.
-pub fn handle(ctx: Context<AddUserToWhitelist>) -> Result<()> {
-    let user = &mut ctx.accounts.user;
-    let user_wallet = ctx.accounts.user_wallet.key();
-
-    if user.user_wallet != user_wallet {
-        user.user_wallet = user_wallet;
-    }
-
+/// The manager can remove user from whitelist for special pair.
+/// After that user can't lock and unlock tokens from special pair.
+pub fn handle(_ctx: Context<RemoveUserFromWhitelist>) -> Result<()> {
     Ok(())
 }
 
 #[derive(Accounts)]
-pub struct AddUserToWhitelist<'info> {
+pub struct RemoveUserFromWhitelist<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
@@ -28,11 +21,9 @@ pub struct AddUserToWhitelist<'info> {
     pub manager: Box<Account<'info, Manager>>,
 
     #[account(
-        init_if_needed,
+        mut,
         seeds = [User::SEED, user_wallet.key().as_ref()],
         bump,
-        payer = authority,
-        space = User::SIZE,
     )]
     pub user: Box<Account<'info, User>>,
 
@@ -40,11 +31,10 @@ pub struct AddUserToWhitelist<'info> {
     pub user_wallet: AccountInfo<'info>,
 
     #[account(
-        init,
+        mut,
         seeds = [WhitelistedUserInfo::SEED, user_wallet.key().as_ref(), pair.key().as_ref()],
         bump,
-        payer = authority,
-        space = WhitelistedUserInfo::SIZE,
+        close = authority
     )]
     pub whitelisted_user_info: Box<Account<'info, WhitelistedUserInfo>>,
 
@@ -52,7 +42,7 @@ pub struct AddUserToWhitelist<'info> {
         mut,
         seeds = [Pair::SEED, token_a.key().as_ref(), token_b.key().as_ref()],
         bump,
-        constraint = pair.manager_wallet == authority.key(),
+        constraint = pair.manager_wallet == authority.key()
     )]
     pub pair: Box<Account<'info, Pair>>,
 

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token;
 
 use crate::{
-    state::{Admin, Manager, Pair, User},
+    state::{Admin, Manager, Pair, User, WhitelistedUserInfo},
     ErrorCode,
     events::LockTokensEvent
 };
@@ -11,6 +11,7 @@ use crate::{
 /// After that pair authority mints utility tokens to user.
 pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
+    let whitelisted_user_info = &mut ctx.accounts.whitelisted_user_info;
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
@@ -22,10 +23,6 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
 
     if admin.is_platform_paused || manager.is_all_paused || pair.is_paused {
         return Err(ErrorCode::IsPaused.into());
-    }
-
-    if user.user_wallet != user_wallet {
-        user.user_wallet = user_wallet;
     }
 
     if user.is_blocked {
@@ -59,7 +56,7 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
         amount * pair.ratio.num / pair.ratio.denom,
     )?;
 
-    user.locked_amount += amount;
+    whitelisted_user_info.locked_amount += amount;
     pair.locked_amount += amount;
 
     emit!(LockTokensEvent {
@@ -79,13 +76,18 @@ pub struct LockTokens<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        init_if_needed,
+        mut,
         seeds = [User::SEED, authority.key().as_ref()],
         bump,
-        payer = authority,
-        space = User::SIZE,
     )]
     pub user: Box<Account<'info, User>>,
+
+    #[account(
+        mut,
+        seeds = [WhitelistedUserInfo::SEED, authority.key().as_ref(), pair.key().as_ref()],
+        bump,
+    )]
+    pub whitelisted_user_info: Box<Account<'info, WhitelistedUserInfo>>,
 
     #[account(
         mut,

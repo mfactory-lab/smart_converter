@@ -30,15 +30,24 @@ impl Manager {
 pub struct User {
     /// User wallet address
     pub user_wallet: Pubkey,
-    /// Amount of security tokens currently locked by user
-    pub locked_amount: u64,
     /// Indicates if user is blocked or not
     pub is_blocked: bool,
 }
 
 impl User {
     pub const SEED: &'static [u8] = b"user";
-    pub const SIZE: usize = 8 + 32 + 8 + 1;
+    pub const SIZE: usize = 8 + 32 + 1;
+}
+
+#[account]
+pub struct WhitelistedUserInfo {
+    /// Amount of security tokens currently locked by user
+    pub locked_amount: u64,
+}
+
+impl WhitelistedUserInfo {
+    pub const SEED: &'static [u8] = b"whitelist";
+    pub const SIZE: usize = 8 + 8;
 }
 
 #[account]
