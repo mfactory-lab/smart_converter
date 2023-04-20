@@ -37,6 +37,18 @@ pub fn update(ctx: Context<UpdatePair>, data: UpdatePairData) -> Result<()> {
         pair.ratio = ratio
     }
 
+    if let Some(lock_fee) = data.lock_fee {
+        pair.lock_fee = lock_fee
+    }
+
+    if let Some(unlock_fee) = data.unlock_fee {
+        pair.unlock_fee = unlock_fee
+    }
+
+    if let Some(fee_receiver) = data.fee_receiver {
+        pair.fee_receiver = fee_receiver
+    }
+
     Ok(())
 }
 
@@ -45,6 +57,9 @@ pub struct UpdatePairData {
     manager_wallet: Option<Pubkey>,
     is_paused: Option<bool>,
     ratio: Option<Ratio>,
+    lock_fee: Option<u16>,
+    unlock_fee: Option<u16>,
+    fee_receiver: Option<Pubkey>,
 }
 
 #[derive(Accounts)]

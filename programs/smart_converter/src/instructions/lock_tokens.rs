@@ -1,10 +1,10 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 use anchor_spl::token;
 
 use crate::{
+    events::LockTokensEvent,
     state::{Admin, Manager, Pair, User, WhitelistedUserInfo},
     ErrorCode,
-    events::LockTokensEvent
 };
 
 /// The user can lock security tokens in special pair.
@@ -27,6 +27,23 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
 
     if user.is_blocked {
         return Err(ErrorCode::IsBlocked.into());
+    }
+
+    if pair.lock_fee > 0 {
+        let fee = amount.saturating_div(1000).saturating_mul(pair.lock_fee as u64);
+        msg!("Transfer deposit fee: {} lamports", fee);
+
+        system_program::transfer(
+            CpiContext::new(
+                ctx.accounts.system_program.to_account_info(),
+                system_program::Transfer {
+                    from: ctx.accounts.fee_payer.to_account_info(),
+                    to: ctx.accounts.fee_receiver.to_account_info(),
+                },
+            ),
+            fee,
+        )
+        .map_err(|_| ErrorCode::InsufficientFunds)?;
     }
 
     // Transfer security token
@@ -142,6 +159,13 @@ pub struct LockTokens<'info> {
         associated_token::authority = authority,
     )]
     pub destination_b: Account<'info, token::TokenAccount>,
+
+    #[account(mut)]
+    pub fee_payer: Signer<'info>,
+
+    /// CHECK: no needs to check, only for transfer
+    #[account(mut, address = pair.fee_receiver)]
+    pub fee_receiver: AccountInfo<'info>,
 
     pub clock: Sysvar<'info, Clock>,
     pub token_program: Program<'info, token::Token>,

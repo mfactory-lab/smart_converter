@@ -64,11 +64,17 @@ pub struct Pair {
     pub ratio: Ratio,
     /// Indicates if pair is paused or not
     pub is_paused: bool,
+    /// Fee for locking token A
+    pub lock_fee: u16,
+    /// Fee for unlocking token A
+    pub unlock_fee: u16,
+    /// Wallet that will receive fee
+    pub fee_receiver: Pubkey,
 }
 
 impl Pair {
     pub const SEED: &'static [u8] = b"pair";
-    pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 16 + 1;
+    pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 16 + 1 + 2 + 2 + 32;
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]

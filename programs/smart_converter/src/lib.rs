@@ -5,8 +5,7 @@ mod utils;
 
 use anchor_lang::prelude::*;
 
-use crate::instructions::*;
-use crate::state::*;
+use crate::{instructions::*, state::*};
 
 declare_id!("BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH");
 
@@ -95,4 +94,6 @@ pub enum ErrorCode {
     AlreadyUnblocked,
     #[msg("Insufficient locked amount")]
     InsufficientLockedAmount,
+    #[msg("Insufficient funds")]
+    InsufficientFunds,
 }

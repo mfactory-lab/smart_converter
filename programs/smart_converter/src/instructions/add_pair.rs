@@ -23,6 +23,7 @@ pub fn handle(ctx: Context<AddPair>, ratio: Ratio) -> Result<()> {
     pair.token_a = token_a.key();
     pair.token_b = token_b.key();
     pair.ratio = ratio;
+    pair.fee_receiver = pair_authority.key();
 
     Ok(())
 }
