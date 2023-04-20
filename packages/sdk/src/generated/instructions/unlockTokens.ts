@@ -38,7 +38,7 @@ export const unlockTokensStruct = new beet.BeetArgsStruct<
  *
  * @property [_writable_, **signer**] authority
  * @property [_writable_] user
- * @property [_writable_] whitelistedUserInfo
+ * @property [] whitelistedUserInfo
  * @property [_writable_] pair
  * @property [] manager
  * @property [] admin
@@ -114,7 +114,7 @@ export function createUnlockTokensInstruction(
     },
     {
       pubkey: accounts.whitelistedUserInfo,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {

@@ -240,7 +240,7 @@
         },
         {
           "name": "whitelistedUserInfo",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -367,7 +367,7 @@
         },
         {
           "name": "whitelistedUserInfo",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -761,11 +761,18 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "lockedAmount",
+            "name": "userWallet",
             "docs": [
-              "Amount of security tokens currently locked by user"
+              "User wallet address"
             ],
-            "type": "u64"
+            "type": "publicKey"
+          },
+          {
+            "name": "pair",
+            "docs": [
+              "Pair address"
+            ],
+            "type": "publicKey"
           }
         ]
       }

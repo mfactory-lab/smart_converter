@@ -41,13 +41,15 @@ impl User {
 
 #[account]
 pub struct WhitelistedUserInfo {
-    /// Amount of security tokens currently locked by user
-    pub locked_amount: u64,
+    /// User wallet address
+    pub user_wallet: Pubkey,
+    /// Pair address
+    pub pair: Pubkey,
 }
 
 impl WhitelistedUserInfo {
     pub const SEED: &'static [u8] = b"whitelist";
-    pub const SIZE: usize = 8 + 8;
+    pub const SIZE: usize = 8 + 32 + 32;
 }
 
 #[account]

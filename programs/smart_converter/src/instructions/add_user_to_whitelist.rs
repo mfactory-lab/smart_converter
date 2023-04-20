@@ -8,10 +8,14 @@ use crate::state::{Manager, Pair, User, WhitelistedUserInfo};
 pub fn handle(ctx: Context<AddUserToWhitelist>) -> Result<()> {
     let user = &mut ctx.accounts.user;
     let user_wallet = ctx.accounts.user_wallet.key();
+    let whitelisted_user_info = &mut ctx.accounts.whitelisted_user_info;
 
     if user.user_wallet != user_wallet {
         user.user_wallet = user_wallet;
     }
+
+    whitelisted_user_info.user_wallet = user_wallet;
+    whitelisted_user_info.pair = ctx.accounts.pair.key();
 
     Ok(())
 }

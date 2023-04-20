@@ -240,7 +240,7 @@ export interface SmartConverter {
         },
         {
           'name': 'whitelistedUserInfo'
-          'isMut': true
+          'isMut': false
           'isSigner': false
         },
         {
@@ -367,7 +367,7 @@ export interface SmartConverter {
         },
         {
           'name': 'whitelistedUserInfo'
-          'isMut': true
+          'isMut': false
           'isSigner': false
         },
         {
@@ -761,11 +761,18 @@ export interface SmartConverter {
         'kind': 'struct'
         'fields': [
           {
-            'name': 'lockedAmount'
+            'name': 'userWallet'
             'docs': [
-              'Amount of security tokens currently locked by user',
+              'User wallet address',
             ]
-            'type': 'u64'
+            'type': 'publicKey'
+          },
+          {
+            'name': 'pair'
+            'docs': [
+              'Pair address',
+            ]
+            'type': 'publicKey'
           },
         ]
       }
@@ -1256,7 +1263,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'whitelistedUserInfo',
-          isMut: true,
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1383,7 +1390,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'whitelistedUserInfo',
-          isMut: true,
+          isMut: false,
           isSigner: false,
         },
         {
@@ -1777,11 +1784,18 @@ export const IDL: SmartConverter = {
         kind: 'struct',
         fields: [
           {
-            name: 'lockedAmount',
+            name: 'userWallet',
             docs: [
-              'Amount of security tokens currently locked by user',
+              'User wallet address',
             ],
-            type: 'u64',
+            type: 'publicKey',
+          },
+          {
+            name: 'pair',
+            docs: [
+              'Pair address',
+            ],
+            type: 'publicKey',
           },
         ],
       },

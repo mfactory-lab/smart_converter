@@ -5,9 +5,9 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
+import * as beet from '@metaplex-foundation/beet'
 
 /**
  * Arguments used to create {@link WhitelistedUserInfo}
@@ -15,7 +15,8 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
  * @category generated
  */
 export interface WhitelistedUserInfoArgs {
-  lockedAmount: beet.bignum
+  userWallet: web3.PublicKey
+  pair: web3.PublicKey
 }
 
 export const whitelistedUserInfoDiscriminator = [
@@ -29,13 +30,16 @@ export const whitelistedUserInfoDiscriminator = [
  * @category generated
  */
 export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
-  private constructor(readonly lockedAmount: beet.bignum) {}
+  private constructor(
+    readonly userWallet: web3.PublicKey,
+    readonly pair: web3.PublicKey,
+  ) {}
 
   /**
    * Creates a {@link WhitelistedUserInfo} instance from the provided args.
    */
   static fromArgs(args: WhitelistedUserInfoArgs) {
-    return new WhitelistedUserInfo(args.lockedAmount)
+    return new WhitelistedUserInfo(args.userWallet, args.pair)
   }
 
   /**
@@ -143,17 +147,8 @@ export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
    */
   pretty() {
     return {
-      lockedAmount: (() => {
-        const x = <{ toNumber: () => number }> this.lockedAmount
-        if (typeof x.toNumber === 'function') {
-          try {
-            return x.toNumber()
-          } catch (_) {
-            return x
-          }
-        }
-        return x
-      })(),
+      userWallet: this.userWallet.toBase58(),
+      pair: this.pair.toBase58(),
     }
   }
 }
@@ -170,7 +165,8 @@ export const whitelistedUserInfoBeet = new beet.BeetStruct<
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['lockedAmount', beet.u64],
+    ['userWallet', beetSolana.publicKey],
+    ['pair', beetSolana.publicKey],
   ],
   WhitelistedUserInfo.fromArgs,
   'WhitelistedUserInfo',

@@ -11,7 +11,6 @@ use crate::{
 /// After that user burns utility tokens and gets locked tokens back.
 pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
-    let whitelisted_user_info = &mut ctx.accounts.whitelisted_user_info;
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
@@ -76,7 +75,6 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
         amount,
     )?;
 
-    whitelisted_user_info.locked_amount = whitelisted_user_info.locked_amount.saturating_sub(amount);
     pair.locked_amount -= amount;
 
     emit!(UnlockTokensEvent {
@@ -103,7 +101,6 @@ pub struct UnlockTokens<'info> {
     pub user: Box<Account<'info, User>>,
 
     #[account(
-        mut,
         seeds = [WhitelistedUserInfo::SEED, authority.key().as_ref(), pair.key().as_ref()],
         bump,
     )]

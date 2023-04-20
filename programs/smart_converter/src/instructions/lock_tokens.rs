@@ -11,7 +11,6 @@ use crate::{
 /// After that pair authority mints utility tokens to user.
 pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
-    let whitelisted_user_info = &mut ctx.accounts.whitelisted_user_info;
     let manager = &mut ctx.accounts.manager;
     let admin = &mut ctx.accounts.admin;
     let pair = &mut ctx.accounts.pair;
@@ -73,7 +72,6 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
         amount * pair.ratio.num / pair.ratio.denom,
     )?;
 
-    whitelisted_user_info.locked_amount += amount;
     pair.locked_amount += amount;
 
     emit!(LockTokensEvent {
@@ -100,7 +98,6 @@ pub struct LockTokens<'info> {
     pub user: Box<Account<'info, User>>,
 
     #[account(
-        mut,
         seeds = [WhitelistedUserInfo::SEED, authority.key().as_ref(), pair.key().as_ref()],
         bump,
     )]
