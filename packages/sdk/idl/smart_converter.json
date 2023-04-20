@@ -105,17 +105,83 @@
           "isSigner": false
         },
         {
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
       ],
-      "args": [
+      "args": []
+    },
+    {
+      "name": "removeUserFromWhitelist",
+      "accounts": [
         {
-          "name": "amount",
-          "type": "u64"
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
         }
-      ]
+      ],
+      "args": []
     },
     {
       "name": "pausePlatform",
@@ -173,6 +239,11 @@
           "isSigner": false
         },
         {
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "pair",
           "isMut": true,
           "isSigner": false
@@ -219,6 +290,16 @@
         },
         {
           "name": "destinationB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feeReceiver",
           "isMut": true,
           "isSigner": false
         },
@@ -285,6 +366,11 @@
           "isSigner": false
         },
         {
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "pair",
           "isMut": true,
           "isSigner": false
@@ -331,6 +417,16 @@
         },
         {
           "name": "sourceB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feeReceiver",
           "isMut": true,
           "isSigner": false
         },
@@ -650,18 +746,26 @@
             "type": "publicKey"
           },
           {
-            "name": "lockedAmount",
-            "docs": [
-              "Amount of security tokens currently locked by user"
-            ],
-            "type": "u64"
-          },
-          {
             "name": "isBlocked",
             "docs": [
               "Indicates if user is blocked or not"
             ],
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistedUserInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lockedAmount",
+            "docs": [
+              "Amount of security tokens currently locked by user"
+            ],
+            "type": "u64"
           }
         ]
       }
@@ -714,6 +818,27 @@
               "Indicates if pair is paused or not"
             ],
             "type": "bool"
+          },
+          {
+            "name": "lockFee",
+            "docs": [
+              "Fee for locking token A"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "unlockFee",
+            "docs": [
+              "Fee for unlocking token A"
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "feeReceiver",
+            "docs": [
+              "Wallet that will receive fee"
+            ],
+            "type": "publicKey"
           }
         ]
       }
@@ -743,6 +868,24 @@
               "option": {
                 "defined": "Ratio"
               }
+            }
+          },
+          {
+            "name": "lockFee",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "unlockFee",
+            "type": {
+              "option": "u16"
+            }
+          },
+          {
+            "name": "feeReceiver",
+            "type": {
+              "option": "publicKey"
             }
           }
         ]
@@ -862,6 +1005,11 @@
       "code": 6006,
       "name": "InsufficientLockedAmount",
       "msg": "Insufficient locked amount"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
     }
   ],
   "metadata": {

@@ -105,17 +105,83 @@ export interface SmartConverter {
           'isSigner': false
         },
         {
+          'name': 'whitelistedUserInfo'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'pair'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'tokenA'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'tokenB'
+          'isMut': true
+          'isSigner': false
+        },
+        {
           'name': 'systemProgram'
           'isMut': false
           'isSigner': false
         },
       ]
-      'args': [
+      'args': []
+    },
+    {
+      'name': 'removeUserFromWhitelist'
+      'accounts': [
         {
-          'name': 'amount'
-          'type': 'u64'
+          'name': 'authority'
+          'isMut': true
+          'isSigner': true
+        },
+        {
+          'name': 'manager'
+          'isMut': false
+          'isSigner': false
+        },
+        {
+          'name': 'user'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'userWallet'
+          'isMut': false
+          'isSigner': false
+        },
+        {
+          'name': 'whitelistedUserInfo'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'pair'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'tokenA'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'tokenB'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'systemProgram'
+          'isMut': false
+          'isSigner': false
         },
       ]
+      'args': []
     },
     {
       'name': 'pausePlatform'
@@ -173,6 +239,11 @@ export interface SmartConverter {
           'isSigner': false
         },
         {
+          'name': 'whitelistedUserInfo'
+          'isMut': true
+          'isSigner': false
+        },
+        {
           'name': 'pair'
           'isMut': true
           'isSigner': false
@@ -219,6 +290,16 @@ export interface SmartConverter {
         },
         {
           'name': 'destinationB'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'feePayer'
+          'isMut': true
+          'isSigner': true
+        },
+        {
+          'name': 'feeReceiver'
           'isMut': true
           'isSigner': false
         },
@@ -285,6 +366,11 @@ export interface SmartConverter {
           'isSigner': false
         },
         {
+          'name': 'whitelistedUserInfo'
+          'isMut': true
+          'isSigner': false
+        },
+        {
           'name': 'pair'
           'isMut': true
           'isSigner': false
@@ -331,6 +417,16 @@ export interface SmartConverter {
         },
         {
           'name': 'sourceB'
+          'isMut': true
+          'isSigner': false
+        },
+        {
+          'name': 'feePayer'
+          'isMut': true
+          'isSigner': true
+        },
+        {
+          'name': 'feeReceiver'
           'isMut': true
           'isSigner': false
         },
@@ -650,18 +746,26 @@ export interface SmartConverter {
             'type': 'publicKey'
           },
           {
-            'name': 'lockedAmount'
-            'docs': [
-              'Amount of security tokens currently locked by user',
-            ]
-            'type': 'u64'
-          },
-          {
             'name': 'isBlocked'
             'docs': [
               'Indicates if user is blocked or not',
             ]
             'type': 'bool'
+          },
+        ]
+      }
+    },
+    {
+      'name': 'whitelistedUserInfo'
+      'type': {
+        'kind': 'struct'
+        'fields': [
+          {
+            'name': 'lockedAmount'
+            'docs': [
+              'Amount of security tokens currently locked by user',
+            ]
+            'type': 'u64'
           },
         ]
       }
@@ -715,6 +819,27 @@ export interface SmartConverter {
             ]
             'type': 'bool'
           },
+          {
+            'name': 'lockFee'
+            'docs': [
+              'Fee for locking token A',
+            ]
+            'type': 'u16'
+          },
+          {
+            'name': 'unlockFee'
+            'docs': [
+              'Fee for unlocking token A',
+            ]
+            'type': 'u16'
+          },
+          {
+            'name': 'feeReceiver'
+            'docs': [
+              'Wallet that will receive fee',
+            ]
+            'type': 'publicKey'
+          },
         ]
       }
     },
@@ -743,6 +868,24 @@ export interface SmartConverter {
               'option': {
                 'defined': 'Ratio'
               }
+            }
+          },
+          {
+            'name': 'lockFee'
+            'type': {
+              'option': 'u16'
+            }
+          },
+          {
+            'name': 'unlockFee'
+            'type': {
+              'option': 'u16'
+            }
+          },
+          {
+            'name': 'feeReceiver'
+            'type': {
+              'option': 'publicKey'
             }
           },
         ]
@@ -863,6 +1006,11 @@ export interface SmartConverter {
       'name': 'InsufficientLockedAmount'
       'msg': 'Insufficient locked amount'
     },
+    {
+      'code': 6007
+      'name': 'InsufficientFunds'
+      'msg': 'Insufficient funds'
+    },
   ]
 }
 
@@ -973,17 +1121,83 @@ export const IDL: SmartConverter = {
           isSigner: false,
         },
         {
+          name: 'whitelistedUserInfo',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'pair',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'tokenA',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'tokenB',
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: 'systemProgram',
           isMut: false,
           isSigner: false,
         },
       ],
-      args: [
+      args: [],
+    },
+    {
+      name: 'removeUserFromWhitelist',
+      accounts: [
         {
-          name: 'amount',
-          type: 'u64',
+          name: 'authority',
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: 'manager',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'user',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'userWallet',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'whitelistedUserInfo',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'pair',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'tokenA',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'tokenB',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false,
         },
       ],
+      args: [],
     },
     {
       name: 'pausePlatform',
@@ -1041,6 +1255,11 @@ export const IDL: SmartConverter = {
           isSigner: false,
         },
         {
+          name: 'whitelistedUserInfo',
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: 'pair',
           isMut: true,
           isSigner: false,
@@ -1087,6 +1306,16 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'destinationB',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'feePayer',
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: 'feeReceiver',
           isMut: true,
           isSigner: false,
         },
@@ -1153,6 +1382,11 @@ export const IDL: SmartConverter = {
           isSigner: false,
         },
         {
+          name: 'whitelistedUserInfo',
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: 'pair',
           isMut: true,
           isSigner: false,
@@ -1199,6 +1433,16 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'sourceB',
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: 'feePayer',
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: 'feeReceiver',
           isMut: true,
           isSigner: false,
         },
@@ -1518,18 +1762,26 @@ export const IDL: SmartConverter = {
             type: 'publicKey',
           },
           {
-            name: 'lockedAmount',
-            docs: [
-              'Amount of security tokens currently locked by user',
-            ],
-            type: 'u64',
-          },
-          {
             name: 'isBlocked',
             docs: [
               'Indicates if user is blocked or not',
             ],
             type: 'bool',
+          },
+        ],
+      },
+    },
+    {
+      name: 'whitelistedUserInfo',
+      type: {
+        kind: 'struct',
+        fields: [
+          {
+            name: 'lockedAmount',
+            docs: [
+              'Amount of security tokens currently locked by user',
+            ],
+            type: 'u64',
           },
         ],
       },
@@ -1583,6 +1835,27 @@ export const IDL: SmartConverter = {
             ],
             type: 'bool',
           },
+          {
+            name: 'lockFee',
+            docs: [
+              'Fee for locking token A',
+            ],
+            type: 'u16',
+          },
+          {
+            name: 'unlockFee',
+            docs: [
+              'Fee for unlocking token A',
+            ],
+            type: 'u16',
+          },
+          {
+            name: 'feeReceiver',
+            docs: [
+              'Wallet that will receive fee',
+            ],
+            type: 'publicKey',
+          },
         ],
       },
     },
@@ -1611,6 +1884,24 @@ export const IDL: SmartConverter = {
               option: {
                 defined: 'Ratio',
               },
+            },
+          },
+          {
+            name: 'lockFee',
+            type: {
+              option: 'u16',
+            },
+          },
+          {
+            name: 'unlockFee',
+            type: {
+              option: 'u16',
+            },
+          },
+          {
+            name: 'feeReceiver',
+            type: {
+              option: 'publicKey',
             },
           },
         ],
@@ -1730,6 +2021,11 @@ export const IDL: SmartConverter = {
       code: 6006,
       name: 'InsufficientLockedAmount',
       msg: 'Insufficient locked amount',
+    },
+    {
+      code: 6007,
+      name: 'InsufficientFunds',
+      msg: 'Insufficient funds',
     },
   ],
 }

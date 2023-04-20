@@ -14,6 +14,9 @@ export interface UpdatePairData {
   managerWallet: beet.COption<web3.PublicKey>
   isPaused: beet.COption<boolean>
   ratio: beet.COption<Ratio>
+  lockFee: beet.COption<number>
+  unlockFee: beet.COption<number>
+  feeReceiver: beet.COption<web3.PublicKey>
 }
 
 /**
@@ -26,6 +29,9 @@ export const updatePairDataBeet
       ['managerWallet', beet.coption(beetSolana.publicKey)],
       ['isPaused', beet.coption(beet.bool)],
       ['ratio', beet.coption(ratioBeet)],
+      ['lockFee', beet.coption(beet.u16)],
+      ['unlockFee', beet.coption(beet.u16)],
+      ['feeReceiver', beet.coption(beetSolana.publicKey)],
     ],
     'UpdatePairData',
   )

@@ -23,6 +23,9 @@ export interface PairArgs {
   lockedAmount: beet.bignum
   ratio: Ratio
   isPaused: boolean
+  lockFee: number
+  unlockFee: number
+  feeReceiver: web3.PublicKey
 }
 
 export const pairDiscriminator = [85, 72, 49, 176, 182, 228, 141, 82]
@@ -41,6 +44,9 @@ export class Pair implements PairArgs {
     readonly lockedAmount: beet.bignum,
     readonly ratio: Ratio,
     readonly isPaused: boolean,
+    readonly lockFee: number,
+    readonly unlockFee: number,
+    readonly feeReceiver: web3.PublicKey,
   ) {}
 
   /**
@@ -54,6 +60,9 @@ export class Pair implements PairArgs {
       args.lockedAmount,
       args.ratio,
       args.isPaused,
+      args.lockFee,
+      args.unlockFee,
+      args.feeReceiver,
     )
   }
 
@@ -176,6 +185,9 @@ export class Pair implements PairArgs {
       })(),
       ratio: this.ratio,
       isPaused: this.isPaused,
+      lockFee: this.lockFee,
+      unlockFee: this.unlockFee,
+      feeReceiver: this.feeReceiver.toBase58(),
     }
   }
 }
@@ -198,6 +210,9 @@ export const pairBeet = new beet.BeetStruct<
     ['lockedAmount', beet.u64],
     ['ratio', ratioBeet],
     ['isPaused', beet.bool],
+    ['lockFee', beet.u16],
+    ['unlockFee', beet.u16],
+    ['feeReceiver', beetSolana.publicKey],
   ],
   Pair.fromArgs,
   'Pair',

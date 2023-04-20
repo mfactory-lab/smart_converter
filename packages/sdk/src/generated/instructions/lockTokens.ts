@@ -38,6 +38,7 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
  *
  * @property [_writable_, **signer**] authority
  * @property [_writable_] user
+ * @property [_writable_] whitelistedUserInfo
  * @property [_writable_] pair
  * @property [] manager
  * @property [] admin
@@ -48,6 +49,8 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
  * @property [_writable_] sourceA
  * @property [_writable_] destinationA
  * @property [_writable_] destinationB
+ * @property [_writable_, **signer**] feePayer
+ * @property [_writable_] feeReceiver
  * @property [] clock
  * @category Instructions
  * @category LockTokens
@@ -56,6 +59,7 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
 export interface LockTokensInstructionAccounts {
   authority: web3.PublicKey
   user: web3.PublicKey
+  whitelistedUserInfo: web3.PublicKey
   pair: web3.PublicKey
   manager: web3.PublicKey
   admin: web3.PublicKey
@@ -66,6 +70,8 @@ export interface LockTokensInstructionAccounts {
   sourceA: web3.PublicKey
   destinationA: web3.PublicKey
   destinationB: web3.PublicKey
+  feePayer: web3.PublicKey
+  feeReceiver: web3.PublicKey
   clock: web3.PublicKey
   tokenProgram?: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -103,6 +109,11 @@ export function createLockTokensInstruction(
     },
     {
       pubkey: accounts.user,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.whitelistedUserInfo,
       isWritable: true,
       isSigner: false,
     },
@@ -153,6 +164,16 @@ export function createLockTokensInstruction(
     },
     {
       pubkey: accounts.destinationB,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.feePayer,
+      isWritable: true,
+      isSigner: true,
+    },
+    {
+      pubkey: accounts.feeReceiver,
       isWritable: true,
       isSigner: false,
     },

@@ -5,55 +5,53 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
+import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import * as beet from '@metaplex-foundation/beet'
 
 /**
- * Arguments used to create {@link User}
+ * Arguments used to create {@link WhitelistedUserInfo}
  * @category Accounts
  * @category generated
  */
-export interface UserArgs {
-  userWallet: web3.PublicKey
-  isBlocked: boolean
+export interface WhitelistedUserInfoArgs {
+  lockedAmount: beet.bignum
 }
 
-export const userDiscriminator = [159, 117, 95, 227, 239, 151, 58, 236]
+export const whitelistedUserInfoDiscriminator = [
+  17, 50, 115, 0, 10, 220, 15, 157,
+]
 /**
- * Holds the data for the {@link User} Account and provides de/serialization
+ * Holds the data for the {@link WhitelistedUserInfo} Account and provides de/serialization
  * functionality for that data
  *
  * @category Accounts
  * @category generated
  */
-export class User implements UserArgs {
-  private constructor(
-    readonly userWallet: web3.PublicKey,
-    readonly isBlocked: boolean,
-  ) {}
+export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
+  private constructor(readonly lockedAmount: beet.bignum) {}
 
   /**
-   * Creates a {@link User} instance from the provided args.
+   * Creates a {@link WhitelistedUserInfo} instance from the provided args.
    */
-  static fromArgs(args: UserArgs) {
-    return new User(args.userWallet, args.isBlocked)
+  static fromArgs(args: WhitelistedUserInfoArgs) {
+    return new WhitelistedUserInfo(args.lockedAmount)
   }
 
   /**
-   * Deserializes the {@link User} from the data of the provided {@link web3.AccountInfo}.
+   * Deserializes the {@link WhitelistedUserInfo} from the data of the provided {@link web3.AccountInfo}.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
     offset = 0,
-  ): [User, number] {
-    return User.deserialize(accountInfo.data, offset)
+  ): [WhitelistedUserInfo, number] {
+    return WhitelistedUserInfo.deserialize(accountInfo.data, offset)
   }
 
   /**
    * Retrieves the account info from the provided address and deserializes
-   * the {@link User} from its data.
+   * the {@link WhitelistedUserInfo} from its data.
    *
    * @throws Error if no account info is found at the address or if deserialization fails
    */
@@ -61,15 +59,17 @@ export class User implements UserArgs {
     connection: web3.Connection,
     address: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig,
-  ): Promise<User> {
+  ): Promise<WhitelistedUserInfo> {
     const accountInfo = await connection.getAccountInfo(
       address,
       commitmentOrConfig,
     )
     if (accountInfo == null) {
-      throw new Error(`Unable to find User account at ${address}`)
+      throw new Error(
+        `Unable to find WhitelistedUserInfo account at ${address}`,
+      )
     }
-    return User.fromAccountInfo(accountInfo, 0)[0]
+    return WhitelistedUserInfo.fromAccountInfo(accountInfo, 0)[0]
   }
 
   /**
@@ -83,39 +83,39 @@ export class User implements UserArgs {
       'BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH',
     ),
   ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, userBeet)
+    return beetSolana.GpaBuilder.fromStruct(programId, whitelistedUserInfoBeet)
   }
 
   /**
-   * Deserializes the {@link User} from the provided data Buffer.
+   * Deserializes the {@link WhitelistedUserInfo} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static deserialize(buf: Buffer, offset = 0): [User, number] {
-    return userBeet.deserialize(buf, offset)
+  static deserialize(buf: Buffer, offset = 0): [WhitelistedUserInfo, number] {
+    return whitelistedUserInfoBeet.deserialize(buf, offset)
   }
 
   /**
-   * Serializes the {@link User} into a Buffer.
+   * Serializes the {@link WhitelistedUserInfo} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   serialize(): [Buffer, number] {
-    return userBeet.serialize({
-      accountDiscriminator: userDiscriminator,
+    return whitelistedUserInfoBeet.serialize({
+      accountDiscriminator: whitelistedUserInfoDiscriminator,
       ...this,
     })
   }
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link User}
+   * {@link WhitelistedUserInfo}
    */
   static get byteSize() {
-    return userBeet.byteSize
+    return whitelistedUserInfoBeet.byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
-   * {@link User} data from rent
+   * {@link WhitelistedUserInfo} data from rent
    *
    * @param connection used to retrieve the rent exemption information
    */
@@ -124,27 +124,36 @@ export class User implements UserArgs {
     commitment?: web3.Commitment,
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      User.byteSize,
+      WhitelistedUserInfo.byteSize,
       commitment,
     )
   }
 
   /**
    * Determines if the provided {@link Buffer} has the correct byte size to
-   * hold {@link User} data.
+   * hold {@link WhitelistedUserInfo} data.
    */
   static hasCorrectByteSize(buf: Buffer, offset = 0) {
-    return buf.byteLength - offset === User.byteSize
+    return buf.byteLength - offset === WhitelistedUserInfo.byteSize
   }
 
   /**
-   * Returns a readable version of {@link User} properties
+   * Returns a readable version of {@link WhitelistedUserInfo} properties
    * and can be used to convert to JSON and/or logging
    */
   pretty() {
     return {
-      userWallet: this.userWallet.toBase58(),
-      isBlocked: this.isBlocked,
+      lockedAmount: (() => {
+        const x = <{ toNumber: () => number }> this.lockedAmount
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
     }
   }
 }
@@ -153,17 +162,16 @@ export class User implements UserArgs {
  * @category Accounts
  * @category generated
  */
-export const userBeet = new beet.BeetStruct<
-  User,
-  UserArgs & {
+export const whitelistedUserInfoBeet = new beet.BeetStruct<
+  WhitelistedUserInfo,
+  WhitelistedUserInfoArgs & {
     accountDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['userWallet', beetSolana.publicKey],
-    ['isBlocked', beet.bool],
+    ['lockedAmount', beet.u64],
   ],
-  User.fromArgs,
-  'User',
+  WhitelistedUserInfo.fromArgs,
+  'WhitelistedUserInfo',
 )

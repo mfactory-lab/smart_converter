@@ -2,7 +2,7 @@ import type { Address, BN, Program } from '@project-serum/anchor'
 import type { PublicKey } from '@solana/web3.js'
 import { Transaction } from '@solana/web3.js'
 import { web3 } from '@project-serum/anchor'
-import type { Admin, Manager, Pair, Ratio, User } from './generated'
+import type { Admin, Manager, Pair, Ratio, User, WhitelistedUserInfo } from './generated'
 import {
   PROGRAM_ID,
   createAddManagerInstruction,
@@ -14,12 +14,12 @@ import {
   createPausePlatformInstruction,
   createRemoveManagerInstruction,
   createRemovePairInstruction,
+  createRemoveUserFromWhitelistInstruction,
   createResumePairsInstruction,
   createResumePlatformInstruction,
   createSetAdminInstruction,
   createUnblockUserInstruction,
-  createUnlockTokensInstruction,
-  createUpdatePairInstruction,
+  createUnlockTokensInstruction, createUpdatePairInstruction,
 } from './generated'
 import { IDL } from './idl/smart_converter'
 
@@ -27,6 +27,7 @@ const USER_SEED_PREFIX = 'user'
 const MANAGER_SEED_PREFIX = 'manager'
 const PAIR_SEED_PREFIX = 'pair'
 const ADMIN_SEED_PREFIX = 'admin'
+const WHITELIST_SEED_PREFIX = 'whitelist'
 
 export class SmartConverterClient {
   static programId = PROGRAM_ID
@@ -62,6 +63,10 @@ export class SmartConverterClient {
 
   async fetchPair(address: Address) {
     return await this.program.account.pair.fetchNullable(address) as unknown as Pair
+  }
+
+  async fetchWhitelistedUserInfo(address: Address) {
+    return await this.program.account.whitelistedUserInfo.fetchNullable(address) as unknown as WhitelistedUserInfo
   }
 
   // Functions that construct instructions using pre-generated sdk
@@ -116,21 +121,57 @@ export class SmartConverterClient {
     }
   }
 
-  async addUserToWhitelist(props: AddUserToWhitelistProps) {
+  async addUserToWhitelist(props: WhitelistProps) {
     const payer = this.wallet.publicKey
     const [manager] = await this.pda.manager(payer)
     const userWallet = props.userWallet
     const [user] = await this.pda.user(userWallet)
+    const tokenA = props.tokenA
+    const tokenB = props.tokenB
+    const [pair] = await this.pda.pair(tokenA, tokenB)
+    const [whitelistedUserInfo] = await this.pda.whitelistedUserInfo(userWallet, pair)
 
     const ix = createAddUserToWhitelistInstruction(
       {
         authority: payer,
         manager,
+        pair,
+        tokenA,
+        tokenB,
         user,
         userWallet,
+        whitelistedUserInfo,
       },
+    )
+    const tx = new Transaction().add(ix)
+
+    return {
+      tx,
+      user,
+    }
+  }
+
+  async removeUserFromWhitelist(props: WhitelistProps) {
+    const payer = this.wallet.publicKey
+    const [manager] = await this.pda.manager(payer)
+    const userWallet = props.userWallet
+    const [user] = await this.pda.user(userWallet)
+    const tokenA = props.tokenA
+    const tokenB = props.tokenB
+    const [pair] = await this.pda.pair(tokenA, tokenB)
+    const [whitelistedUserInfo] = await this.pda.whitelistedUserInfo(userWallet, pair)
+
+    const ix = createRemoveUserFromWhitelistInstruction(
       {
-        amount: props.amount,
+        authority: payer,
+        manager,
+        pair,
+        tokenA,
+        tokenB,
+        user,
+        userWallet,
+        whitelistedUserInfo,
+
       },
     )
     const tx = new Transaction().add(ix)
@@ -173,9 +214,14 @@ export class SmartConverterClient {
     const [pair] = await this.pda.pair(tokenA, tokenB)
     const [pairAuthority] = await this.pda.pairAuthority(pair)
     const [admin] = await this.pda.admin()
+    const [whitelistedUserInfo] = await this.pda.whitelistedUserInfo(payer, pair)
+    const pairData = await this.fetchPair(pair)
 
     const ix = createLockTokensInstruction(
       {
+        feePayer: props.feePayer ?? payer,
+        feeReceiver: pairData.feeReceiver,
+        whitelistedUserInfo,
         clock: SmartConverterClient.clock,
         admin,
         authority: payer,
@@ -381,9 +427,14 @@ export class SmartConverterClient {
     const [user] = await this.pda.user(payer)
     const [pair] = await this.pda.pair(tokenA, tokenB)
     const [pairAuthority] = await this.pda.pairAuthority(pair)
+    const [whitelistedUserInfo] = await this.pda.whitelistedUserInfo(payer, pair)
+    const pairData = await this.fetchPair(pair)
 
     const ix = createUnlockTokensInstruction(
       {
+        feePayer: props.feePayer ?? payer,
+        feeReceiver: pairData.feeReceiver,
+        whitelistedUserInfo,
         clock: SmartConverterClient.clock,
         admin,
         authority: payer,
@@ -428,6 +479,9 @@ export class SmartConverterClient {
       },
       {
         data: {
+          feeReceiver: props.feeReceiver ?? null,
+          lockFee: props.lockFee ?? null,
+          unlockFee: props.unlockFee ?? null,
           managerWallet: props.managerWallet ?? null,
           isPaused: props.isPaused ?? null,
           ratio: props.ratio ?? null,
@@ -469,6 +523,12 @@ class SmartConverterPDA {
     new web3.PublicKey(tokenB).toBuffer(),
   ])
 
+  whitelistedUserInfo = (wallet: Address, pair: Address) => this.pda([
+    Buffer.from(WHITELIST_SEED_PREFIX),
+    new web3.PublicKey(wallet).toBuffer(),
+    new web3.PublicKey(pair).toBuffer(),
+  ])
+
   private async pda(seeds: Array<Buffer | Uint8Array>) {
     return await web3.PublicKey.findProgramAddress(seeds, SmartConverterClient.programId)
   }
@@ -492,9 +552,10 @@ interface AddPairProps {
   ratio: Ratio
 }
 
-interface AddUserToWhitelistProps {
+interface WhitelistProps {
   userWallet: PublicKey
-  amount: BN
+  tokenA: PublicKey
+  tokenB: PublicKey
 }
 
 interface UpdateUserProps {
@@ -509,6 +570,7 @@ interface LockTokensProps {
   destinationA: PublicKey
   destinationB: PublicKey
   amount: BN
+  feePayer?: PublicKey
 }
 
 interface ManagerProps {
@@ -532,6 +594,7 @@ interface UnlockTokensProps {
   sourceB: PublicKey
   destinationA: PublicKey
   amount: BN
+  feePayer?: PublicKey
 }
 
 interface UpdatePairProps {
@@ -540,4 +603,7 @@ interface UpdatePairProps {
   managerWallet?: PublicKey
   isPaused?: boolean
   ratio?: Ratio
+  feeReceiver?: PublicKey
+  lockFee?: number
+  unlockFee?: number
 }

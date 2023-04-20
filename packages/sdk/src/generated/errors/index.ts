@@ -164,6 +164,29 @@ createErrorFromNameLookup.set(
 )
 
 /**
+ * InsufficientFunds: 'Insufficient funds'
+ *
+ * @category Errors
+ * @category generated
+ */
+export class InsufficientFundsError extends Error {
+  readonly code: number = 0x1777
+  readonly name: string = 'InsufficientFunds'
+  constructor() {
+    super('Insufficient funds')
+    if (typeof Error.captureStackTrace === 'function') {
+      Error.captureStackTrace(this, InsufficientFundsError)
+    }
+  }
+}
+
+createErrorFromCodeLookup.set(0x1777, () => new InsufficientFundsError())
+createErrorFromNameLookup.set(
+  'InsufficientFunds',
+  () => new InsufficientFundsError(),
+)
+
+/**
  * Attempts to resolve a custom program error from the provided error code.
  * @category Errors
  * @category generated

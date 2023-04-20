@@ -10,17 +10,17 @@ import * as web3 from '@solana/web3.js'
 
 /**
  * @category Instructions
- * @category AddUserToWhitelist
+ * @category RemoveUserFromWhitelist
  * @category generated
  */
-export const addUserToWhitelistStruct = new beet.BeetArgsStruct<{
+export const removeUserFromWhitelistStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'AddUserToWhitelistInstructionArgs',
+  'RemoveUserFromWhitelistInstructionArgs',
 )
 /**
- * Accounts required by the _addUserToWhitelist_ instruction
+ * Accounts required by the _removeUserFromWhitelist_ instruction
  *
  * @property [_writable_, **signer**] authority
  * @property [] manager
@@ -31,10 +31,10 @@ export const addUserToWhitelistStruct = new beet.BeetArgsStruct<{
  * @property [_writable_] tokenA
  * @property [_writable_] tokenB
  * @category Instructions
- * @category AddUserToWhitelist
+ * @category RemoveUserFromWhitelist
  * @category generated
  */
-export interface AddUserToWhitelistInstructionAccounts {
+export interface RemoveUserFromWhitelistInstructionAccounts {
   authority: web3.PublicKey
   manager: web3.PublicKey
   user: web3.PublicKey
@@ -47,24 +47,24 @@ export interface AddUserToWhitelistInstructionAccounts {
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const addUserToWhitelistInstructionDiscriminator = [
-  244, 177, 124, 12, 22, 50, 139, 152,
+export const removeUserFromWhitelistInstructionDiscriminator = [
+  198, 73, 139, 218, 243, 209, 180, 182,
 ]
 
 /**
- * Creates a _AddUserToWhitelist_ instruction.
+ * Creates a _RemoveUserFromWhitelist_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @category Instructions
- * @category AddUserToWhitelist
+ * @category RemoveUserFromWhitelist
  * @category generated
  */
-export function createAddUserToWhitelistInstruction(
-  accounts: AddUserToWhitelistInstructionAccounts,
+export function createRemoveUserFromWhitelistInstruction(
+  accounts: RemoveUserFromWhitelistInstructionAccounts,
   programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
 ) {
-  const [data] = addUserToWhitelistStruct.serialize({
-    instructionDiscriminator: addUserToWhitelistInstructionDiscriminator,
+  const [data] = removeUserFromWhitelistStruct.serialize({
+    instructionDiscriminator: removeUserFromWhitelistInstructionDiscriminator,
   })
   const keys: web3.AccountMeta[] = [
     {
