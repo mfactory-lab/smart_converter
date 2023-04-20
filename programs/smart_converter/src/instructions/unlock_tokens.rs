@@ -137,10 +137,10 @@ pub struct UnlockTokens<'info> {
     pub manager_wallet: AccountInfo<'info>,
 
     #[account(mut)]
-    pub token_a: Account<'info, token::Mint>,
+    pub token_a: Box<Account<'info, token::Mint>>,
 
     #[account(mut)]
-    pub token_b: Account<'info, token::Mint>,
+    pub token_b: Box<Account<'info, token::Mint>>,
 
     #[account(
         mut,
