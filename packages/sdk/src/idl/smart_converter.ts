@@ -707,7 +707,7 @@ export interface SmartConverter {
         },
         {
           'name': 'pairAuthority'
-          'isMut': false
+          'isMut': true
           'isSigner': false
         },
         {
@@ -1781,7 +1781,7 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'pairAuthority',
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {

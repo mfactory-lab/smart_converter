@@ -422,6 +422,40 @@ describe('smart_converter', () => {
         assert.ok(true)
       }
     })
+
+    it('can withdraw fee', async () => {
+      const [pair] = await clientManager.pda.pair(mintA, mintB)
+      const [pairAuthority] = await clientManager.pda.pairAuthority(pair)
+
+      const transaction = new web3.Transaction().add(
+        web3.SystemProgram.transfer({
+          fromPubkey: providerManager.wallet.publicKey,
+          toPubkey: pairAuthority,
+          lamports: web3.LAMPORTS_PER_SOL,
+        }),
+      )
+
+      try {
+        await providerManager.sendAndConfirm(transaction)
+      } catch (e: any) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientManager.withdrawFee({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destination: providerManager.wallet.publicKey,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx)
+      } catch (e: any) {
+        console.log(e)
+        throw e
+      }
+    })
   })
 
   describe('user instructions', async () => {

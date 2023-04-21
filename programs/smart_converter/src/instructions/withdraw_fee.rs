@@ -50,7 +50,7 @@ pub struct WithdrawFee<'info> {
     pub token_b: Box<Account<'info, token::Mint>>,
 
     /// CHECK: no needs to check, only for signing
-    #[account(seeds = [pair.key().as_ref()], bump)]
+    #[account(mut, seeds = [pair.key().as_ref()], bump)]
     pub pair_authority: AccountInfo<'info>,
 
     /// CHECK: wallet for transfer

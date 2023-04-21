@@ -707,7 +707,7 @@
         },
         {
           "name": "pairAuthority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {

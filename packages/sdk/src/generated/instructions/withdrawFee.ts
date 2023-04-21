@@ -38,7 +38,7 @@ export const withdrawFeeStruct = new beet.BeetArgsStruct<
  * @property [_writable_] pair
  * @property [_writable_] tokenA
  * @property [_writable_] tokenB
- * @property [] pairAuthority
+ * @property [_writable_] pairAuthority
  * @property [_writable_] destination
  * @property [_writable_] manager
  * @property [_writable_, **signer**] authority
@@ -99,7 +99,7 @@ export function createWithdrawFeeInstruction(
     },
     {
       pubkey: accounts.pairAuthority,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
