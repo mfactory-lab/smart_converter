@@ -247,7 +247,6 @@ export class SmartConverterClient {
     return {
       tx,
       pair,
-      user,
     }
   }
 

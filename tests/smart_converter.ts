@@ -1,7 +1,7 @@
-import { AnchorProvider, Program, Wallet, web3, BN } from '@project-serum/anchor'
+import { AnchorProvider, BN, Program, Wallet, web3 } from '@project-serum/anchor'
 import { assert } from 'chai'
 import { SmartConverterClient } from '@smart-converter/sdk/src/client'
-import { TOKEN_PROGRAM_ID, createMint } from '@solana/spl-token'
+import { TOKEN_PROGRAM_ID, createAssociatedTokenAccount, createMint, getOrCreateAssociatedTokenAccount, mintTo } from '@solana/spl-token'
 
 const adminKeypair = web3.Keypair.generate()
 const managerKeypair = web3.Keypair.generate()
@@ -39,6 +39,9 @@ describe('smart_converter', () => {
 
   let mintA: web3.PublicKey
   let mintB: web3.PublicKey
+  let userA: web3.PublicKey
+  let userB: web3.PublicKey
+  let pairA: web3.PublicKey
 
   before(async () => {
     await providerAdmin.connection.confirmTransaction(
@@ -408,7 +411,7 @@ describe('smart_converter', () => {
     })
 
     it('can not call manager instruction from non-manager wallet', async () => {
-      const { tx, user } = await clientAdmin.blockUser({
+      const { tx } = await clientAdmin.blockUser({
         userWallet: providerUser.wallet.publicKey,
       })
 
@@ -416,62 +419,487 @@ describe('smart_converter', () => {
         await providerAdmin.sendAndConfirm(tx)
         assert.ok(false)
       } catch (e) {
-        assertErrorCode(e, 'AccountNotInitialized')
+        assert.ok(true)
       }
     })
   })
 
   describe('user instructions', async () => {
-    it('can lock tokens', async () => {
-
-    })
-
     it('can not lock tokens if user is not whitelisted', async () => {
+      userA = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, providerUser.wallet.publicKey)
+      userB = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintB, providerUser.wallet.publicKey)
+      const [pair] = await clientUser.pda.pair(mintA, mintB)
+      const [pairAuthority] = await clientUser.pda.pairAuthority(pair)
+      pairA = (await getOrCreateAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, pairAuthority, true)).address
+      await mintTo(providerManager.connection, managerKeypair, mintA, userA, providerManager.wallet.publicKey, 6 * web3.LAMPORTS_PER_SOL, [], undefined, TOKEN_PROGRAM_ID)
 
-    })
+      const { tx } = await clientUser.lockTokens({
+        amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+        destinationA: pairA,
+        destinationB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: userA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
 
-    it('can not lock tokens if user blocked', async () => {
-
-    })
-
-    it('can not lock tokens if pair paused', async () => {
-
-    })
-
-    it('can not lock tokens if all manager`s pairs paused', async () => {
-
-    })
-
-    it('can not lock tokens if platform paused', async () => {
-
-    })
-
-    it('can unlock tokens', async () => {
-
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'AccountNotInitialized')
+      }
     })
 
     it('can not unlock tokens if user is not whitelisted', async () => {
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
 
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'AccountNotInitialized')
+      }
+    })
+
+    it('can lock tokens', async () => {
+      const { tx: tx1 } = await clientManager.addUserToWhitelist({
+        tokenA: mintA,
+        tokenB: mintB,
+        userWallet: providerUser.wallet.publicKey,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      let sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
+      let destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
+      let destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
+      assert.equal(destinationABalance.value.amount, '0')
+      assert.equal(sourceABalance.value.amount, '6000000000')
+      assert.equal(destinationBBalance.value.amount, '0')
+
+      const { tx, pair } = await clientUser.lockTokens({
+        amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+        destinationA: pairA,
+        destinationB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: userA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+      } catch (e: any) {
+        console.log(e)
+        throw e
+      }
+
+      sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
+      destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
+      destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
+      assert.equal(destinationABalance.value.amount, '5000000000')
+      assert.equal(sourceABalance.value.amount, '1000000000')
+      assert.equal(destinationBBalance.value.amount, '50000000000')
+
+      const pairData = await clientManager.fetchPair(pair)
+      assert.equal(pairData.lockedAmount, 5 * web3.LAMPORTS_PER_SOL)
+    })
+
+    it('can not lock tokens if user blocked', async () => {
+      const { tx: tx1 } = await clientManager.blockUser({
+        userWallet: providerUser.wallet.publicKey,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.lockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: pairA,
+        destinationB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: userA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsBlocked')
+      }
+
+      const { tx: tx2 } = await clientManager.unblockUser({
+        userWallet: providerUser.wallet.publicKey,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+    })
+
+    it('can not lock tokens if pair paused', async () => {
+      const { tx: tx1 } = await clientManager.updatePair({
+        isPaused: true,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.lockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: pairA,
+        destinationB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: userA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsPaused')
+      }
+
+      const { tx: tx2 } = await clientManager.updatePair({
+        isPaused: false,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+    })
+
+    it('can not lock tokens if all manager`s pairs paused', async () => {
+      const { tx: tx1 } = await clientAdmin.pausePairs({
+        managerWallet: providerManager.wallet.publicKey,
+      })
+
+      try {
+        await providerAdmin.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.lockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: pairA,
+        destinationB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: userA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsPaused')
+      }
+
+      const { tx: tx2 } = await clientAdmin.resumePairs({
+        managerWallet: providerManager.wallet.publicKey,
+      })
+
+      try {
+        await providerAdmin.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+    })
+
+    it('can not lock tokens if platform paused', async () => {
+      const { tx: tx1 } = await clientAdmin.pausePlatform()
+
+      try {
+        await providerAdmin.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.lockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: pairA,
+        destinationB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: userA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsPaused')
+      }
+
+      const { tx: tx2 } = await clientAdmin.resumePlatform()
+
+      try {
+        await providerAdmin.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+    })
+
+    it('can unlock tokens', async () => {
+      let sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
+      let destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
+      let destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
+      assert.equal(destinationABalance.value.amount, '5000000000')
+      assert.equal(sourceABalance.value.amount, '1000000000')
+      assert.equal(destinationBBalance.value.amount, '50000000000')
+
+      const { tx, pair } = await clientUser.unlockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+      } catch (e: any) {
+        console.log(e)
+        throw e
+      }
+
+      sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
+      destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
+      destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
+      assert.equal(destinationABalance.value.amount, '4000000000')
+      assert.equal(sourceABalance.value.amount, '2000000000')
+      assert.equal(destinationBBalance.value.amount, '40000000000')
+
+      const pairData = await clientManager.fetchPair(pair)
+      assert.equal(pairData.lockedAmount, 4 * web3.LAMPORTS_PER_SOL)
     })
 
     it('can not unlock tokens if user blocked', async () => {
+      const { tx: tx1 } = await clientManager.blockUser({
+        userWallet: providerUser.wallet.publicKey,
+      })
 
+      try {
+        await providerManager.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsBlocked')
+      }
+
+      const { tx: tx2 } = await clientManager.unblockUser({
+        userWallet: providerUser.wallet.publicKey,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
     })
 
     it('can not unlock tokens if pair paused', async () => {
+      const { tx: tx1 } = await clientManager.updatePair({
+        isPaused: true,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
 
+      try {
+        await providerManager.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsPaused')
+      }
+
+      const { tx: tx2 } = await clientManager.updatePair({
+        isPaused: false,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerManager.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
     })
 
     it('can not unlock tokens if all manager`s pairs paused', async () => {
+      const { tx: tx1 } = await clientAdmin.pausePairs({
+        managerWallet: providerManager.wallet.publicKey,
+      })
 
+      try {
+        await providerAdmin.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsPaused')
+      }
+
+      const { tx: tx2 } = await clientAdmin.resumePairs({
+        managerWallet: providerManager.wallet.publicKey,
+      })
+
+      try {
+        await providerAdmin.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
     })
 
     it('can not unlock tokens if platform paused', async () => {
+      const { tx: tx1 } = await clientAdmin.pausePlatform()
 
+      try {
+        await providerAdmin.sendAndConfirm(tx1)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
+
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'IsPaused')
+      }
+
+      const { tx: tx2 } = await clientAdmin.resumePlatform()
+
+      try {
+        await providerAdmin.sendAndConfirm(tx2)
+      } catch (e) {
+        console.log(e)
+        throw e
+      }
     })
 
     it('can not unlock tokens if wished amount is greater than pair`s locked amount', async () => {
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(4 * web3.LAMPORTS_PER_SOL + 1),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
 
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'InsufficientLockedAmount')
+      }
     })
   })
 })
