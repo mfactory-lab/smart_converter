@@ -32,8 +32,8 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     }
 
     if pair.unlock_fee > 0 {
-        // TODO maybe checked_div
-        let fee = amount.saturating_div(1000).saturating_mul(pair.unlock_fee as u64);
+        let fee = amount.checked_div(1000).ok_or(ErrorCode::InsufficientFunds)?
+            .checked_mul(pair.unlock_fee as u64).ok_or(ErrorCode::InsufficientFunds)?;
         msg!("Transfer deposit fee: {} lamports", fee);
 
         system_program::transfer(
