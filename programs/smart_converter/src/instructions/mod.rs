@@ -9,6 +9,7 @@ pub mod unlock_tokens;
 pub mod update_manager;
 pub mod update_pair;
 pub mod update_user_state;
+pub mod withdraw_fee;
 
 pub use add_manager::*;
 pub use add_pair::*;
@@ -21,3 +22,4 @@ pub use unlock_tokens::*;
 pub use update_manager::*;
 pub use update_pair::*;
 pub use update_user_state::*;
+pub use withdraw_fee::*;

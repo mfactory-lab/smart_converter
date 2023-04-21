@@ -76,6 +76,10 @@ pub mod smart_converter {
     pub fn unblock_user(ctx: Context<UpdateUser>) -> Result<()> {
         unblock(ctx)
     }
+
+    pub fn withdraw_fee(ctx: Context<WithdrawFee>, amount: u64) -> Result<()> {
+        withdraw_fee::handle(ctx, amount)
+    }
 }
 
 #[error_code]

@@ -1,2045 +1,2147 @@
-export interface SmartConverter {
-  'version': '0.0.4'
-  'name': 'smart_converter'
-  'instructions': [
+export type SmartConverter = {
+  "version": "0.0.4",
+  "name": "smart_converter",
+  "instructions": [
     {
-      'name': 'addManager'
-      'accounts': [
+      "name": "addManager",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'managerWallet'
-          'isMut': false
-          'isSigner': false
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'manager'
-          'isMut': true
-          'isSigner': false
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'admin'
-          'isMut': false
-          'isSigner': false
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'addPair'
-      'accounts': [
+      "name": "addPair",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'pair'
-          'isMut': true
-          'isSigner': false
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'pairAuthority'
-          'isMut': false
-          'isSigner': false
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'tokenA'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'tokenB'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': [
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
         {
-          'name': 'ratio'
-          'type': {
-            'defined': 'Ratio'
+          "name": "ratio",
+          "type": {
+            "defined": "Ratio"
           }
-        },
+        }
       ]
     },
     {
-      'name': 'addUserToWhitelist'
-      'accounts': [
+      "name": "addUserToWhitelist",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'user'
-          'isMut': true
-          'isSigner': false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'userWallet'
-          'isMut': false
-          'isSigner': false
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'whitelistedUserInfo'
-          'isMut': true
-          'isSigner': false
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'pair'
-          'isMut': true
-          'isSigner': false
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'tokenA'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'tokenB'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'removeUserFromWhitelist'
-      'accounts': [
+      "name": "removeUserFromWhitelist",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'user'
-          'isMut': true
-          'isSigner': false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'userWallet'
-          'isMut': false
-          'isSigner': false
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'whitelistedUserInfo'
-          'isMut': true
-          'isSigner': false
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'pair'
-          'isMut': true
-          'isSigner': false
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'tokenA'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'tokenB'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'pausePlatform'
-      'accounts': [
+      "name": "pausePlatform",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'admin'
-          'isMut': true
-          'isSigner': false
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'resumePlatform'
-      'accounts': [
+      "name": "resumePlatform",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'admin'
-          'isMut': true
-          'isSigner': false
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'lockTokens'
-      'accounts': [
+      "name": "lockTokens",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'user'
-          'isMut': true
-          'isSigner': false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'whitelistedUserInfo'
-          'isMut': false
-          'isSigner': false
+          "name": "whitelistedUserInfo",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'pair'
-          'isMut': true
-          'isSigner': false
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'admin'
-          'isMut': false
-          'isSigner': false
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'pairAuthority'
-          'isMut': false
-          'isSigner': false
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'managerWallet'
-          'isMut': false
-          'isSigner': false
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'tokenA'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'tokenB'
-          'isMut': true
-          'isSigner': false
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'sourceA'
-          'isMut': true
-          'isSigner': false
+          "name": "sourceA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'destinationA'
-          'isMut': true
-          'isSigner': false
+          "name": "destinationA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'destinationB'
-          'isMut': true
-          'isSigner': false
+          "name": "destinationB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'feePayer'
-          'isMut': true
-          'isSigner': true
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'feeReceiver'
-          'isMut': true
-          'isSigner': false
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'clock'
-          'isMut': false
-          'isSigner': false
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'tokenProgram'
-          'isMut': false
-          'isSigner': false
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': [
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
         {
-          'name': 'amount'
-          'type': 'u64'
-        },
-      ]
-    },
-    {
-      'name': 'setAdmin'
-      'accounts': [
-        {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
-        },
-        {
-          'name': 'adminWallet'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'admin'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
-    },
-    {
-      'name': 'unlockTokens'
-      'accounts': [
-        {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
-        },
-        {
-          'name': 'user'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'whitelistedUserInfo'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'pair'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'admin'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'pairAuthority'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'managerWallet'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'tokenA'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'tokenB'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'sourceA'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'destinationA'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'sourceB'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'feePayer'
-          'isMut': true
-          'isSigner': true
-        },
-        {
-          'name': 'feeReceiver'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'clock'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'tokenProgram'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': [
-        {
-          'name': 'amount'
-          'type': 'u64'
-        },
+          "name": "amount",
+          "type": "u64"
+        }
       ]
     },
     {
-      'name': 'removeManager'
-      'accounts': [
+      "name": "setAdmin",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': true
-          'isSigner': false
+          "name": "adminWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'admin'
-          'isMut': false
-          'isSigner': false
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'managerWallet'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'pausePairs'
-      'accounts': [
+      "name": "unlockTokens",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': true
-          'isSigner': false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'admin'
-          'isMut': false
-          'isSigner': false
+          "name": "whitelistedUserInfo",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'managerWallet'
-          'isMut': false
-          'isSigner': false
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
+        {
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sourceA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "destinationA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "sourceB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
       ]
-      'args': []
     },
     {
-      'name': 'resumePairs'
-      'accounts': [
+      "name": "removeManager",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': true
-          'isSigner': false
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'admin'
-          'isMut': false
-          'isSigner': false
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'managerWallet'
-          'isMut': false
-          'isSigner': false
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'removePair'
-      'accounts': [
+      "name": "pausePairs",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'pair'
-          'isMut': true
-          'isSigner': false
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'tokenA'
-          'isMut': true
-          'isSigner': false
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'tokenB'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     },
     {
-      'name': 'updatePair'
-      'accounts': [
+      "name": "resumePairs",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'pair'
-          'isMut': true
-          'isSigner': false
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'tokenA'
-          'isMut': true
-          'isSigner': false
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'tokenB'
-          'isMut': true
-          'isSigner': false
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "removePair",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
-      ]
-      'args': [
         {
-          'name': 'data'
-          'type': {
-            'defined': 'UpdatePairData'
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "updatePair",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "data",
+          "type": {
+            "defined": "UpdatePairData"
           }
-        },
+        }
       ]
     },
     {
-      'name': 'blockUser'
-      'accounts': [
+      "name": "blockUser",
+      "accounts": [
         {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'user'
-          'isMut': true
-          'isSigner': false
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          'name': 'userWallet'
-          'isMut': false
-          'isSigner': false
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unblockUser",
+      "accounts": [
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
+        {
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdrawFee",
+      "accounts": [
+        {
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
       ]
-      'args': []
-    },
+    }
+  ],
+  "accounts": [
     {
-      'name': 'unblockUser'
-      'accounts': [
-        {
-          'name': 'authority'
-          'isMut': true
-          'isSigner': true
-        },
-        {
-          'name': 'manager'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'user'
-          'isMut': true
-          'isSigner': false
-        },
-        {
-          'name': 'userWallet'
-          'isMut': false
-          'isSigner': false
-        },
-        {
-          'name': 'systemProgram'
-          'isMut': false
-          'isSigner': false
-        },
-      ]
-      'args': []
-    },
-  ]
-  'accounts': [
-    {
-      'name': 'admin'
-      'type': {
-        'kind': 'struct'
-        'fields': [
+      "name": "admin",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            'name': 'authority'
-            'docs': [
-              'Manager wallet address',
-            ]
-            'type': 'publicKey'
+            "name": "authority",
+            "docs": [
+              "Manager wallet address"
+            ],
+            "type": "publicKey"
           },
           {
-            'name': 'isPlatformPaused'
-            'docs': [
-              'Indicates if platform is paused or not',
-            ]
-            'type': 'bool'
-          },
+            "name": "isPlatformPaused",
+            "docs": [
+              "Indicates if platform is paused or not"
+            ],
+            "type": "bool"
+          }
         ]
       }
     },
     {
-      'name': 'manager'
-      'type': {
-        'kind': 'struct'
-        'fields': [
+      "name": "manager",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            'name': 'authority'
-            'docs': [
-              'Manager wallet address',
-            ]
-            'type': 'publicKey'
+            "name": "authority",
+            "docs": [
+              "Manager wallet address"
+            ],
+            "type": "publicKey"
           },
           {
-            'name': 'isAllPaused'
-            'docs': [
-              'Indicates if manager\'s pairs are paused or not',
-            ]
-            'type': 'bool'
-          },
+            "name": "isAllPaused",
+            "docs": [
+              "Indicates if manager's pairs are paused or not"
+            ],
+            "type": "bool"
+          }
         ]
       }
     },
     {
-      'name': 'user'
-      'type': {
-        'kind': 'struct'
-        'fields': [
+      "name": "user",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            'name': 'userWallet'
-            'docs': [
-              'User wallet address',
-            ]
-            'type': 'publicKey'
+            "name": "userWallet",
+            "docs": [
+              "User wallet address"
+            ],
+            "type": "publicKey"
           },
           {
-            'name': 'isBlocked'
-            'docs': [
-              'Indicates if user is blocked or not',
-            ]
-            'type': 'bool'
-          },
+            "name": "isBlocked",
+            "docs": [
+              "Indicates if user is blocked or not"
+            ],
+            "type": "bool"
+          }
         ]
       }
     },
     {
-      'name': 'whitelistedUserInfo'
-      'type': {
-        'kind': 'struct'
-        'fields': [
+      "name": "whitelistedUserInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            'name': 'userWallet'
-            'docs': [
-              'User wallet address',
-            ]
-            'type': 'publicKey'
+            "name": "userWallet",
+            "docs": [
+              "User wallet address"
+            ],
+            "type": "publicKey"
           },
           {
-            'name': 'pair'
-            'docs': [
-              'Pair address',
-            ]
-            'type': 'publicKey'
-          },
+            "name": "pair",
+            "docs": [
+              "Pair address"
+            ],
+            "type": "publicKey"
+          }
         ]
       }
     },
     {
-      'name': 'pair'
-      'type': {
-        'kind': 'struct'
-        'fields': [
+      "name": "pair",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            'name': 'managerWallet'
-            'docs': [
-              'Manager wallet address',
-            ]
-            'type': 'publicKey'
+            "name": "managerWallet",
+            "docs": [
+              "Manager wallet address"
+            ],
+            "type": "publicKey"
           },
           {
-            'name': 'tokenA'
-            'docs': [
-              'Security token mint address',
-            ]
-            'type': 'publicKey'
+            "name": "tokenA",
+            "docs": [
+              "Security token mint address"
+            ],
+            "type": "publicKey"
           },
           {
-            'name': 'tokenB'
-            'docs': [
-              'Utility token mint address',
-            ]
-            'type': 'publicKey'
+            "name": "tokenB",
+            "docs": [
+              "Utility token mint address"
+            ],
+            "type": "publicKey"
           },
           {
-            'name': 'lockedAmount'
-            'docs': [
-              'Amount of security tokens currently locked',
-            ]
-            'type': 'u64'
+            "name": "lockedAmount",
+            "docs": [
+              "Amount of security tokens currently locked"
+            ],
+            "type": "u64"
           },
           {
-            'name': 'ratio'
-            'docs': [
-              'Ratio of token A to token B',
-            ]
-            'type': {
-              'defined': 'Ratio'
+            "name": "ratio",
+            "docs": [
+              "Ratio of token A to token B"
+            ],
+            "type": {
+              "defined": "Ratio"
             }
           },
           {
-            'name': 'isPaused'
-            'docs': [
-              'Indicates if pair is paused or not',
-            ]
-            'type': 'bool'
+            "name": "isPaused",
+            "docs": [
+              "Indicates if pair is paused or not"
+            ],
+            "type": "bool"
           },
           {
-            'name': 'lockFee'
-            'docs': [
-              'Fee for locking token A',
-            ]
-            'type': 'u16'
+            "name": "lockFee",
+            "docs": [
+              "Fee for locking token A"
+            ],
+            "type": "u16"
           },
           {
-            'name': 'unlockFee'
-            'docs': [
-              'Fee for unlocking token A',
-            ]
-            'type': 'u16'
+            "name": "unlockFee",
+            "docs": [
+              "Fee for unlocking token A"
+            ],
+            "type": "u16"
           },
           {
-            'name': 'feeReceiver'
-            'docs': [
-              'Wallet that will receive fee',
-            ]
-            'type': 'publicKey'
-          },
+            "name": "feeReceiver",
+            "docs": [
+              "Wallet that will receive fee"
+            ],
+            "type": "publicKey"
+          }
         ]
       }
-    },
-  ]
-  'types': [
+    }
+  ],
+  "types": [
     {
-      'name': 'UpdatePairData'
-      'type': {
-        'kind': 'struct'
-        'fields': [
+      "name": "UpdatePairData",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            'name': 'managerWallet'
-            'type': {
-              'option': 'publicKey'
+            "name": "managerWallet",
+            "type": {
+              "option": "publicKey"
             }
           },
           {
-            'name': 'isPaused'
-            'type': {
-              'option': 'bool'
+            "name": "isPaused",
+            "type": {
+              "option": "bool"
             }
           },
           {
-            'name': 'ratio'
-            'type': {
-              'option': {
-                'defined': 'Ratio'
+            "name": "ratio",
+            "type": {
+              "option": {
+                "defined": "Ratio"
               }
             }
           },
           {
-            'name': 'lockFee'
-            'type': {
-              'option': 'u16'
+            "name": "lockFee",
+            "type": {
+              "option": "u16"
             }
           },
           {
-            'name': 'unlockFee'
-            'type': {
-              'option': 'u16'
+            "name": "unlockFee",
+            "type": {
+              "option": "u16"
             }
           },
           {
-            'name': 'feeReceiver'
-            'type': {
-              'option': 'publicKey'
+            "name": "feeReceiver",
+            "type": {
+              "option": "publicKey"
             }
-          },
+          }
         ]
       }
     },
     {
-      'name': 'Ratio'
-      'type': {
-        'kind': 'struct'
-        'fields': [
+      "name": "Ratio",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            'name': 'num'
-            'type': 'u64'
+            "name": "num",
+            "type": "u64"
           },
           {
-            'name': 'denom'
-            'type': 'u64'
-          },
+            "name": "denom",
+            "type": "u64"
+          }
         ]
       }
-    },
-  ]
-  'events': [
+    }
+  ],
+  "events": [
     {
-      'name': 'LockTokensEvent'
-      'fields': [
+      "name": "LockTokensEvent",
+      "fields": [
         {
-          'name': 'pair'
-          'type': 'publicKey'
-          'index': true
+          "name": "pair",
+          "type": "publicKey",
+          "index": true
         },
         {
-          'name': 'user'
-          'type': 'publicKey'
-          'index': true
+          "name": "user",
+          "type": "publicKey",
+          "index": true
         },
         {
-          'name': 'userWallet'
-          'type': 'publicKey'
-          'index': false
+          "name": "userWallet",
+          "type": "publicKey",
+          "index": false
         },
         {
-          'name': 'amount'
-          'type': 'u64'
-          'index': false
+          "name": "amount",
+          "type": "u64",
+          "index": false
         },
         {
-          'name': 'timestamp'
-          'type': 'i64'
-          'index': false
-        },
+          "name": "timestamp",
+          "type": "i64",
+          "index": false
+        }
       ]
     },
     {
-      'name': 'UnlockTokensEvent'
-      'fields': [
+      "name": "UnlockTokensEvent",
+      "fields": [
         {
-          'name': 'pair'
-          'type': 'publicKey'
-          'index': true
+          "name": "pair",
+          "type": "publicKey",
+          "index": true
         },
         {
-          'name': 'user'
-          'type': 'publicKey'
-          'index': true
+          "name": "user",
+          "type": "publicKey",
+          "index": true
         },
         {
-          'name': 'userWallet'
-          'type': 'publicKey'
-          'index': false
+          "name": "userWallet",
+          "type": "publicKey",
+          "index": false
         },
         {
-          'name': 'amount'
-          'type': 'u64'
-          'index': false
+          "name": "amount",
+          "type": "u64",
+          "index": false
         },
         {
-          'name': 'timestamp'
-          'type': 'i64'
-          'index': false
-        },
+          "name": "timestamp",
+          "type": "i64",
+          "index": false
+        }
       ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized action"
     },
+    {
+      "code": 6001,
+      "name": "IsPaused",
+      "msg": "Paused"
+    },
+    {
+      "code": 6002,
+      "name": "AlreadyResumed",
+      "msg": "Already resumed"
+    },
+    {
+      "code": 6003,
+      "name": "StillRemainingLockedTokens",
+      "msg": "Pair still have locked tokens"
+    },
+    {
+      "code": 6004,
+      "name": "IsBlocked",
+      "msg": "User is blocked"
+    },
+    {
+      "code": 6005,
+      "name": "AlreadyUnblocked",
+      "msg": "User is already unblocked"
+    },
+    {
+      "code": 6006,
+      "name": "InsufficientLockedAmount",
+      "msg": "Insufficient locked amount"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    }
   ]
-  'errors': [
-    {
-      'code': 6000
-      'name': 'Unauthorized'
-      'msg': 'Unauthorized action'
-    },
-    {
-      'code': 6001
-      'name': 'IsPaused'
-      'msg': 'Paused'
-    },
-    {
-      'code': 6002
-      'name': 'AlreadyResumed'
-      'msg': 'Already resumed'
-    },
-    {
-      'code': 6003
-      'name': 'StillRemainingLockedTokens'
-      'msg': 'Pair still have locked tokens'
-    },
-    {
-      'code': 6004
-      'name': 'IsBlocked'
-      'msg': 'User is blocked'
-    },
-    {
-      'code': 6005
-      'name': 'AlreadyUnblocked'
-      'msg': 'User is already unblocked'
-    },
-    {
-      'code': 6006
-      'name': 'InsufficientLockedAmount'
-      'msg': 'Insufficient locked amount'
-    },
-    {
-      'code': 6007
-      'name': 'InsufficientFunds'
-      'msg': 'Insufficient funds'
-    },
-  ]
-}
+};
 
 export const IDL: SmartConverter = {
-  version: '0.0.4',
-  name: 'smart_converter',
-  instructions: [
+  "version": "0.0.4",
+  "name": "smart_converter",
+  "instructions": [
     {
-      name: 'addManager',
-      accounts: [
+      "name": "addManager",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'managerWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'manager',
-          isMut: true,
-          isSigner: false,
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'admin',
-          isMut: false,
-          isSigner: false,
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'addPair',
-      accounts: [
+      "name": "addPair",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'pair',
-          isMut: true,
-          isSigner: false,
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'pairAuthority',
-          isMut: false,
-          isSigner: false,
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'tokenA',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenB',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [
+      "args": [
         {
-          name: 'ratio',
-          type: {
-            defined: 'Ratio',
-          },
-        },
-      ],
+          "name": "ratio",
+          "type": {
+            "defined": "Ratio"
+          }
+        }
+      ]
     },
     {
-      name: 'addUserToWhitelist',
-      accounts: [
+      "name": "addUserToWhitelist",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false,
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'userWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'whitelistedUserInfo',
-          isMut: true,
-          isSigner: false,
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'pair',
-          isMut: true,
-          isSigner: false,
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenA',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenB',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'removeUserFromWhitelist',
-      accounts: [
+      "name": "removeUserFromWhitelist",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false,
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'userWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'whitelistedUserInfo',
-          isMut: true,
-          isSigner: false,
+          "name": "whitelistedUserInfo",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'pair',
-          isMut: true,
-          isSigner: false,
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenA',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenB',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'pausePlatform',
-      accounts: [
+      "name": "pausePlatform",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'admin',
-          isMut: true,
-          isSigner: false,
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'resumePlatform',
-      accounts: [
+      "name": "resumePlatform",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'admin',
-          isMut: true,
-          isSigner: false,
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'lockTokens',
-      accounts: [
+      "name": "lockTokens",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false,
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'whitelistedUserInfo',
-          isMut: false,
-          isSigner: false,
+          "name": "whitelistedUserInfo",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'pair',
-          isMut: true,
-          isSigner: false,
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'admin',
-          isMut: false,
-          isSigner: false,
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'pairAuthority',
-          isMut: false,
-          isSigner: false,
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'managerWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'tokenA',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenB',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'sourceA',
-          isMut: true,
-          isSigner: false,
+          "name": "sourceA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'destinationA',
-          isMut: true,
-          isSigner: false,
+          "name": "destinationA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'destinationB',
-          isMut: true,
-          isSigner: false,
+          "name": "destinationB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'feePayer',
-          isMut: true,
-          isSigner: true,
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'feeReceiver',
-          isMut: true,
-          isSigner: false,
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'clock',
-          isMut: false,
-          isSigner: false,
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'tokenProgram',
-          isMut: false,
-          isSigner: false,
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [
+      "args": [
         {
-          name: 'amount',
-          type: 'u64',
-        },
-      ],
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     },
     {
-      name: 'setAdmin',
-      accounts: [
+      "name": "setAdmin",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'adminWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "adminWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'admin',
-          isMut: true,
-          isSigner: false,
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'unlockTokens',
-      accounts: [
+      "name": "unlockTokens",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false,
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'whitelistedUserInfo',
-          isMut: false,
-          isSigner: false,
+          "name": "whitelistedUserInfo",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'pair',
-          isMut: true,
-          isSigner: false,
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'admin',
-          isMut: false,
-          isSigner: false,
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'pairAuthority',
-          isMut: false,
-          isSigner: false,
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'managerWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'tokenA',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenB',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'sourceA',
-          isMut: true,
-          isSigner: false,
+          "name": "sourceA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'destinationA',
-          isMut: true,
-          isSigner: false,
+          "name": "destinationA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'sourceB',
-          isMut: true,
-          isSigner: false,
+          "name": "sourceB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'feePayer',
-          isMut: true,
-          isSigner: true,
+          "name": "feePayer",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'feeReceiver',
-          isMut: true,
-          isSigner: false,
+          "name": "feeReceiver",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'clock',
-          isMut: false,
-          isSigner: false,
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'tokenProgram',
-          isMut: false,
-          isSigner: false,
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [
+      "args": [
         {
-          name: 'amount',
-          type: 'u64',
-        },
-      ],
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     },
     {
-      name: 'removeManager',
-      accounts: [
+      "name": "removeManager",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: true,
-          isSigner: false,
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'admin',
-          isMut: false,
-          isSigner: false,
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'managerWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'pausePairs',
-      accounts: [
+      "name": "pausePairs",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: true,
-          isSigner: false,
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'admin',
-          isMut: false,
-          isSigner: false,
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'managerWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'resumePairs',
-      accounts: [
+      "name": "resumePairs",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: true,
-          isSigner: false,
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'admin',
-          isMut: false,
-          isSigner: false,
+          "name": "admin",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'managerWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "managerWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'removePair',
-      accounts: [
+      "name": "removePair",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'pair',
-          isMut: true,
-          isSigner: false,
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenA',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenB',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'updatePair',
-      accounts: [
+      "name": "updatePair",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'pair',
-          isMut: true,
-          isSigner: false,
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenA',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'tokenB',
-          isMut: true,
-          isSigner: false,
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [
+      "args": [
         {
-          name: 'data',
-          type: {
-            defined: 'UpdatePairData',
-          },
-        },
-      ],
+          "name": "data",
+          "type": {
+            "defined": "UpdatePairData"
+          }
+        }
+      ]
     },
     {
-      name: 'blockUser',
-      accounts: [
+      "name": "blockUser",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false,
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'userWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
     {
-      name: 'unblockUser',
-      accounts: [
+      "name": "unblockUser",
+      "accounts": [
         {
-          name: 'authority',
-          isMut: true,
-          isSigner: true,
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
         },
         {
-          name: 'manager',
-          isMut: false,
-          isSigner: false,
+          "name": "manager",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'user',
-          isMut: true,
-          isSigner: false,
+          "name": "user",
+          "isMut": true,
+          "isSigner": false
         },
         {
-          name: 'userWallet',
-          isMut: false,
-          isSigner: false,
+          "name": "userWallet",
+          "isMut": false,
+          "isSigner": false
         },
         {
-          name: 'systemProgram',
-          isMut: false,
-          isSigner: false,
-        },
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
-      args: [],
+      "args": []
     },
+    {
+      "name": "withdrawFee",
+      "accounts": [
+        {
+          "name": "pair",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenA",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenB",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "destination",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "manager",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
   ],
-  accounts: [
+  "accounts": [
     {
-      name: 'admin',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "admin",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'authority',
-            docs: [
-              'Manager wallet address',
+            "name": "authority",
+            "docs": [
+              "Manager wallet address"
             ],
-            type: 'publicKey',
+            "type": "publicKey"
           },
           {
-            name: 'isPlatformPaused',
-            docs: [
-              'Indicates if platform is paused or not',
+            "name": "isPlatformPaused",
+            "docs": [
+              "Indicates if platform is paused or not"
             ],
-            type: 'bool',
-          },
-        ],
-      },
+            "type": "bool"
+          }
+        ]
+      }
     },
     {
-      name: 'manager',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "manager",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'authority',
-            docs: [
-              'Manager wallet address',
+            "name": "authority",
+            "docs": [
+              "Manager wallet address"
             ],
-            type: 'publicKey',
+            "type": "publicKey"
           },
           {
-            name: 'isAllPaused',
-            docs: [
-              'Indicates if manager\'s pairs are paused or not',
+            "name": "isAllPaused",
+            "docs": [
+              "Indicates if manager's pairs are paused or not"
             ],
-            type: 'bool',
-          },
-        ],
-      },
+            "type": "bool"
+          }
+        ]
+      }
     },
     {
-      name: 'user',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "user",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'userWallet',
-            docs: [
-              'User wallet address',
+            "name": "userWallet",
+            "docs": [
+              "User wallet address"
             ],
-            type: 'publicKey',
+            "type": "publicKey"
           },
           {
-            name: 'isBlocked',
-            docs: [
-              'Indicates if user is blocked or not',
+            "name": "isBlocked",
+            "docs": [
+              "Indicates if user is blocked or not"
             ],
-            type: 'bool',
-          },
-        ],
-      },
+            "type": "bool"
+          }
+        ]
+      }
     },
     {
-      name: 'whitelistedUserInfo',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "whitelistedUserInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'userWallet',
-            docs: [
-              'User wallet address',
+            "name": "userWallet",
+            "docs": [
+              "User wallet address"
             ],
-            type: 'publicKey',
+            "type": "publicKey"
           },
           {
-            name: 'pair',
-            docs: [
-              'Pair address',
+            "name": "pair",
+            "docs": [
+              "Pair address"
             ],
-            type: 'publicKey',
-          },
-        ],
-      },
+            "type": "publicKey"
+          }
+        ]
+      }
     },
     {
-      name: 'pair',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "pair",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'managerWallet',
-            docs: [
-              'Manager wallet address',
+            "name": "managerWallet",
+            "docs": [
+              "Manager wallet address"
             ],
-            type: 'publicKey',
+            "type": "publicKey"
           },
           {
-            name: 'tokenA',
-            docs: [
-              'Security token mint address',
+            "name": "tokenA",
+            "docs": [
+              "Security token mint address"
             ],
-            type: 'publicKey',
+            "type": "publicKey"
           },
           {
-            name: 'tokenB',
-            docs: [
-              'Utility token mint address',
+            "name": "tokenB",
+            "docs": [
+              "Utility token mint address"
             ],
-            type: 'publicKey',
+            "type": "publicKey"
           },
           {
-            name: 'lockedAmount',
-            docs: [
-              'Amount of security tokens currently locked',
+            "name": "lockedAmount",
+            "docs": [
+              "Amount of security tokens currently locked"
             ],
-            type: 'u64',
+            "type": "u64"
           },
           {
-            name: 'ratio',
-            docs: [
-              'Ratio of token A to token B',
+            "name": "ratio",
+            "docs": [
+              "Ratio of token A to token B"
             ],
-            type: {
-              defined: 'Ratio',
-            },
+            "type": {
+              "defined": "Ratio"
+            }
           },
           {
-            name: 'isPaused',
-            docs: [
-              'Indicates if pair is paused or not',
+            "name": "isPaused",
+            "docs": [
+              "Indicates if pair is paused or not"
             ],
-            type: 'bool',
+            "type": "bool"
           },
           {
-            name: 'lockFee',
-            docs: [
-              'Fee for locking token A',
+            "name": "lockFee",
+            "docs": [
+              "Fee for locking token A"
             ],
-            type: 'u16',
+            "type": "u16"
           },
           {
-            name: 'unlockFee',
-            docs: [
-              'Fee for unlocking token A',
+            "name": "unlockFee",
+            "docs": [
+              "Fee for unlocking token A"
             ],
-            type: 'u16',
+            "type": "u16"
           },
           {
-            name: 'feeReceiver',
-            docs: [
-              'Wallet that will receive fee',
+            "name": "feeReceiver",
+            "docs": [
+              "Wallet that will receive fee"
             ],
-            type: 'publicKey',
-          },
-        ],
-      },
-    },
+            "type": "publicKey"
+          }
+        ]
+      }
+    }
   ],
-  types: [
+  "types": [
     {
-      name: 'UpdatePairData',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "UpdatePairData",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'managerWallet',
-            type: {
-              option: 'publicKey',
-            },
+            "name": "managerWallet",
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
-            name: 'isPaused',
-            type: {
-              option: 'bool',
-            },
+            "name": "isPaused",
+            "type": {
+              "option": "bool"
+            }
           },
           {
-            name: 'ratio',
-            type: {
-              option: {
-                defined: 'Ratio',
-              },
-            },
+            "name": "ratio",
+            "type": {
+              "option": {
+                "defined": "Ratio"
+              }
+            }
           },
           {
-            name: 'lockFee',
-            type: {
-              option: 'u16',
-            },
+            "name": "lockFee",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            name: 'unlockFee',
-            type: {
-              option: 'u16',
-            },
+            "name": "unlockFee",
+            "type": {
+              "option": "u16"
+            }
           },
           {
-            name: 'feeReceiver',
-            type: {
-              option: 'publicKey',
-            },
-          },
-        ],
-      },
+            "name": "feeReceiver",
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
     },
     {
-      name: 'Ratio',
-      type: {
-        kind: 'struct',
-        fields: [
+      "name": "Ratio",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
-            name: 'num',
-            type: 'u64',
+            "name": "num",
+            "type": "u64"
           },
           {
-            name: 'denom',
-            type: 'u64',
-          },
-        ],
-      },
-    },
+            "name": "denom",
+            "type": "u64"
+          }
+        ]
+      }
+    }
   ],
-  events: [
+  "events": [
     {
-      name: 'LockTokensEvent',
-      fields: [
+      "name": "LockTokensEvent",
+      "fields": [
         {
-          name: 'pair',
-          type: 'publicKey',
-          index: true,
+          "name": "pair",
+          "type": "publicKey",
+          "index": true
         },
         {
-          name: 'user',
-          type: 'publicKey',
-          index: true,
+          "name": "user",
+          "type": "publicKey",
+          "index": true
         },
         {
-          name: 'userWallet',
-          type: 'publicKey',
-          index: false,
+          "name": "userWallet",
+          "type": "publicKey",
+          "index": false
         },
         {
-          name: 'amount',
-          type: 'u64',
-          index: false,
+          "name": "amount",
+          "type": "u64",
+          "index": false
         },
         {
-          name: 'timestamp',
-          type: 'i64',
-          index: false,
-        },
-      ],
+          "name": "timestamp",
+          "type": "i64",
+          "index": false
+        }
+      ]
     },
     {
-      name: 'UnlockTokensEvent',
-      fields: [
+      "name": "UnlockTokensEvent",
+      "fields": [
         {
-          name: 'pair',
-          type: 'publicKey',
-          index: true,
+          "name": "pair",
+          "type": "publicKey",
+          "index": true
         },
         {
-          name: 'user',
-          type: 'publicKey',
-          index: true,
+          "name": "user",
+          "type": "publicKey",
+          "index": true
         },
         {
-          name: 'userWallet',
-          type: 'publicKey',
-          index: false,
+          "name": "userWallet",
+          "type": "publicKey",
+          "index": false
         },
         {
-          name: 'amount',
-          type: 'u64',
-          index: false,
+          "name": "amount",
+          "type": "u64",
+          "index": false
         },
         {
-          name: 'timestamp',
-          type: 'i64',
-          index: false,
-        },
-      ],
-    },
+          "name": "timestamp",
+          "type": "i64",
+          "index": false
+        }
+      ]
+    }
   ],
-  errors: [
+  "errors": [
     {
-      code: 6000,
-      name: 'Unauthorized',
-      msg: 'Unauthorized action',
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized action"
     },
     {
-      code: 6001,
-      name: 'IsPaused',
-      msg: 'Paused',
+      "code": 6001,
+      "name": "IsPaused",
+      "msg": "Paused"
     },
     {
-      code: 6002,
-      name: 'AlreadyResumed',
-      msg: 'Already resumed',
+      "code": 6002,
+      "name": "AlreadyResumed",
+      "msg": "Already resumed"
     },
     {
-      code: 6003,
-      name: 'StillRemainingLockedTokens',
-      msg: 'Pair still have locked tokens',
+      "code": 6003,
+      "name": "StillRemainingLockedTokens",
+      "msg": "Pair still have locked tokens"
     },
     {
-      code: 6004,
-      name: 'IsBlocked',
-      msg: 'User is blocked',
+      "code": 6004,
+      "name": "IsBlocked",
+      "msg": "User is blocked"
     },
     {
-      code: 6005,
-      name: 'AlreadyUnblocked',
-      msg: 'User is already unblocked',
+      "code": 6005,
+      "name": "AlreadyUnblocked",
+      "msg": "User is already unblocked"
     },
     {
-      code: 6006,
-      name: 'InsufficientLockedAmount',
-      msg: 'Insufficient locked amount',
+      "code": 6006,
+      "name": "InsufficientLockedAmount",
+      "msg": "Insufficient locked amount"
     },
     {
-      code: 6007,
-      name: 'InsufficientFunds',
-      msg: 'Insufficient funds',
-    },
-  ],
-}
+      "code": 6007,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    }
+  ]
+};
