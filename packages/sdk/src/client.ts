@@ -19,7 +19,7 @@ import {
   createResumePlatformInstruction,
   createSetAdminInstruction,
   createUnblockUserInstruction,
-  createUnlockTokensInstruction, createUpdatePairInstruction,
+  createUnlockTokensInstruction, createUpdatePairInstruction, createWithdrawFeeInstruction,
 } from './generated'
 import { IDL } from './idl/smart_converter'
 
@@ -396,6 +396,35 @@ export class SmartConverterClient {
     }
   }
 
+  async withdrawFee(props: WithdrawFeeProps) {
+    const payer = this.wallet.publicKey
+    const [manager] = await this.pda.manager(payer)
+    const tokenA = props.tokenA
+    const tokenB = props.tokenB
+    const [pair] = await this.pda.pair(tokenA, tokenB)
+    const [pairAuthority] = await this.pda.pairAuthority(pair)
+
+    const ix = createWithdrawFeeInstruction(
+      {
+        authority: payer,
+        destination: props.destination,
+        manager,
+        pair,
+        pairAuthority,
+        tokenA,
+        tokenB,
+      },
+      {
+        amount: props.amount,
+      },
+    )
+    const tx = new Transaction().add(ix)
+
+    return {
+      tx,
+    }
+  }
+
   async unblockUser(props: UpdateUserProps) {
     const payer = this.wallet.publicKey
     const userWallet = props.userWallet
@@ -585,6 +614,13 @@ interface RemovePairProps {
 
 interface SetAdminProps {
   adminWallet: PublicKey
+}
+
+interface WithdrawFeeProps {
+  tokenA: PublicKey
+  tokenB: PublicKey
+  destination: PublicKey
+  amount: BN
 }
 
 interface UnlockTokensProps {
