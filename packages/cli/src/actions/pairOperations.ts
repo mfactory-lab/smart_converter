@@ -1,6 +1,6 @@
 import { BN, web3 } from '@project-serum/anchor'
 import log from 'loglevel'
-import { createAssociatedTokenAccount } from '@solana/spl-token'
+import { getOrCreateAssociatedTokenAccount } from '@solana/spl-token'
 import { useContext } from '../context'
 
 interface AddPairOpts {
@@ -19,7 +19,7 @@ interface UpdatePairOpts {
   tokenA: string
   tokenB: string
   managerWallet?: string
-  isPaused?: boolean
+  isPaused?: string
   num?: number
   denom?: number
   feeReceiver?: string
@@ -44,7 +44,7 @@ export async function addPair(opts: AddPairOpts) {
 
   const [pair] = await client.pda.pair(tokenA, tokenB)
   const [pairAuthority] = await client.pda.pairAuthority(pair)
-  await createAssociatedTokenAccount(provider.connection, keypair, tokenA, pairAuthority)
+  await getOrCreateAssociatedTokenAccount(provider.connection, keypair, tokenA, pairAuthority, true)
 
   const { tx } = await client.addPair({
     ratio: { num, denom },
@@ -98,6 +98,10 @@ export async function updatePair(opts: UpdatePairOpts) {
     const denom = new BN(opts.denom)
     ratio = { num, denom }
   }
+  let isPaused
+  if (opts.isPaused !== undefined) {
+    isPaused = opts.isPaused.includes('true')
+  }
 
   const { tx, pair } = await client.updatePair({
     tokenA: new web3.PublicKey(opts.tokenA),
@@ -107,7 +111,7 @@ export async function updatePair(opts: UpdatePairOpts) {
     lockFee: opts.lockFee,
     unlockFee: opts.unlockFee,
     ratio,
-    isPaused: opts.isPaused,
+    isPaused,
   })
 
   try {
@@ -142,7 +146,7 @@ export async function withdrawFee(opts: WithdrawFeeOpts) {
 }
 
 export async function showPairInfo(address: string) {
-  const { client, provider } = useContext()
+  const { client, provider, cluster } = useContext()
 
   const pair = new web3.PublicKey(address)
   const pairData = await client.fetchPair(pair)
@@ -152,7 +156,7 @@ export async function showPairInfo(address: string) {
   log.info('--------------------------------------------------------------------------')
   log.info(`Pair: ${pair}`)
   log.info(`Token A: ${pairData.tokenA} - TokenB: ${pairData.tokenB}`)
-  log.info(`Ratio: ${pairData.ratio}`)
+  log.info(`Ratio: ${pairData.ratio.num}/${pairData.ratio.denom}`)
   log.info(`Manager wallet: ${pairData.managerWallet}`)
   log.info(`Fee receiver: ${pairData.feeReceiver}`)
   log.info(`Is pair paused: ${pairData.isPaused}`)
@@ -160,11 +164,12 @@ export async function showPairInfo(address: string) {
   log.info(`Lock fee (in .%): ${pairData.lockFee}`)
   log.info(`Unlock fee (in .%): ${pairData.unlockFee}`)
   log.info(`Fee balance: ${feeBalance}`)
+  log.info(`See whitelisted users: "pnpm cli -c ${cluster} pair show-users ${pair}"`)
   log.info('--------------------------------------------------------------------------')
 }
 
 export async function findPairInfo(tokenA: string, tokenB: string) {
-  const { client, provider } = useContext()
+  const { client, provider, cluster } = useContext()
 
   const [pair] = await client.pda.pair(new web3.PublicKey(tokenA), new web3.PublicKey(tokenB))
   const pairData = await client.fetchPair(pair)
@@ -174,7 +179,7 @@ export async function findPairInfo(tokenA: string, tokenB: string) {
   log.info('--------------------------------------------------------------------------')
   log.info(`Pair: ${pair}`)
   log.info(`Token A: ${pairData.tokenA} - TokenB: ${pairData.tokenB}`)
-  log.info(`Ratio: ${pairData.ratio}`)
+  log.info(`Ratio: ${pairData.ratio.num}/${pairData.ratio.denom}`)
   log.info(`Manager wallet: ${pairData.managerWallet}`)
   log.info(`Fee receiver: ${pairData.feeReceiver}`)
   log.info(`Is pair paused: ${pairData.isPaused}`)
@@ -182,6 +187,7 @@ export async function findPairInfo(tokenA: string, tokenB: string) {
   log.info(`Lock fee (in .%): ${pairData.lockFee}`)
   log.info(`Unlock fee (in .%): ${pairData.unlockFee}`)
   log.info(`Fee balance: ${feeBalance}`)
+  log.info(`See whitelisted users: "pnpm cli -c ${cluster} pair show-users ${pair}"`)
   log.info('--------------------------------------------------------------------------')
 }
 

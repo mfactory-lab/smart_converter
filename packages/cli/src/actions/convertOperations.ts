@@ -25,7 +25,7 @@ export async function lockTokens(opts: Opts) {
   }
 
   const sourceA = await getAssociatedTokenAddress(tokenA, provider.wallet.publicKey)
-  const destinationA = await getAssociatedTokenAddress(tokenA, pairAuhtority)
+  const destinationA = await getAssociatedTokenAddress(tokenA, pairAuhtority, true)
   const destinationB = (await getOrCreateAssociatedTokenAccount(provider.connection, keypair, tokenB, provider.wallet.publicKey)).address
 
   const { tx } = await client.lockTokens({
@@ -64,7 +64,7 @@ export async function unlockTokens(opts: Opts) {
     feePayer = new web3.PublicKey(opts.feePayer)
   }
 
-  const sourceA = await getAssociatedTokenAddress(tokenA, pairAuhtority)
+  const sourceA = await getAssociatedTokenAddress(tokenA, pairAuhtority, true)
   const destinationA = await getAssociatedTokenAddress(tokenA, provider.wallet.publicKey)
   const sourceB = await getAssociatedTokenAddress(tokenB, provider.wallet.publicKey)
 
