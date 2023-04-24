@@ -69,6 +69,29 @@ export class SmartConverterClient {
     return await this.program.account.whitelistedUserInfo.fetchNullable(address) as unknown as WhitelistedUserInfo
   }
 
+  async findManagers() {
+    return await this.program.account.manager.all()
+  }
+
+  async findPairs() {
+    return await this.program.account.pair.all()
+  }
+
+  async findManagerPairs(managerWallet: web3.PublicKey) {
+    const accounts = await this.program.account.pair.all()
+    return accounts.filter(a => a.account.managerWallet.toBase58() === managerWallet.toBase58())
+  }
+
+  async findWhitelistedUsers(pair: web3.PublicKey) {
+    const accounts = await this.program.account.whitelistedUserInfo.all()
+    return accounts.filter(a => a.account.pair.toBase58() === pair.toBase58())
+  }
+
+  async findUserWhitelistInfos(userWallet: web3.PublicKey) {
+    const accounts = await this.program.account.whitelistedUserInfo.all()
+    return accounts.filter(a => a.account.userWallet.toBase58() === userWallet.toBase58())
+  }
+
   // Functions that construct instructions using pre-generated sdk
   async addManager(props: ManagerProps) {
     const payer = this.wallet.publicKey

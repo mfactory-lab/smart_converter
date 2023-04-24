@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
 import fs from 'fs'
-import { OmnisolClient } from '@omnisol/sdk'
+import { SmartConverterClient } from '@smart-converter/sdk'
 import { AnchorProvider, Program, Wallet, web3 } from '@project-serum/anchor'
 import type { Cluster } from '@solana/web3.js'
 import { Keypair } from '@solana/web3.js'
@@ -9,7 +9,7 @@ import { clusterUrl } from './utils'
 export interface Context {
   cluster: Cluster | string
   provider: AnchorProvider
-  client: OmnisolClient
+  client: SmartConverterClient
   keypair: Keypair
 }
 
@@ -30,8 +30,8 @@ export function initContext({ cluster, keypair }: { cluster: Cluster; keypair: s
 
   context.cluster = cluster
   context.provider = new AnchorProvider(connection, wallet, opts)
-  context.client = new OmnisolClient({
-    program: new Program(OmnisolClient.IDL, OmnisolClient.programId, context.provider),
+  context.client = new SmartConverterClient({
+    program: new Program(SmartConverterClient.IDL, SmartConverterClient.programId, context.provider),
     wallet: context.provider.wallet,
   })
   context.keypair = walletKeypair
