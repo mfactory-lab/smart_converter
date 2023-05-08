@@ -23,11 +23,14 @@ pub fn verify(
         .data
         .try_borrow_mut()
         .map_err(|_| ErrorCode::AccountDidNotDeserialize)?[..];
-    let whitelisted_user_info: WhitelistedUserInfo = WhitelistedUserInfo::try_deserialize(&mut whitelisted_user_data)?;
 
-    if whitelisted_user_info.user_wallet != user_wallet || whitelisted_user_info.pair != pair_key {
-        check_compliant(&zkp_request, Some(user_wallet))?
+    if let Ok(whitelisted_user_info) = WhitelistedUserInfo::try_deserialize(&mut whitelisted_user_data) {
+        if whitelisted_user_info.user_wallet == user_wallet && whitelisted_user_info.pair == pair_key {
+            return Ok(());
+        }
     }
 
+    msg!("User is not in whitelist! Trying to verify ZKP request");
+    check_compliant(&zkp_request, Some(user_wallet))?;
     Ok(())
 }
