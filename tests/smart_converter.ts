@@ -7,6 +7,7 @@ const adminKeypair = web3.Keypair.generate()
 const managerKeypair = web3.Keypair.generate()
 const userKeypair = web3.Keypair.generate()
 const opts = AnchorProvider.defaultOptions()
+
 const providerAdmin = new AnchorProvider(
   new web3.Connection('http://localhost:8899', opts.preflightCommitment),
   new Wallet(adminKeypair),
@@ -459,7 +460,7 @@ describe('smart_converter', () => {
   })
 
   describe('user instructions', async () => {
-    it('can not lock tokens if user is not whitelisted', async () => {
+    it('can not lock tokens if user is not whitelisted and ZKP request is not created', async () => {
       userA = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, providerUser.wallet.publicKey)
       userB = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintB, providerUser.wallet.publicKey)
       const [pair] = await clientUser.pda.pair(mintA, mintB)
@@ -481,11 +482,11 @@ describe('smart_converter', () => {
         await providerUser.sendAndConfirm(tx)
         assert.ok(false)
       } catch (e: any) {
-        assertErrorCode(e, 'AccountNotInitialized')
+        assertErrorCode(e, 'InvalidAccountData')
       }
     })
 
-    it('can not unlock tokens if user is not whitelisted', async () => {
+    it('can not unlock tokens if user is not whitelisted and ZKP request is not created', async () => {
       const { tx } = await clientUser.unlockTokens({
         amount: new BN(5 * web3.LAMPORTS_PER_SOL),
         destinationA: userA,
@@ -500,8 +501,20 @@ describe('smart_converter', () => {
         await providerUser.sendAndConfirm(tx)
         assert.ok(false)
       } catch (e: any) {
-        assertErrorCode(e, 'AccountNotInitialized')
+        assertErrorCode(e, 'InvalidAccountData')
       }
+    })
+
+    it('can not lock/unlock tokens if user is not whitelisted and ZKP request is not verified', async () => {
+      // TODO: impl after albus import
+    })
+
+    it('can not lock/unlock tokens if user is not whitelisted and the owner of ZKP request is not a user', async () => {
+      // TODO: impl after albus import
+    })
+
+    it('can not lock/unlock tokens if user is not whitelisted but has verified ZKP request', async () => {
+      // TODO: impl after albus import
     })
 
     it('can lock tokens', async () => {
