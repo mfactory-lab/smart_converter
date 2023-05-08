@@ -39,6 +39,7 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
  * @property [_writable_, **signer**] authority
  * @property [_writable_] user
  * @property [] whitelistedUserInfo
+ * @property [] zkpRequest
  * @property [_writable_] pair
  * @property [] manager
  * @property [] admin
@@ -60,6 +61,7 @@ export interface LockTokensInstructionAccounts {
   authority: web3.PublicKey
   user: web3.PublicKey
   whitelistedUserInfo: web3.PublicKey
+  zkpRequest: web3.PublicKey
   pair: web3.PublicKey
   manager: web3.PublicKey
   admin: web3.PublicKey
@@ -114,6 +116,11 @@ export function createLockTokensInstruction(
     },
     {
       pubkey: accounts.whitelistedUserInfo,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.zkpRequest,
       isWritable: false,
       isSigner: false,
     },

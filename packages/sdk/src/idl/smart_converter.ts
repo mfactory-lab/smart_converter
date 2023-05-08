@@ -244,6 +244,11 @@ export interface SmartConverter {
           'isSigner': false
         },
         {
+          'name': 'zkpRequest'
+          'isMut': false
+          'isSigner': false
+        },
+        {
           'name': 'pair'
           'isMut': true
           'isSigner': false
@@ -367,6 +372,11 @@ export interface SmartConverter {
         },
         {
           'name': 'whitelistedUserInfo'
+          'isMut': false
+          'isSigner': false
+        },
+        {
+          'name': 'zkpRequest'
           'isMut': false
           'isSigner': false
         },
@@ -1318,6 +1328,11 @@ export const IDL: SmartConverter = {
           isSigner: false,
         },
         {
+          name: 'zkpRequest',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'pair',
           isMut: true,
           isSigner: false,
@@ -1441,6 +1456,11 @@ export const IDL: SmartConverter = {
         },
         {
           name: 'whitelistedUserInfo',
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: 'zkpRequest',
           isMut: false,
           isSigner: false,
         },
