@@ -19,3 +19,11 @@ smart_converter = "BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH"
 
 [programs.testnet]
 smart_converter = "BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH"
+
+[[test.genesis]]
+address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+program = "target/deploy/metadata.so"
+
+[[test.genesis]]
+address = "ALBUSePbQQtw6WavFNyALeyL4ekBADRE28PQJovDDZQz"
+program = "target/deploy/albus.so"

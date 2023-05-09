@@ -1,27 +1,39 @@
 import { AnchorProvider, BN, Program, Wallet, web3 } from '@project-serum/anchor'
 import { assert } from 'chai'
 import { SmartConverterClient } from '@smart-converter/sdk/src/client'
+import { AlbusClient } from '@albus/packages/albus-sdk'
 import { TOKEN_PROGRAM_ID, createAssociatedTokenAccount, createMint, getOrCreateAssociatedTokenAccount, mintTo } from '@solana/spl-token'
+import { Metaplex, keypairIdentity } from '@metaplex-foundation/js'
 
 const adminKeypair = web3.Keypair.generate()
 const managerKeypair = web3.Keypair.generate()
 const userKeypair = web3.Keypair.generate()
-const opts = AnchorProvider.defaultOptions()
-const providerAdmin = new AnchorProvider(
-  new web3.Connection('http://localhost:8899', opts.preflightCommitment),
-  new Wallet(adminKeypair),
-  AnchorProvider.defaultOptions(),
-)
-const providerManager = new AnchorProvider(
-  new web3.Connection('http://localhost:8899', opts.preflightCommitment),
-  new Wallet(managerKeypair),
-  AnchorProvider.defaultOptions(),
-)
-const providerUser = new AnchorProvider(
-  new web3.Connection('http://localhost:8899', opts.preflightCommitment),
-  new Wallet(userKeypair),
-  AnchorProvider.defaultOptions(),
-)
+
+export const payerKeypair = web3.Keypair.fromSecretKey(Uint8Array.from([46, 183, 156, 94, 55, 128, 248, 0, 49, 70, 183, 244, 178, 0, 0, 236, 212, 131, 76, 78, 112, 48, 25, 79, 249, 33, 43, 158, 199, 2, 168, 18, 55, 174, 166, 159, 57, 67, 197, 158, 255, 142, 177, 177, 47, 39, 35, 185, 148, 253, 191, 58, 219, 119, 104, 89, 225, 26, 244, 119, 160, 6, 156, 227]))
+
+export function newProvider(payerKeypair: web3.Keypair) {
+  const opts = AnchorProvider.defaultOptions()
+  return new AnchorProvider(
+    new web3.Connection('http://localhost:8899', opts),
+    new Wallet(payerKeypair),
+    opts,
+  )
+}
+
+const providerAdmin = newProvider(adminKeypair)
+const providerManager = newProvider(managerKeypair)
+const providerUser = newProvider(userKeypair)
+const providerAlbus = newProvider(payerKeypair)
+
+async function mintNFT(metaplex: Metaplex, symbol: string) {
+  const { nft } = await metaplex.nfts().create({
+    uri: 'http://localhost/metadata.json',
+    name: 'ALBUS NFT',
+    symbol,
+    sellerFeeBasisPoints: 500,
+  })
+  return nft
+}
 
 describe('smart_converter', () => {
   const clientAdmin = new SmartConverterClient({
@@ -36,6 +48,11 @@ describe('smart_converter', () => {
     program: new Program(SmartConverterClient.IDL, SmartConverterClient.programId, providerUser),
     wallet: providerUser.wallet,
   })
+
+  const clientAlbusUser = new AlbusClient(providerUser)
+  const clientAlbusStranger = new AlbusClient(providerManager)
+  const clientAlbusManager = new AlbusClient(providerAlbus)
+  const metaplex = Metaplex.make(providerAlbus.connection).use(keypairIdentity(payerKeypair))
 
   let mintA: web3.PublicKey
   let mintB: web3.PublicKey
@@ -459,7 +476,7 @@ describe('smart_converter', () => {
   })
 
   describe('user instructions', async () => {
-    it('can not lock tokens if user is not whitelisted', async () => {
+    it('can not lock tokens if user is not whitelisted and ZKP request is not created', async () => {
       userA = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, providerUser.wallet.publicKey)
       userB = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintB, providerUser.wallet.publicKey)
       const [pair] = await clientUser.pda.pair(mintA, mintB)
@@ -481,11 +498,11 @@ describe('smart_converter', () => {
         await providerUser.sendAndConfirm(tx)
         assert.ok(false)
       } catch (e: any) {
-        assertErrorCode(e, 'AccountNotInitialized')
+        assertErrorCode(e, 'InvalidAccountData')
       }
     })
 
-    it('can not unlock tokens if user is not whitelisted', async () => {
+    it('can not unlock tokens if user is not whitelisted and ZKP request is not created', async () => {
       const { tx } = await clientUser.unlockTokens({
         amount: new BN(5 * web3.LAMPORTS_PER_SOL),
         destinationA: userA,
@@ -500,11 +517,155 @@ describe('smart_converter', () => {
         await providerUser.sendAndConfirm(tx)
         assert.ok(false)
       } catch (e: any) {
-        assertErrorCode(e, 'AccountNotInitialized')
+        assertErrorCode(e, 'InvalidAccountData')
       }
     })
 
-    it('can lock tokens', async () => {
+    it('can not lock/unlock tokens if user is not whitelisted and ZKP request is not verified', async () => {
+      await clientAlbusUser.addServiceProvider({
+        code: 'code',
+        name: 'name',
+      })
+
+      const nft = await mintNFT(metaplex, 'ALBUS-C')
+      const mint = nft.address
+
+      await clientAlbusUser.createZKPRequest({
+        circuitMint: mint,
+        serviceProviderCode: 'code',
+      })
+
+      const [serviceProviderAddress] = clientAlbusUser.getServiceProviderPDA('code')
+      const [ZKPRequestAddress] = clientAlbusUser.getZKPRequestPDA(serviceProviderAddress, mint, userKeypair.publicKey)
+
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+        zkpRequest: ZKPRequestAddress,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'Custom(3)')
+      }
+    })
+
+    it('can not lock/unlock tokens if user is not whitelisted and the owner of ZKP request is not a user', async () => {
+      const nft = await mintNFT(metaplex, 'ALBUS-C')
+      const mint = nft.address
+
+      await clientAlbusStranger.createZKPRequest({
+        circuitMint: mint,
+        serviceProviderCode: 'code',
+      })
+
+      const [serviceProviderAddress] = clientAlbusStranger.getServiceProviderPDA('code')
+      const [ZKPRequestAddress] = clientAlbusStranger.getZKPRequestPDA(serviceProviderAddress, mint, userKeypair.publicKey)
+
+      const { tx } = await clientUser.unlockTokens({
+        amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+        zkpRequest: ZKPRequestAddress,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+        assert.ok(false)
+      } catch (e: any) {
+        assertErrorCode(e, 'InvalidAccountData')
+      }
+    })
+
+    it('can lock/unlock tokens if user is not whitelisted but has verified ZKP request', async () => {
+      const nft = await mintNFT(metaplex, 'ALBUS-C')
+      const mint = nft.address
+
+      await clientAlbusUser.createZKPRequest({
+        circuitMint: mint,
+        serviceProviderCode: 'code',
+      })
+
+      const [serviceProviderAddress] = clientAlbusUser.getServiceProviderPDA('code')
+      const [ZKPRequestAddress] = clientAlbusUser.getZKPRequestPDA(serviceProviderAddress, mint, userKeypair.publicKey)
+
+      const proofNft = await mintNFT(metaplex, 'ALBUS-P')
+
+      await clientAlbusUser.prove({
+        proofMetadata: proofNft.metadataAddress,
+        zkpRequest: ZKPRequestAddress,
+      })
+
+      await clientAlbusManager.verify({
+        zkpRequest: ZKPRequestAddress,
+      })
+
+      let sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
+      let destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
+      let destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
+      assert.equal(destinationABalance.value.amount, '0')
+      assert.equal(sourceABalance.value.amount, '6000000000')
+      assert.equal(destinationBBalance.value.amount, '0')
+
+      const { tx, pair } = await clientUser.lockTokens({
+        amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+        destinationA: pairA,
+        destinationB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: userA,
+        tokenA: mintA,
+        tokenB: mintB,
+        zkpRequest: ZKPRequestAddress,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx)
+      } catch (e: any) {
+        console.log(e)
+        throw e
+      }
+
+      sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
+      destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
+      destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
+      assert.equal(destinationABalance.value.amount, '5000000000')
+      assert.equal(sourceABalance.value.amount, '1000000000')
+      assert.equal(destinationBBalance.value.amount, '50000000000')
+
+      const pairData = await clientManager.fetchPair(pair)
+      assert.equal(pairData.lockedAmount, 5 * web3.LAMPORTS_PER_SOL)
+
+      const { tx: tx2 } = await clientUser.unlockTokens({
+        amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+        destinationA: userA,
+        sourceB: userB,
+        managerWallet: providerManager.wallet.publicKey,
+        sourceA: pairA,
+        tokenA: mintA,
+        tokenB: mintB,
+        zkpRequest: ZKPRequestAddress,
+      })
+
+      try {
+        await providerUser.sendAndConfirm(tx2)
+      } catch (e: any) {
+        console.log(e)
+        throw e
+      }
+    })
+
+    it('can lock tokens if user whitelisted', async () => {
       const { tx: tx1 } = await clientManager.addUserToWhitelist({
         tokenA: mintA,
         tokenB: mintB,
@@ -717,7 +878,7 @@ describe('smart_converter', () => {
       }
     })
 
-    it('can unlock tokens', async () => {
+    it('can unlock tokens if user whitelisted', async () => {
       let sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
       let destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
       let destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)

@@ -244,6 +244,7 @@ export class SmartConverterClient {
 
     const ix = createLockTokensInstruction(
       {
+        zkpRequest: props.zkpRequest ?? web3.PublicKey.default,
         feePayer: props.feePayer ?? payer,
         feeReceiver: pairData.feeReceiver,
         whitelistedUserInfo,
@@ -485,6 +486,7 @@ export class SmartConverterClient {
 
     const ix = createUnlockTokensInstruction(
       {
+        zkpRequest: props.zkpRequest ?? web3.PublicKey.default,
         feePayer: props.feePayer ?? payer,
         feeReceiver: pairData.feeReceiver,
         whitelistedUserInfo,
@@ -624,6 +626,7 @@ interface LockTokensProps {
   destinationB: PublicKey
   amount: BN
   feePayer?: PublicKey
+  zkpRequest?: PublicKey
 }
 
 interface ManagerProps {
@@ -655,6 +658,7 @@ interface UnlockTokensProps {
   destinationA: PublicKey
   amount: BN
   feePayer?: PublicKey
+  zkpRequest?: PublicKey
 }
 
 interface UpdatePairProps {

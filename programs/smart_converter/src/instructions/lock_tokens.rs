@@ -3,7 +3,8 @@ use anchor_spl::token;
 
 use crate::{
     events::LockTokensEvent,
-    state::{Admin, Manager, Pair, User, WhitelistedUserInfo},
+    state::{Admin, Manager, Pair, User},
+    utils::verify,
     ErrorCode,
 };
 
@@ -20,6 +21,14 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     let pair_key = pair.key();
     let pair_authority_seeds = [pair_key.as_ref(), &[ctx.bumps["pair_authority"]]];
 
+    // Check if user have access to lock tokens
+    verify(
+        ctx.accounts.whitelisted_user_info.to_account_info(),
+        ctx.accounts.zkp_request.to_account_info(),
+        user_wallet,
+        pair_key,
+    )?;
+
     if admin.is_platform_paused || manager.is_all_paused || pair.is_paused {
         return Err(ErrorCode::IsPaused.into());
     }
@@ -29,8 +38,11 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     }
 
     if pair.lock_fee > 0 {
-        let fee = amount.checked_div(1000).ok_or(ErrorCode::InsufficientFunds)?
-            .checked_mul(pair.lock_fee as u64).ok_or(ErrorCode::InsufficientFunds)?;
+        let fee = amount
+            .checked_div(1000)
+            .ok_or(ErrorCode::InsufficientFunds)?
+            .checked_mul(pair.lock_fee as u64)
+            .ok_or(ErrorCode::InsufficientFunds)?;
         msg!("Transfer deposit fee: {} lamports", fee);
 
         system_program::transfer(
@@ -98,11 +110,11 @@ pub struct LockTokens<'info> {
     )]
     pub user: Box<Account<'info, User>>,
 
-    #[account(
-        seeds = [WhitelistedUserInfo::SEED, authority.key().as_ref(), pair.key().as_ref()],
-        bump,
-    )]
-    pub whitelisted_user_info: Box<Account<'info, WhitelistedUserInfo>>,
+    /// CHECK: will be checked in code
+    pub whitelisted_user_info: AccountInfo<'info>,
+
+    /// CHECK: will be checked in code
+    pub zkp_request: AccountInfo<'info>,
 
     #[account(
         mut,

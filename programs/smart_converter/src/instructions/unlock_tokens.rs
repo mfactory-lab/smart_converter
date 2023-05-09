@@ -3,7 +3,8 @@ use anchor_spl::token;
 
 use crate::{
     events::UnlockTokensEvent,
-    state::{Admin, Manager, Pair, User, WhitelistedUserInfo},
+    state::{Admin, Manager, Pair, User},
+    utils::verify,
     ErrorCode,
 };
 
@@ -16,8 +17,17 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     let pair = &mut ctx.accounts.pair;
     let clock = &ctx.accounts.clock;
 
+    let user_wallet = ctx.accounts.authority.key();
     let pair_key = pair.key();
     let pair_authority_seeds = [pair_key.as_ref(), &[ctx.bumps["pair_authority"]]];
+
+    // Check if user have access to unlock tokens
+    verify(
+        ctx.accounts.whitelisted_user_info.to_account_info(),
+        ctx.accounts.zkp_request.to_account_info(),
+        user_wallet,
+        pair_key,
+    )?;
 
     if admin.is_platform_paused || manager.is_all_paused || pair.is_paused {
         return Err(ErrorCode::IsPaused.into());
@@ -32,8 +42,11 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     }
 
     if pair.unlock_fee > 0 {
-        let fee = amount.checked_div(1000).ok_or(ErrorCode::InsufficientFunds)?
-            .checked_mul(pair.unlock_fee as u64).ok_or(ErrorCode::InsufficientFunds)?;
+        let fee = amount
+            .checked_div(1000)
+            .ok_or(ErrorCode::InsufficientFunds)?
+            .checked_mul(pair.unlock_fee as u64)
+            .ok_or(ErrorCode::InsufficientFunds)?;
         msg!("Transfer deposit fee: {} lamports", fee);
 
         system_program::transfer(
@@ -81,7 +94,7 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     emit!(UnlockTokensEvent {
         pair: pair_key,
         user: user.key(),
-        user_wallet: ctx.accounts.authority.key(),
+        user_wallet,
         amount,
         timestamp: clock.unix_timestamp,
     });
@@ -101,11 +114,11 @@ pub struct UnlockTokens<'info> {
     )]
     pub user: Box<Account<'info, User>>,
 
-    #[account(
-        seeds = [WhitelistedUserInfo::SEED, authority.key().as_ref(), pair.key().as_ref()],
-        bump,
-    )]
-    pub whitelisted_user_info: Box<Account<'info, WhitelistedUserInfo>>,
+    /// CHECK: will be checked in code
+    pub whitelisted_user_info: AccountInfo<'info>,
+
+    /// CHECK: will be checked in code
+    pub zkp_request: AccountInfo<'info>,
 
     #[account(
         mut,
