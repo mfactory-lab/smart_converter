@@ -61,6 +61,8 @@ dependencies = [
 [[package]]
 name = "albus-verifier"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfef80cae7bf6995659912b0ea8f13f8946f12f0f4d4971ef78a39a3f389d992"
 dependencies = [
  "arrayref",
  "solana-program",
