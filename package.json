@@ -1,6 +1,5 @@
 {
   "private": true,
-  "type": "module",
   "packageManager": "pnpm@8.14.0",
   "scripts": {
     "cli": "pnpm -F cli run cli",
