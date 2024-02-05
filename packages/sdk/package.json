@@ -1,16 +1,18 @@
 {
   "name": "@smart-converter/sdk",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "private": true,
+  "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "api:gen": "DEBUG='(solita|rustbin):(info|error)' solita"
+    "generate": "DEBUG='(solita|rustbin):(info|error)' solita"
   },
   "dependencies": {
-    "@solana/spl-token": "^0.3.6",
-    "@solana/web3.js": "^1.63.1"
+    "@metaplex-foundation/js": "^0.20.1",
+    "@solana/spl-token": "^0.3.7",
+    "@solana/web3.js": "^1.89.1"
   },
   "devDependencies": {
-    "@metaplex-foundation/solita": "^0.18.0"
+    "@metaplex-foundation/solita": "^0.20.1"
   }
 }

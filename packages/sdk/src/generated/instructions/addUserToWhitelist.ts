@@ -17,7 +17,7 @@ export const addUserToWhitelistStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'AddUserToWhitelistInstructionArgs',
+  'AddUserToWhitelistInstructionArgs'
 )
 /**
  * Accounts required by the _addUserToWhitelist_ instruction
@@ -25,7 +25,7 @@ export const addUserToWhitelistStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] authority
  * @property [] manager
  * @property [_writable_] user
- * @property [] userWallet
+ * @property [] userAuthority
  * @property [_writable_] whitelistedUserInfo
  * @property [_writable_] pair
  * @property [_writable_] tokenA
@@ -34,11 +34,11 @@ export const addUserToWhitelistStruct = new beet.BeetArgsStruct<{
  * @category AddUserToWhitelist
  * @category generated
  */
-export interface AddUserToWhitelistInstructionAccounts {
+export type AddUserToWhitelistInstructionAccounts = {
   authority: web3.PublicKey
   manager: web3.PublicKey
   user: web3.PublicKey
-  userWallet: web3.PublicKey
+  userAuthority: web3.PublicKey
   whitelistedUserInfo: web3.PublicKey
   pair: web3.PublicKey
   tokenA: web3.PublicKey
@@ -61,7 +61,7 @@ export const addUserToWhitelistInstructionDiscriminator = [
  */
 export function createAddUserToWhitelistInstruction(
   accounts: AddUserToWhitelistInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = addUserToWhitelistStruct.serialize({
     instructionDiscriminator: addUserToWhitelistInstructionDiscriminator,
@@ -83,7 +83,7 @@ export function createAddUserToWhitelistInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.userWallet,
+      pubkey: accounts.userAuthority,
       isWritable: false,
       isSigner: false,
     },

@@ -14,8 +14,8 @@ import * as beet from '@metaplex-foundation/beet'
  * @category Accounts
  * @category generated
  */
-export interface UserArgs {
-  userWallet: web3.PublicKey
+export type UserArgs = {
+  authority: web3.PublicKey
   isBlocked: boolean
 }
 
@@ -29,15 +29,15 @@ export const userDiscriminator = [159, 117, 95, 227, 239, 151, 58, 236]
  */
 export class User implements UserArgs {
   private constructor(
-    readonly userWallet: web3.PublicKey,
-    readonly isBlocked: boolean,
+    readonly authority: web3.PublicKey,
+    readonly isBlocked: boolean
   ) {}
 
   /**
    * Creates a {@link User} instance from the provided args.
    */
   static fromArgs(args: UserArgs) {
-    return new User(args.userWallet, args.isBlocked)
+    return new User(args.authority, args.isBlocked)
   }
 
   /**
@@ -46,7 +46,7 @@ export class User implements UserArgs {
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
-    offset = 0,
+    offset = 0
   ): [User, number] {
     return User.deserialize(accountInfo.data, offset)
   }
@@ -60,11 +60,11 @@ export class User implements UserArgs {
   static async fromAccountAddress(
     connection: web3.Connection,
     address: web3.PublicKey,
-    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig,
+    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
   ): Promise<User> {
     const accountInfo = await connection.getAccountInfo(
       address,
-      commitmentOrConfig,
+      commitmentOrConfig
     )
     if (accountInfo == null) {
       throw new Error(`Unable to find User account at ${address}`)
@@ -80,8 +80,8 @@ export class User implements UserArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH',
-    ),
+      'JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm'
+    )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, userBeet)
   }
@@ -121,11 +121,11 @@ export class User implements UserArgs {
    */
   static async getMinimumBalanceForRentExemption(
     connection: web3.Connection,
-    commitment?: web3.Commitment,
+    commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
       User.byteSize,
-      commitment,
+      commitment
     )
   }
 
@@ -143,7 +143,7 @@ export class User implements UserArgs {
    */
   pretty() {
     return {
-      userWallet: this.userWallet.toBase58(),
+      authority: this.authority.toBase58(),
       isBlocked: this.isBlocked,
     }
   }
@@ -161,9 +161,9 @@ export const userBeet = new beet.BeetStruct<
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['userWallet', beetSolana.publicKey],
+    ['authority', beetSolana.publicKey],
     ['isBlocked', beet.bool],
   ],
   User.fromArgs,
-  'User',
+  'User'
 )

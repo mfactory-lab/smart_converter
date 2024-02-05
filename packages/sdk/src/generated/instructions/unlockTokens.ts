@@ -14,7 +14,7 @@ import * as web3 from '@solana/web3.js'
  * @category UnlockTokens
  * @category generated
  */
-export interface UnlockTokensInstructionArgs {
+export type UnlockTokensInstructionArgs = {
   amount: beet.bignum
 }
 /**
@@ -31,20 +31,19 @@ export const unlockTokensStruct = new beet.BeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['amount', beet.u64],
   ],
-  'UnlockTokensInstructionArgs',
+  'UnlockTokensInstructionArgs'
 )
 /**
  * Accounts required by the _unlockTokens_ instruction
  *
- * @property [_writable_, **signer**] authority
+ * @property [] proofRequest (optional)
  * @property [_writable_] user
- * @property [] whitelistedUserInfo
- * @property [] zkpRequest
+ * @property [_writable_, **signer**] userAuthority
  * @property [_writable_] pair
+ * @property [] pairAuthority
+ * @property [] whitelistedUserInfo
  * @property [] manager
  * @property [] admin
- * @property [] pairAuthority
- * @property [] managerWallet
  * @property [_writable_] tokenA
  * @property [_writable_] tokenB
  * @property [_writable_] sourceA
@@ -52,21 +51,19 @@ export const unlockTokensStruct = new beet.BeetArgsStruct<
  * @property [_writable_] sourceB
  * @property [_writable_, **signer**] feePayer
  * @property [_writable_] feeReceiver
- * @property [] clock
  * @category Instructions
  * @category UnlockTokens
  * @category generated
  */
-export interface UnlockTokensInstructionAccounts {
-  authority: web3.PublicKey
+export type UnlockTokensInstructionAccounts = {
+  proofRequest?: web3.PublicKey
   user: web3.PublicKey
-  whitelistedUserInfo: web3.PublicKey
-  zkpRequest: web3.PublicKey
+  userAuthority: web3.PublicKey
   pair: web3.PublicKey
+  pairAuthority: web3.PublicKey
+  whitelistedUserInfo: web3.PublicKey
   manager: web3.PublicKey
   admin: web3.PublicKey
-  pairAuthority: web3.PublicKey
-  managerWallet: web3.PublicKey
   tokenA: web3.PublicKey
   tokenB: web3.PublicKey
   sourceA: web3.PublicKey
@@ -74,7 +71,6 @@ export interface UnlockTokensInstructionAccounts {
   sourceB: web3.PublicKey
   feePayer: web3.PublicKey
   feeReceiver: web3.PublicKey
-  clock: web3.PublicKey
   tokenProgram?: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -87,6 +83,9 @@ export const unlockTokensInstructionDiscriminator = [
 /**
  * Creates a _UnlockTokens_ instruction.
  *
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
+ *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
@@ -97,7 +96,7 @@ export const unlockTokensInstructionDiscriminator = [
 export function createUnlockTokensInstruction(
   accounts: UnlockTokensInstructionAccounts,
   args: UnlockTokensInstructionArgs,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = unlockTokensStruct.serialize({
     instructionDiscriminator: unlockTokensInstructionDiscriminator,
@@ -105,9 +104,9 @@ export function createUnlockTokensInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.authority,
-      isWritable: true,
-      isSigner: true,
+      pubkey: accounts.proofRequest ?? programId,
+      isWritable: false,
+      isSigner: false,
     },
     {
       pubkey: accounts.user,
@@ -115,18 +114,23 @@ export function createUnlockTokensInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.whitelistedUserInfo,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.zkpRequest,
-      isWritable: false,
-      isSigner: false,
+      pubkey: accounts.userAuthority,
+      isWritable: true,
+      isSigner: true,
     },
     {
       pubkey: accounts.pair,
       isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.pairAuthority,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.whitelistedUserInfo,
+      isWritable: false,
       isSigner: false,
     },
     {
@@ -136,16 +140,6 @@ export function createUnlockTokensInstruction(
     },
     {
       pubkey: accounts.admin,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.pairAuthority,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.managerWallet,
       isWritable: false,
       isSigner: false,
     },
@@ -182,11 +176,6 @@ export function createUnlockTokensInstruction(
     {
       pubkey: accounts.feeReceiver,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.clock,
-      isWritable: false,
       isSigner: false,
     },
     {

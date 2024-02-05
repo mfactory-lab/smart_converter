@@ -17,7 +17,7 @@ export const resumePairsStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'ResumePairsInstructionArgs',
+  'ResumePairsInstructionArgs'
 )
 /**
  * Accounts required by the _resumePairs_ instruction
@@ -25,16 +25,14 @@ export const resumePairsStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] authority
  * @property [_writable_] manager
  * @property [] admin
- * @property [] managerWallet
  * @category Instructions
  * @category ResumePairs
  * @category generated
  */
-export interface ResumePairsInstructionAccounts {
+export type ResumePairsInstructionAccounts = {
   authority: web3.PublicKey
   manager: web3.PublicKey
   admin: web3.PublicKey
-  managerWallet: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -53,7 +51,7 @@ export const resumePairsInstructionDiscriminator = [
  */
 export function createResumePairsInstruction(
   accounts: ResumePairsInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = resumePairsStruct.serialize({
     instructionDiscriminator: resumePairsInstructionDiscriminator,
@@ -71,11 +69,6 @@ export function createResumePairsInstruction(
     },
     {
       pubkey: accounts.admin,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.managerWallet,
       isWritable: false,
       isSigner: false,
     },

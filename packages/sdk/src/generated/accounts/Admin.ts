@@ -14,7 +14,7 @@ import * as beet from '@metaplex-foundation/beet'
  * @category Accounts
  * @category generated
  */
-export interface AdminArgs {
+export type AdminArgs = {
   authority: web3.PublicKey
   isPlatformPaused: boolean
 }
@@ -30,7 +30,7 @@ export const adminDiscriminator = [244, 158, 220, 65, 8, 73, 4, 65]
 export class Admin implements AdminArgs {
   private constructor(
     readonly authority: web3.PublicKey,
-    readonly isPlatformPaused: boolean,
+    readonly isPlatformPaused: boolean
   ) {}
 
   /**
@@ -46,7 +46,7 @@ export class Admin implements AdminArgs {
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
-    offset = 0,
+    offset = 0
   ): [Admin, number] {
     return Admin.deserialize(accountInfo.data, offset)
   }
@@ -60,11 +60,11 @@ export class Admin implements AdminArgs {
   static async fromAccountAddress(
     connection: web3.Connection,
     address: web3.PublicKey,
-    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig,
+    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
   ): Promise<Admin> {
     const accountInfo = await connection.getAccountInfo(
       address,
-      commitmentOrConfig,
+      commitmentOrConfig
     )
     if (accountInfo == null) {
       throw new Error(`Unable to find Admin account at ${address}`)
@@ -80,8 +80,8 @@ export class Admin implements AdminArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH',
-    ),
+      'JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm'
+    )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, adminBeet)
   }
@@ -121,11 +121,11 @@ export class Admin implements AdminArgs {
    */
   static async getMinimumBalanceForRentExemption(
     connection: web3.Connection,
-    commitment?: web3.Commitment,
+    commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
       Admin.byteSize,
-      commitment,
+      commitment
     )
   }
 
@@ -165,5 +165,5 @@ export const adminBeet = new beet.BeetStruct<
     ['isPlatformPaused', beet.bool],
   ],
   Admin.fromArgs,
-  'Admin',
+  'Admin'
 )

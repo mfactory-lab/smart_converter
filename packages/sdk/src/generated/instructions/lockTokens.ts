@@ -14,7 +14,7 @@ import * as web3 from '@solana/web3.js'
  * @category LockTokens
  * @category generated
  */
-export interface LockTokensInstructionArgs {
+export type LockTokensInstructionArgs = {
   amount: beet.bignum
 }
 /**
@@ -31,20 +31,19 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['amount', beet.u64],
   ],
-  'LockTokensInstructionArgs',
+  'LockTokensInstructionArgs'
 )
 /**
  * Accounts required by the _lockTokens_ instruction
  *
- * @property [_writable_, **signer**] authority
+ * @property [] proofRequest (optional)
  * @property [_writable_] user
- * @property [] whitelistedUserInfo
- * @property [] zkpRequest
+ * @property [_writable_, **signer**] userAuthority
  * @property [_writable_] pair
- * @property [] manager
- * @property [] admin
  * @property [] pairAuthority
- * @property [] managerWallet
+ * @property [] whitelistedUserInfo
+ * @property [] admin
+ * @property [] manager
  * @property [_writable_] tokenA
  * @property [_writable_] tokenB
  * @property [_writable_] sourceA
@@ -52,21 +51,19 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
  * @property [_writable_] destinationB
  * @property [_writable_, **signer**] feePayer
  * @property [_writable_] feeReceiver
- * @property [] clock
  * @category Instructions
  * @category LockTokens
  * @category generated
  */
-export interface LockTokensInstructionAccounts {
-  authority: web3.PublicKey
+export type LockTokensInstructionAccounts = {
+  proofRequest?: web3.PublicKey
   user: web3.PublicKey
-  whitelistedUserInfo: web3.PublicKey
-  zkpRequest: web3.PublicKey
+  userAuthority: web3.PublicKey
   pair: web3.PublicKey
-  manager: web3.PublicKey
-  admin: web3.PublicKey
   pairAuthority: web3.PublicKey
-  managerWallet: web3.PublicKey
+  whitelistedUserInfo: web3.PublicKey
+  admin: web3.PublicKey
+  manager: web3.PublicKey
   tokenA: web3.PublicKey
   tokenB: web3.PublicKey
   sourceA: web3.PublicKey
@@ -74,7 +71,6 @@ export interface LockTokensInstructionAccounts {
   destinationB: web3.PublicKey
   feePayer: web3.PublicKey
   feeReceiver: web3.PublicKey
-  clock: web3.PublicKey
   tokenProgram?: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -87,6 +83,9 @@ export const lockTokensInstructionDiscriminator = [
 /**
  * Creates a _LockTokens_ instruction.
  *
+ * Optional accounts that are not provided default to the program ID since
+ * this was indicated in the IDL from which this instruction was generated.
+ *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
@@ -97,7 +96,7 @@ export const lockTokensInstructionDiscriminator = [
 export function createLockTokensInstruction(
   accounts: LockTokensInstructionAccounts,
   args: LockTokensInstructionArgs,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = lockTokensStruct.serialize({
     instructionDiscriminator: lockTokensInstructionDiscriminator,
@@ -105,9 +104,9 @@ export function createLockTokensInstruction(
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.authority,
-      isWritable: true,
-      isSigner: true,
+      pubkey: accounts.proofRequest ?? programId,
+      isWritable: false,
+      isSigner: false,
     },
     {
       pubkey: accounts.user,
@@ -115,14 +114,9 @@ export function createLockTokensInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.whitelistedUserInfo,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.zkpRequest,
-      isWritable: false,
-      isSigner: false,
+      pubkey: accounts.userAuthority,
+      isWritable: true,
+      isSigner: true,
     },
     {
       pubkey: accounts.pair,
@@ -130,7 +124,12 @@ export function createLockTokensInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.manager,
+      pubkey: accounts.pairAuthority,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.whitelistedUserInfo,
       isWritable: false,
       isSigner: false,
     },
@@ -140,12 +139,7 @@ export function createLockTokensInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.pairAuthority,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.managerWallet,
+      pubkey: accounts.manager,
       isWritable: false,
       isSigner: false,
     },
@@ -182,11 +176,6 @@ export function createLockTokensInstruction(
     {
       pubkey: accounts.feeReceiver,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.clock,
-      isWritable: false,
       isSigner: false,
     },
     {

@@ -6,7 +6,7 @@
  */
 
 import * as beet from '@metaplex-foundation/beet'
-export interface Ratio {
+export type Ratio = {
   num: beet.bignum
   denom: beet.bignum
 }
@@ -20,5 +20,5 @@ export const ratioBeet = new beet.BeetArgsStruct<Ratio>(
     ['num', beet.u64],
     ['denom', beet.u64],
   ],
-  'Ratio',
+  'Ratio'
 )

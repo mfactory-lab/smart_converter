@@ -17,7 +17,7 @@ export const pausePlatformStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'PausePlatformInstructionArgs',
+  'PausePlatformInstructionArgs'
 )
 /**
  * Accounts required by the _pausePlatform_ instruction
@@ -28,7 +28,7 @@ export const pausePlatformStruct = new beet.BeetArgsStruct<{
  * @category PausePlatform
  * @category generated
  */
-export interface PausePlatformInstructionAccounts {
+export type PausePlatformInstructionAccounts = {
   authority: web3.PublicKey
   admin: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -49,7 +49,7 @@ export const pausePlatformInstructionDiscriminator = [
  */
 export function createPausePlatformInstruction(
   accounts: PausePlatformInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = pausePlatformStruct.serialize({
     instructionDiscriminator: pausePlatformInstructionDiscriminator,

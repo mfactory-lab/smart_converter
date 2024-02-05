@@ -14,8 +14,8 @@ import * as beet from '@metaplex-foundation/beet'
  * @category Accounts
  * @category generated
  */
-export interface WhitelistedUserInfoArgs {
-  userWallet: web3.PublicKey
+export type WhitelistedUserInfoArgs = {
+  user: web3.PublicKey
   pair: web3.PublicKey
 }
 
@@ -31,15 +31,15 @@ export const whitelistedUserInfoDiscriminator = [
  */
 export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
   private constructor(
-    readonly userWallet: web3.PublicKey,
-    readonly pair: web3.PublicKey,
+    readonly user: web3.PublicKey,
+    readonly pair: web3.PublicKey
   ) {}
 
   /**
    * Creates a {@link WhitelistedUserInfo} instance from the provided args.
    */
   static fromArgs(args: WhitelistedUserInfoArgs) {
-    return new WhitelistedUserInfo(args.userWallet, args.pair)
+    return new WhitelistedUserInfo(args.user, args.pair)
   }
 
   /**
@@ -48,7 +48,7 @@ export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
-    offset = 0,
+    offset = 0
   ): [WhitelistedUserInfo, number] {
     return WhitelistedUserInfo.deserialize(accountInfo.data, offset)
   }
@@ -62,15 +62,15 @@ export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
   static async fromAccountAddress(
     connection: web3.Connection,
     address: web3.PublicKey,
-    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig,
+    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
   ): Promise<WhitelistedUserInfo> {
     const accountInfo = await connection.getAccountInfo(
       address,
-      commitmentOrConfig,
+      commitmentOrConfig
     )
     if (accountInfo == null) {
       throw new Error(
-        `Unable to find WhitelistedUserInfo account at ${address}`,
+        `Unable to find WhitelistedUserInfo account at ${address}`
       )
     }
     return WhitelistedUserInfo.fromAccountInfo(accountInfo, 0)[0]
@@ -84,8 +84,8 @@ export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH',
-    ),
+      'JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm'
+    )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, whitelistedUserInfoBeet)
   }
@@ -125,11 +125,11 @@ export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
    */
   static async getMinimumBalanceForRentExemption(
     connection: web3.Connection,
-    commitment?: web3.Commitment,
+    commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
       WhitelistedUserInfo.byteSize,
-      commitment,
+      commitment
     )
   }
 
@@ -147,7 +147,7 @@ export class WhitelistedUserInfo implements WhitelistedUserInfoArgs {
    */
   pretty() {
     return {
-      userWallet: this.userWallet.toBase58(),
+      user: this.user.toBase58(),
       pair: this.pair.toBase58(),
     }
   }
@@ -165,9 +165,9 @@ export const whitelistedUserInfoBeet = new beet.BeetStruct<
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['userWallet', beetSolana.publicKey],
+    ['user', beetSolana.publicKey],
     ['pair', beetSolana.publicKey],
   ],
   WhitelistedUserInfo.fromArgs,
-  'WhitelistedUserInfo',
+  'WhitelistedUserInfo'
 )

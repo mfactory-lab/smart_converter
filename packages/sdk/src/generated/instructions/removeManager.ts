@@ -17,7 +17,7 @@ export const removeManagerStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'RemoveManagerInstructionArgs',
+  'RemoveManagerInstructionArgs'
 )
 /**
  * Accounts required by the _removeManager_ instruction
@@ -25,16 +25,14 @@ export const removeManagerStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] authority
  * @property [_writable_] manager
  * @property [] admin
- * @property [] managerWallet
  * @category Instructions
  * @category RemoveManager
  * @category generated
  */
-export interface RemoveManagerInstructionAccounts {
+export type RemoveManagerInstructionAccounts = {
   authority: web3.PublicKey
   manager: web3.PublicKey
   admin: web3.PublicKey
-  managerWallet: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -53,7 +51,7 @@ export const removeManagerInstructionDiscriminator = [
  */
 export function createRemoveManagerInstruction(
   accounts: RemoveManagerInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = removeManagerStruct.serialize({
     instructionDiscriminator: removeManagerInstructionDiscriminator,
@@ -71,11 +69,6 @@ export function createRemoveManagerInstruction(
     },
     {
       pubkey: accounts.admin,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.managerWallet,
       isWritable: false,
       isSigner: false,
     },

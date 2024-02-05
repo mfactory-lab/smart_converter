@@ -5,34 +5,46 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
+import * as beet from '@metaplex-foundation/beet'
 
 /**
  * @category Instructions
  * @category SetAdmin
  * @category generated
  */
-export const setAdminStruct = new beet.BeetArgsStruct<{
-  instructionDiscriminator: number[] /* size: 8 */
-}>(
-  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'SetAdminInstructionArgs',
-)
+export type SetAdminInstructionArgs = {
+  key: web3.PublicKey
+}
 /**
- * Accounts required by the _setAdmin_ instruction
- *
- * @property [_writable_, **signer**] authority
- * @property [] adminWallet
- * @property [_writable_] admin
  * @category Instructions
  * @category SetAdmin
  * @category generated
  */
-export interface SetAdminInstructionAccounts {
-  authority: web3.PublicKey
-  adminWallet: web3.PublicKey
+export const setAdminStruct = new beet.BeetArgsStruct<
+  SetAdminInstructionArgs & {
+    instructionDiscriminator: number[] /* size: 8 */
+  }
+>(
+  [
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['key', beetSolana.publicKey],
+  ],
+  'SetAdminInstructionArgs'
+)
+/**
+ * Accounts required by the _setAdmin_ instruction
+ *
+ * @property [_writable_] admin
+ * @property [_writable_, **signer**] authority
+ * @category Instructions
+ * @category SetAdmin
+ * @category generated
+ */
+export type SetAdminInstructionAccounts = {
   admin: web3.PublicKey
+  authority: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -45,32 +57,31 @@ export const setAdminInstructionDiscriminator = [
  * Creates a _SetAdmin_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
+ * @param args to provide as instruction data to the program
+ *
  * @category Instructions
  * @category SetAdmin
  * @category generated
  */
 export function createSetAdminInstruction(
   accounts: SetAdminInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  args: SetAdminInstructionArgs,
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = setAdminStruct.serialize({
     instructionDiscriminator: setAdminInstructionDiscriminator,
+    ...args,
   })
   const keys: web3.AccountMeta[] = [
-    {
-      pubkey: accounts.authority,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
-      pubkey: accounts.adminWallet,
-      isWritable: false,
-      isSigner: false,
-    },
     {
       pubkey: accounts.admin,
       isWritable: true,
       isSigner: false,
+    },
+    {
+      pubkey: accounts.authority,
+      isWritable: true,
+      isSigner: true,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,

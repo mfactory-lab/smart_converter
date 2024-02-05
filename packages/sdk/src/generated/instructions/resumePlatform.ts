@@ -17,7 +17,7 @@ export const resumePlatformStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'ResumePlatformInstructionArgs',
+  'ResumePlatformInstructionArgs'
 )
 /**
  * Accounts required by the _resumePlatform_ instruction
@@ -28,7 +28,7 @@ export const resumePlatformStruct = new beet.BeetArgsStruct<{
  * @category ResumePlatform
  * @category generated
  */
-export interface ResumePlatformInstructionAccounts {
+export type ResumePlatformInstructionAccounts = {
   authority: web3.PublicKey
   admin: web3.PublicKey
   systemProgram?: web3.PublicKey
@@ -49,7 +49,7 @@ export const resumePlatformInstructionDiscriminator = [
  */
 export function createResumePlatformInstruction(
   accounts: ResumePlatformInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = resumePlatformStruct.serialize({
     instructionDiscriminator: resumePlatformInstructionDiscriminator,

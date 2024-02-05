@@ -5,17 +5,18 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
-import type { Ratio } from '../types/Ratio'
-import { ratioBeet } from '../types/Ratio'
+import * as beet from '@metaplex-foundation/beet'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
+import { Ratio, ratioBeet } from '../types/Ratio'
 
 /**
  * @category Instructions
  * @category AddPair
  * @category generated
  */
-export interface AddPairInstructionArgs {
+export type AddPairInstructionArgs = {
+  policy: beet.COption<web3.PublicKey>
   ratio: Ratio
 }
 /**
@@ -23,16 +24,17 @@ export interface AddPairInstructionArgs {
  * @category AddPair
  * @category generated
  */
-export const addPairStruct = new beet.BeetArgsStruct<
+export const addPairStruct = new beet.FixableBeetArgsStruct<
   AddPairInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['policy', beet.coption(beetSolana.publicKey)],
     ['ratio', ratioBeet],
   ],
-  'AddPairInstructionArgs',
+  'AddPairInstructionArgs'
 )
 /**
  * Accounts required by the _addPair_ instruction
@@ -47,7 +49,7 @@ export const addPairStruct = new beet.BeetArgsStruct<
  * @category AddPair
  * @category generated
  */
-export interface AddPairInstructionAccounts {
+export type AddPairInstructionAccounts = {
   authority: web3.PublicKey
   manager: web3.PublicKey
   pair: web3.PublicKey
@@ -75,7 +77,7 @@ export const addPairInstructionDiscriminator = [
 export function createAddPairInstruction(
   accounts: AddPairInstructionAccounts,
   args: AddPairInstructionArgs,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = addPairStruct.serialize({
     instructionDiscriminator: addPairInstructionDiscriminator,

@@ -1,6 +1,6 @@
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
+const fs = require('node:fs')
+const os = require('node:os')
+const path = require('node:path')
 
 const { programId, programName } = parseAnchorToml()
 
@@ -8,10 +8,10 @@ if (!programId) {
   throw new Error('Invalid `Anchor.toml`')
 }
 
-const programDir = path.join(__dirname, '..', '..', 'programs', programName);
-const idlDir = path.join(__dirname, 'idl');
-const sdkDir = path.join(__dirname, 'src', 'generated');
-const binaryInstallDir = path.join(os.homedir(), '.cargo');
+const programDir = path.join(__dirname, '..', '..', 'programs', programName)
+const idlDir = path.join(__dirname, 'idl')
+const sdkDir = path.join(__dirname, 'src', 'generated')
+const binaryInstallDir = path.join(os.homedir(), '.cargo')
 // const binaryInstallDir = path.join(__dirname, '.crates');
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
   sdkDir,
   binaryInstallDir,
   programDir,
-};
+}
 
 function parseAnchorToml() {
   const anchor = fs.readFileSync(path.join(__dirname, '..', '..', 'Anchor.toml'))

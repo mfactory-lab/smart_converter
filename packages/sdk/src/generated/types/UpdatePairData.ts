@@ -5,13 +5,12 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import type * as web3 from '@solana/web3.js'
+import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import type { Ratio } from './Ratio'
-import { ratioBeet } from './Ratio'
-export interface UpdatePairData {
-  managerWallet: beet.COption<web3.PublicKey>
+import { Ratio, ratioBeet } from './Ratio'
+export type UpdatePairData = {
+  newAuthority: beet.COption<web3.PublicKey>
   isPaused: beet.COption<boolean>
   ratio: beet.COption<Ratio>
   lockFee: beet.COption<number>
@@ -23,15 +22,15 @@ export interface UpdatePairData {
  * @category userTypes
  * @category generated
  */
-export const updatePairDataBeet
-  = new beet.FixableBeetArgsStruct<UpdatePairData>(
+export const updatePairDataBeet =
+  new beet.FixableBeetArgsStruct<UpdatePairData>(
     [
-      ['managerWallet', beet.coption(beetSolana.publicKey)],
+      ['newAuthority', beet.coption(beetSolana.publicKey)],
       ['isPaused', beet.coption(beet.bool)],
       ['ratio', beet.coption(ratioBeet)],
       ['lockFee', beet.coption(beet.u16)],
       ['unlockFee', beet.coption(beet.u16)],
       ['feeReceiver', beet.coption(beetSolana.publicKey)],
     ],
-    'UpdatePairData',
+    'UpdatePairData'
   )

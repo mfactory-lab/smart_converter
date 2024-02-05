@@ -14,7 +14,7 @@ import * as beet from '@metaplex-foundation/beet'
  * @category Accounts
  * @category generated
  */
-export interface ManagerArgs {
+export type ManagerArgs = {
   authority: web3.PublicKey
   isAllPaused: boolean
 }
@@ -30,7 +30,7 @@ export const managerDiscriminator = [221, 78, 171, 233, 213, 142, 113, 56]
 export class Manager implements ManagerArgs {
   private constructor(
     readonly authority: web3.PublicKey,
-    readonly isAllPaused: boolean,
+    readonly isAllPaused: boolean
   ) {}
 
   /**
@@ -46,7 +46,7 @@ export class Manager implements ManagerArgs {
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
-    offset = 0,
+    offset = 0
   ): [Manager, number] {
     return Manager.deserialize(accountInfo.data, offset)
   }
@@ -60,11 +60,11 @@ export class Manager implements ManagerArgs {
   static async fromAccountAddress(
     connection: web3.Connection,
     address: web3.PublicKey,
-    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig,
+    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
   ): Promise<Manager> {
     const accountInfo = await connection.getAccountInfo(
       address,
-      commitmentOrConfig,
+      commitmentOrConfig
     )
     if (accountInfo == null) {
       throw new Error(`Unable to find Manager account at ${address}`)
@@ -80,8 +80,8 @@ export class Manager implements ManagerArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH',
-    ),
+      'JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm'
+    )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, managerBeet)
   }
@@ -121,11 +121,11 @@ export class Manager implements ManagerArgs {
    */
   static async getMinimumBalanceForRentExemption(
     connection: web3.Connection,
-    commitment?: web3.Commitment,
+    commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
       Manager.byteSize,
-      commitment,
+      commitment
     )
   }
 
@@ -165,5 +165,5 @@ export const managerBeet = new beet.BeetStruct<
     ['isAllPaused', beet.bool],
   ],
   Manager.fromArgs,
-  'Manager',
+  'Manager'
 )

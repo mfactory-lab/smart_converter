@@ -13,7 +13,7 @@ import * as web3 from '@solana/web3.js'
  * @category WithdrawFee
  * @category generated
  */
-export interface WithdrawFeeInstructionArgs {
+export type WithdrawFeeInstructionArgs = {
   amount: beet.bignum
 }
 /**
@@ -30,29 +30,23 @@ export const withdrawFeeStruct = new beet.BeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['amount', beet.u64],
   ],
-  'WithdrawFeeInstructionArgs',
+  'WithdrawFeeInstructionArgs'
 )
 /**
  * Accounts required by the _withdrawFee_ instruction
  *
  * @property [_writable_] pair
- * @property [_writable_] tokenA
- * @property [_writable_] tokenB
  * @property [_writable_] pairAuthority
  * @property [_writable_] destination
- * @property [_writable_] manager
  * @property [_writable_, **signer**] authority
  * @category Instructions
  * @category WithdrawFee
  * @category generated
  */
-export interface WithdrawFeeInstructionAccounts {
+export type WithdrawFeeInstructionAccounts = {
   pair: web3.PublicKey
-  tokenA: web3.PublicKey
-  tokenB: web3.PublicKey
   pairAuthority: web3.PublicKey
   destination: web3.PublicKey
-  manager: web3.PublicKey
   authority: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
@@ -75,7 +69,7 @@ export const withdrawFeeInstructionDiscriminator = [
 export function createWithdrawFeeInstruction(
   accounts: WithdrawFeeInstructionAccounts,
   args: WithdrawFeeInstructionArgs,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = withdrawFeeStruct.serialize({
     instructionDiscriminator: withdrawFeeInstructionDiscriminator,
@@ -88,27 +82,12 @@ export function createWithdrawFeeInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.tokenA,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenB,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.pairAuthority,
       isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.destination,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.manager,
       isWritable: true,
       isSigner: false,
     },

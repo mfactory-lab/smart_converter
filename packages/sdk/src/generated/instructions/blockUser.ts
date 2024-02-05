@@ -17,7 +17,7 @@ export const blockUserStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'BlockUserInstructionArgs',
+  'BlockUserInstructionArgs'
 )
 /**
  * Accounts required by the _blockUser_ instruction
@@ -25,16 +25,14 @@ export const blockUserStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] authority
  * @property [] manager
  * @property [_writable_] user
- * @property [] userWallet
  * @category Instructions
  * @category BlockUser
  * @category generated
  */
-export interface BlockUserInstructionAccounts {
+export type BlockUserInstructionAccounts = {
   authority: web3.PublicKey
   manager: web3.PublicKey
   user: web3.PublicKey
-  userWallet: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -53,7 +51,7 @@ export const blockUserInstructionDiscriminator = [
  */
 export function createBlockUserInstruction(
   accounts: BlockUserInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = blockUserStruct.serialize({
     instructionDiscriminator: blockUserInstructionDiscriminator,
@@ -72,11 +70,6 @@ export function createBlockUserInstruction(
     {
       pubkey: accounts.user,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.userWallet,
-      isWritable: false,
       isSigner: false,
     },
     {

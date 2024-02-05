@@ -17,32 +17,22 @@ export const removeUserFromWhitelistStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'RemoveUserFromWhitelistInstructionArgs',
+  'RemoveUserFromWhitelistInstructionArgs'
 )
 /**
  * Accounts required by the _removeUserFromWhitelist_ instruction
  *
  * @property [_writable_, **signer**] authority
- * @property [] manager
- * @property [_writable_] user
- * @property [] userWallet
- * @property [_writable_] whitelistedUserInfo
  * @property [_writable_] pair
- * @property [_writable_] tokenA
- * @property [_writable_] tokenB
+ * @property [_writable_] whitelistedUserInfo
  * @category Instructions
  * @category RemoveUserFromWhitelist
  * @category generated
  */
-export interface RemoveUserFromWhitelistInstructionAccounts {
+export type RemoveUserFromWhitelistInstructionAccounts = {
   authority: web3.PublicKey
-  manager: web3.PublicKey
-  user: web3.PublicKey
-  userWallet: web3.PublicKey
-  whitelistedUserInfo: web3.PublicKey
   pair: web3.PublicKey
-  tokenA: web3.PublicKey
-  tokenB: web3.PublicKey
+  whitelistedUserInfo: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -61,7 +51,7 @@ export const removeUserFromWhitelistInstructionDiscriminator = [
  */
 export function createRemoveUserFromWhitelistInstruction(
   accounts: RemoveUserFromWhitelistInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = removeUserFromWhitelistStruct.serialize({
     instructionDiscriminator: removeUserFromWhitelistInstructionDiscriminator,
@@ -73,37 +63,12 @@ export function createRemoveUserFromWhitelistInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.manager,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.user,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.userWallet,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.whitelistedUserInfo,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.pair,
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.tokenA,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenB,
+      pubkey: accounts.whitelistedUserInfo,
       isWritable: true,
       isSigner: false,
     },

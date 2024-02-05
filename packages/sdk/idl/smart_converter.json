@@ -1,7 +1,33 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "smart_converter",
   "instructions": [
+    {
+      "name": "setAdmin",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "key",
+          "type": "publicKey"
+        }
+      ]
+    },
     {
       "name": "addManager",
       "accounts": [
@@ -11,7 +37,7 @@
           "isSigner": true
         },
         {
-          "name": "managerWallet",
+          "name": "admin",
           "isMut": false,
           "isSigner": false
         },
@@ -21,17 +47,17 @@
           "isSigner": false
         },
         {
-          "name": "admin",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "key",
+          "type": "publicKey"
+        }
+      ]
     },
     {
       "name": "addPair",
@@ -74,6 +100,12 @@
       ],
       "args": [
         {
+          "name": "policy",
+          "type": {
+            "option": "publicKey"
+          }
+        },
+        {
           "name": "ratio",
           "type": {
             "defined": "Ratio"
@@ -100,7 +132,7 @@
           "isSigner": false
         },
         {
-          "name": "userWallet",
+          "name": "userAuthority",
           "isMut": false,
           "isSigner": false
         },
@@ -141,37 +173,12 @@
           "isSigner": true
         },
         {
-          "name": "manager",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userWallet",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "whitelistedUserInfo",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "pair",
           "isMut": true,
           "isSigner": false
         },
         {
-          "name": "tokenA",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenB",
+          "name": "whitelistedUserInfo",
           "isMut": true,
           "isSigner": false
         },
@@ -229,9 +236,10 @@
       "name": "lockTokens",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "name": "proofRequest",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "user",
@@ -239,14 +247,9 @@
           "isSigner": false
         },
         {
-          "name": "whitelistedUserInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zkpRequest",
-          "isMut": false,
-          "isSigner": false
+          "name": "userAuthority",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "pair",
@@ -254,7 +257,12 @@
           "isSigner": false
         },
         {
-          "name": "manager",
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelistedUserInfo",
           "isMut": false,
           "isSigner": false
         },
@@ -264,12 +272,7 @@
           "isSigner": false
         },
         {
-          "name": "pairAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "managerWallet",
+          "name": "manager",
           "isMut": false,
           "isSigner": false
         },
@@ -309,11 +312,6 @@
           "isSigner": false
         },
         {
-          "name": "clock",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -332,38 +330,13 @@
       ]
     },
     {
-      "name": "setAdmin",
-      "accounts": [
-        {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "adminWallet",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "admin",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "unlockTokens",
       "accounts": [
         {
-          "name": "authority",
-          "isMut": true,
-          "isSigner": true
+          "name": "proofRequest",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "user",
@@ -371,18 +344,23 @@
           "isSigner": false
         },
         {
-          "name": "whitelistedUserInfo",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "zkpRequest",
-          "isMut": false,
-          "isSigner": false
+          "name": "userAuthority",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "pair",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pairAuthority",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "whitelistedUserInfo",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -392,16 +370,6 @@
         },
         {
           "name": "admin",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "pairAuthority",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "managerWallet",
           "isMut": false,
           "isSigner": false
         },
@@ -441,11 +409,6 @@
           "isSigner": false
         },
         {
-          "name": "clock",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -482,11 +445,6 @@
           "isSigner": false
         },
         {
-          "name": "managerWallet",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -509,11 +467,6 @@
         },
         {
           "name": "admin",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "managerWallet",
           "isMut": false,
           "isSigner": false
         },
@@ -544,11 +497,6 @@
           "isSigner": false
         },
         {
-          "name": "managerWallet",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -565,22 +513,7 @@
           "isSigner": true
         },
         {
-          "name": "manager",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "pair",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenA",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenB",
           "isMut": true,
           "isSigner": false
         },
@@ -601,22 +534,7 @@
           "isSigner": true
         },
         {
-          "name": "manager",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "pair",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenA",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenB",
           "isMut": true,
           "isSigner": false
         },
@@ -654,11 +572,6 @@
           "isSigner": false
         },
         {
-          "name": "userWallet",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -685,11 +598,6 @@
           "isSigner": false
         },
         {
-          "name": "userWallet",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -706,27 +614,12 @@
           "isSigner": false
         },
         {
-          "name": "tokenA",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "tokenB",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "pairAuthority",
           "isMut": true,
           "isSigner": false
         },
         {
           "name": "destination",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "manager",
           "isMut": true,
           "isSigner": false
         },
@@ -751,102 +644,14 @@
   ],
   "accounts": [
     {
-      "name": "Admin",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "docs": [
-              "Manager wallet address"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "isPlatformPaused",
-            "docs": [
-              "Indicates if platform is paused or not"
-            ],
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Manager",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "authority",
-            "docs": [
-              "Manager wallet address"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "isAllPaused",
-            "docs": [
-              "Indicates if manager's pairs are paused or not"
-            ],
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "User",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "userWallet",
-            "docs": [
-              "User wallet address"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "isBlocked",
-            "docs": [
-              "Indicates if user is blocked or not"
-            ],
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "WhitelistedUserInfo",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "userWallet",
-            "docs": [
-              "User wallet address"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "pair",
-            "docs": [
-              "Pair address"
-            ],
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
       "name": "Pair",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "managerWallet",
+            "name": "authority",
             "docs": [
-              "Manager wallet address"
+              "Manager authority"
             ],
             "type": "publicKey"
           },
@@ -907,6 +712,103 @@
               "Wallet that will receive fee"
             ],
             "type": "publicKey"
+          },
+          {
+            "name": "policy",
+            "docs": [
+              "Albus policy"
+            ],
+            "type": {
+              "option": "publicKey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "docs": [
+              "Manager wallet address"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "isPlatformPaused",
+            "docs": [
+              "Indicates if platform is paused or not"
+            ],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Manager",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "docs": [
+              "Manager address"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "isAllPaused",
+            "docs": [
+              "Indicates if manager's pairs are paused or not"
+            ],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "docs": [
+              "User address"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "isBlocked",
+            "docs": [
+              "Indicates if user is blocked or not"
+            ],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistedUserInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "docs": [
+              "User address"
+            ],
+            "type": "publicKey"
+          },
+          {
+            "name": "pair",
+            "docs": [
+              "Pair address"
+            ],
+            "type": "publicKey"
           }
         ]
       }
@@ -919,7 +821,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "managerWallet",
+            "name": "newAuthority",
             "type": {
               "option": "publicKey"
             }
@@ -1081,9 +983,9 @@
     }
   ],
   "metadata": {
-    "address": "BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH",
+    "address": "JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm",
     "origin": "anchor",
-    "binaryVersion": "0.27.0",
-    "libVersion": "0.27.0"
+    "binaryVersion": "0.29.0",
+    "libVersion": "0.29.0"
   }
 }

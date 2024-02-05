@@ -5,36 +5,48 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
+import * as beet from '@metaplex-foundation/beet'
 
 /**
  * @category Instructions
  * @category AddManager
  * @category generated
  */
-export const addManagerStruct = new beet.BeetArgsStruct<{
-  instructionDiscriminator: number[] /* size: 8 */
-}>(
-  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'AddManagerInstructionArgs',
+export type AddManagerInstructionArgs = {
+  key: web3.PublicKey
+}
+/**
+ * @category Instructions
+ * @category AddManager
+ * @category generated
+ */
+export const addManagerStruct = new beet.BeetArgsStruct<
+  AddManagerInstructionArgs & {
+    instructionDiscriminator: number[] /* size: 8 */
+  }
+>(
+  [
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['key', beetSolana.publicKey],
+  ],
+  'AddManagerInstructionArgs'
 )
 /**
  * Accounts required by the _addManager_ instruction
  *
  * @property [_writable_, **signer**] authority
- * @property [] managerWallet
- * @property [_writable_] manager
  * @property [] admin
+ * @property [_writable_] manager
  * @category Instructions
  * @category AddManager
  * @category generated
  */
-export interface AddManagerInstructionAccounts {
+export type AddManagerInstructionAccounts = {
   authority: web3.PublicKey
-  managerWallet: web3.PublicKey
-  manager: web3.PublicKey
   admin: web3.PublicKey
+  manager: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -47,16 +59,20 @@ export const addManagerInstructionDiscriminator = [
  * Creates a _AddManager_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
+ * @param args to provide as instruction data to the program
+ *
  * @category Instructions
  * @category AddManager
  * @category generated
  */
 export function createAddManagerInstruction(
   accounts: AddManagerInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  args: AddManagerInstructionArgs,
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = addManagerStruct.serialize({
     instructionDiscriminator: addManagerInstructionDiscriminator,
+    ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
@@ -65,18 +81,13 @@ export function createAddManagerInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.managerWallet,
+      pubkey: accounts.admin,
       isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.manager,
       isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.admin,
-      isWritable: false,
       isSigner: false,
     },
     {

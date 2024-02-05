@@ -7,15 +7,14 @@
 
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
-import type { UpdatePairData } from '../types/UpdatePairData'
-import { updatePairDataBeet } from '../types/UpdatePairData'
+import { UpdatePairData, updatePairDataBeet } from '../types/UpdatePairData'
 
 /**
  * @category Instructions
  * @category UpdatePair
  * @category generated
  */
-export interface UpdatePairInstructionArgs {
+export type UpdatePairInstructionArgs = {
   data: UpdatePairData
 }
 /**
@@ -32,26 +31,20 @@ export const updatePairStruct = new beet.FixableBeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['data', updatePairDataBeet],
   ],
-  'UpdatePairInstructionArgs',
+  'UpdatePairInstructionArgs'
 )
 /**
  * Accounts required by the _updatePair_ instruction
  *
  * @property [_writable_, **signer**] authority
- * @property [] manager
  * @property [_writable_] pair
- * @property [_writable_] tokenA
- * @property [_writable_] tokenB
  * @category Instructions
  * @category UpdatePair
  * @category generated
  */
-export interface UpdatePairInstructionAccounts {
+export type UpdatePairInstructionAccounts = {
   authority: web3.PublicKey
-  manager: web3.PublicKey
   pair: web3.PublicKey
-  tokenA: web3.PublicKey
-  tokenB: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -73,7 +66,7 @@ export const updatePairInstructionDiscriminator = [
 export function createUpdatePairInstruction(
   accounts: UpdatePairInstructionAccounts,
   args: UpdatePairInstructionArgs,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = updatePairStruct.serialize({
     instructionDiscriminator: updatePairInstructionDiscriminator,
@@ -86,22 +79,7 @@ export function createUpdatePairInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.manager,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.pair,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenA,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenB,
       isWritable: true,
       isSigner: false,
     },

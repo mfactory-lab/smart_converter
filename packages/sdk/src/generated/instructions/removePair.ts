@@ -17,26 +17,20 @@ export const removePairStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'RemovePairInstructionArgs',
+  'RemovePairInstructionArgs'
 )
 /**
  * Accounts required by the _removePair_ instruction
  *
  * @property [_writable_, **signer**] authority
- * @property [] manager
  * @property [_writable_] pair
- * @property [_writable_] tokenA
- * @property [_writable_] tokenB
  * @category Instructions
  * @category RemovePair
  * @category generated
  */
-export interface RemovePairInstructionAccounts {
+export type RemovePairInstructionAccounts = {
   authority: web3.PublicKey
-  manager: web3.PublicKey
   pair: web3.PublicKey
-  tokenA: web3.PublicKey
-  tokenB: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -55,7 +49,7 @@ export const removePairInstructionDiscriminator = [
  */
 export function createRemovePairInstruction(
   accounts: RemovePairInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = removePairStruct.serialize({
     instructionDiscriminator: removePairInstructionDiscriminator,
@@ -67,22 +61,7 @@ export function createRemovePairInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.manager,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.pair,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenA,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenB,
       isWritable: true,
       isSigner: false,
     },

@@ -17,7 +17,7 @@ export const pausePairsStruct = new beet.BeetArgsStruct<{
   instructionDiscriminator: number[] /* size: 8 */
 }>(
   [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'PausePairsInstructionArgs',
+  'PausePairsInstructionArgs'
 )
 /**
  * Accounts required by the _pausePairs_ instruction
@@ -25,16 +25,14 @@ export const pausePairsStruct = new beet.BeetArgsStruct<{
  * @property [_writable_, **signer**] authority
  * @property [_writable_] manager
  * @property [] admin
- * @property [] managerWallet
  * @category Instructions
  * @category PausePairs
  * @category generated
  */
-export interface PausePairsInstructionAccounts {
+export type PausePairsInstructionAccounts = {
   authority: web3.PublicKey
   manager: web3.PublicKey
   admin: web3.PublicKey
-  managerWallet: web3.PublicKey
   systemProgram?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
@@ -53,7 +51,7 @@ export const pausePairsInstructionDiscriminator = [
  */
 export function createPausePairsInstruction(
   accounts: PausePairsInstructionAccounts,
-  programId = new web3.PublicKey('BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH'),
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
 ) {
   const [data] = pausePairsStruct.serialize({
     instructionDiscriminator: pausePairsInstructionDiscriminator,
@@ -71,11 +69,6 @@ export function createPausePairsInstruction(
     },
     {
       pubkey: accounts.admin,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.managerWallet,
       isWritable: false,
       isSigner: false,
     },

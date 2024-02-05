@@ -8,16 +8,15 @@
 import * as web3 from '@solana/web3.js'
 import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
-import type { Ratio } from '../types/Ratio'
-import { ratioBeet } from '../types/Ratio'
+import { Ratio, ratioBeet } from '../types/Ratio'
 
 /**
  * Arguments used to create {@link Pair}
  * @category Accounts
  * @category generated
  */
-export interface PairArgs {
-  managerWallet: web3.PublicKey
+export type PairArgs = {
+  authority: web3.PublicKey
   tokenA: web3.PublicKey
   tokenB: web3.PublicKey
   lockedAmount: beet.bignum
@@ -26,6 +25,7 @@ export interface PairArgs {
   lockFee: number
   unlockFee: number
   feeReceiver: web3.PublicKey
+  policy: beet.COption<web3.PublicKey>
 }
 
 export const pairDiscriminator = [85, 72, 49, 176, 182, 228, 141, 82]
@@ -38,7 +38,7 @@ export const pairDiscriminator = [85, 72, 49, 176, 182, 228, 141, 82]
  */
 export class Pair implements PairArgs {
   private constructor(
-    readonly managerWallet: web3.PublicKey,
+    readonly authority: web3.PublicKey,
     readonly tokenA: web3.PublicKey,
     readonly tokenB: web3.PublicKey,
     readonly lockedAmount: beet.bignum,
@@ -47,6 +47,7 @@ export class Pair implements PairArgs {
     readonly lockFee: number,
     readonly unlockFee: number,
     readonly feeReceiver: web3.PublicKey,
+    readonly policy: beet.COption<web3.PublicKey>
   ) {}
 
   /**
@@ -54,7 +55,7 @@ export class Pair implements PairArgs {
    */
   static fromArgs(args: PairArgs) {
     return new Pair(
-      args.managerWallet,
+      args.authority,
       args.tokenA,
       args.tokenB,
       args.lockedAmount,
@@ -63,6 +64,7 @@ export class Pair implements PairArgs {
       args.lockFee,
       args.unlockFee,
       args.feeReceiver,
+      args.policy
     )
   }
 
@@ -72,7 +74,7 @@ export class Pair implements PairArgs {
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
-    offset = 0,
+    offset = 0
   ): [Pair, number] {
     return Pair.deserialize(accountInfo.data, offset)
   }
@@ -86,11 +88,11 @@ export class Pair implements PairArgs {
   static async fromAccountAddress(
     connection: web3.Connection,
     address: web3.PublicKey,
-    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig,
+    commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
   ): Promise<Pair> {
     const accountInfo = await connection.getAccountInfo(
       address,
-      commitmentOrConfig,
+      commitmentOrConfig
     )
     if (accountInfo == null) {
       throw new Error(`Unable to find Pair account at ${address}`)
@@ -106,8 +108,8 @@ export class Pair implements PairArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH',
-    ),
+      'JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm'
+    )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, pairBeet)
   }
@@ -133,34 +135,36 @@ export class Pair implements PairArgs {
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link Pair}
+   * {@link Pair} for the provided args.
+   *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    */
-  static get byteSize() {
-    return pairBeet.byteSize
+  static byteSize(args: PairArgs) {
+    const instance = Pair.fromArgs(args)
+    return pairBeet.toFixedFromValue({
+      accountDiscriminator: pairDiscriminator,
+      ...instance,
+    }).byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
    * {@link Pair} data from rent
    *
+   * @param args need to be provided since the byte size for this account
+   * depends on them
    * @param connection used to retrieve the rent exemption information
    */
   static async getMinimumBalanceForRentExemption(
+    args: PairArgs,
     connection: web3.Connection,
-    commitment?: web3.Commitment,
+    commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      Pair.byteSize,
-      commitment,
+      Pair.byteSize(args),
+      commitment
     )
-  }
-
-  /**
-   * Determines if the provided {@link Buffer} has the correct byte size to
-   * hold {@link Pair} data.
-   */
-  static hasCorrectByteSize(buf: Buffer, offset = 0) {
-    return buf.byteLength - offset === Pair.byteSize
   }
 
   /**
@@ -169,11 +173,11 @@ export class Pair implements PairArgs {
    */
   pretty() {
     return {
-      managerWallet: this.managerWallet.toBase58(),
+      authority: this.authority.toBase58(),
       tokenA: this.tokenA.toBase58(),
       tokenB: this.tokenB.toBase58(),
       lockedAmount: (() => {
-        const x = <{ toNumber: () => number }> this.lockedAmount
+        const x = <{ toNumber: () => number }>this.lockedAmount
         if (typeof x.toNumber === 'function') {
           try {
             return x.toNumber()
@@ -188,6 +192,7 @@ export class Pair implements PairArgs {
       lockFee: this.lockFee,
       unlockFee: this.unlockFee,
       feeReceiver: this.feeReceiver.toBase58(),
+      policy: this.policy,
     }
   }
 }
@@ -196,7 +201,7 @@ export class Pair implements PairArgs {
  * @category Accounts
  * @category generated
  */
-export const pairBeet = new beet.BeetStruct<
+export const pairBeet = new beet.FixableBeetStruct<
   Pair,
   PairArgs & {
     accountDiscriminator: number[] /* size: 8 */
@@ -204,7 +209,7 @@ export const pairBeet = new beet.BeetStruct<
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['managerWallet', beetSolana.publicKey],
+    ['authority', beetSolana.publicKey],
     ['tokenA', beetSolana.publicKey],
     ['tokenB', beetSolana.publicKey],
     ['lockedAmount', beet.u64],
@@ -213,7 +218,8 @@ export const pairBeet = new beet.BeetStruct<
     ['lockFee', beet.u16],
     ['unlockFee', beet.u16],
     ['feeReceiver', beetSolana.publicKey],
+    ['policy', beet.coption(beetSolana.publicKey)],
   ],
   Pair.fromArgs,
-  'Pair',
+  'Pair'
 )

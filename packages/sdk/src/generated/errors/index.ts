@@ -90,11 +90,11 @@ export class StillRemainingLockedTokensError extends Error {
 
 createErrorFromCodeLookup.set(
   0x1773,
-  () => new StillRemainingLockedTokensError(),
+  () => new StillRemainingLockedTokensError()
 )
 createErrorFromNameLookup.set(
   'StillRemainingLockedTokens',
-  () => new StillRemainingLockedTokensError(),
+  () => new StillRemainingLockedTokensError()
 )
 
 /**
@@ -137,7 +137,7 @@ export class AlreadyUnblockedError extends Error {
 createErrorFromCodeLookup.set(0x1775, () => new AlreadyUnblockedError())
 createErrorFromNameLookup.set(
   'AlreadyUnblocked',
-  () => new AlreadyUnblockedError(),
+  () => new AlreadyUnblockedError()
 )
 
 /**
@@ -160,7 +160,7 @@ export class InsufficientLockedAmountError extends Error {
 createErrorFromCodeLookup.set(0x1776, () => new InsufficientLockedAmountError())
 createErrorFromNameLookup.set(
   'InsufficientLockedAmount',
-  () => new InsufficientLockedAmountError(),
+  () => new InsufficientLockedAmountError()
 )
 
 /**
@@ -183,7 +183,7 @@ export class InsufficientFundsError extends Error {
 createErrorFromCodeLookup.set(0x1777, () => new InsufficientFundsError())
 createErrorFromNameLookup.set(
   'InsufficientFunds',
-  () => new InsufficientFundsError(),
+  () => new InsufficientFundsError()
 )
 
 /**
