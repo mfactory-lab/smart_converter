@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{
     state::{Manager, User},
-    ErrorCode,
+    SmartConverterError,
 };
 
 /// The manager can block user.
@@ -10,7 +10,7 @@ pub fn block(ctx: Context<UpdateUser>) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
     if user.is_blocked {
-        return Err(ErrorCode::IsBlocked.into());
+        return Err(SmartConverterError::IsBlocked.into());
     }
 
     user.is_blocked = true;
@@ -23,7 +23,7 @@ pub fn unblock(ctx: Context<UpdateUser>) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
     if !user.is_blocked {
-        return Err(ErrorCode::AlreadyUnblocked.into());
+        return Err(SmartConverterError::AlreadyUnblocked.into());
     }
 
     user.is_blocked = false;
@@ -42,15 +42,8 @@ pub struct UpdateUser<'info> {
     )]
     pub manager: Box<Account<'info, Manager>>,
 
-    #[account(
-        mut,
-        seeds = [User::SEED, user_wallet.key().as_ref()],
-        bump,
-    )]
+    #[account(mut)]
     pub user: Box<Account<'info, User>>,
-
-    /// CHECK: Address of user's wallet to update
-    pub user_wallet: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
 }

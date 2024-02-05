@@ -4,13 +4,28 @@ use std::{
 };
 
 use anchor_lang::{
-    error, error::ErrorCode, solana_program::account_info::AccountInfo, Result, __private::CLOSED_ACCOUNT_DISCRIMINATOR,
+    error,
+    error::ErrorCode,
+    prelude::*,
+    solana_program::account_info::AccountInfo,
+    solana_program::{program_memory::sol_memcmp, pubkey::PUBKEY_BYTES},
+    Result,
 };
 
-pub fn close<'info>(info: AccountInfo<'info>, sol_destination: AccountInfo<'info>) -> Result<()> {
+use anchor_lang::__private::CLOSED_ACCOUNT_DISCRIMINATOR;
+
+pub fn cmp_pubkeys(a: &Pubkey, b: &Pubkey) -> bool {
+    sol_memcmp(a.as_ref(), b.as_ref(), PUBKEY_BYTES) == 0
+}
+
+pub fn close_account<'info>(
+    info: AccountInfo<'info>,
+    sol_destination: AccountInfo<'info>,
+) -> Result<()> {
     // Transfer lamports from the account to the sol_destination.
     let dest_starting_lamports = sol_destination.lamports();
-    **sol_destination.lamports.borrow_mut() = dest_starting_lamports.checked_add(info.lamports()).unwrap();
+    **sol_destination.lamports.borrow_mut() =
+        dest_starting_lamports.checked_add(info.lamports()).unwrap();
     **info.lamports.borrow_mut() = 0;
 
     // Clean account data

@@ -1,61 +1,10 @@
 use anchor_lang::prelude::*;
 
 #[account]
-pub struct Admin {
-    /// Manager wallet address
-    pub authority: Pubkey,
-    /// Indicates if platform is paused or not
-    pub is_platform_paused: bool,
-}
-
-impl Admin {
-    pub const SEED: &'static [u8] = b"admin";
-    pub const SIZE: usize = 8 + 32 + 1;
-}
-
-#[account]
-pub struct Manager {
-    /// Manager wallet address
-    pub authority: Pubkey,
-    /// Indicates if manager's pairs are paused or not
-    pub is_all_paused: bool,
-}
-
-impl Manager {
-    pub const SEED: &'static [u8] = b"manager";
-    pub const SIZE: usize = 8 + 32 + 1;
-}
-
-#[account]
-pub struct User {
-    /// User wallet address
-    pub user_wallet: Pubkey,
-    /// Indicates if user is blocked or not
-    pub is_blocked: bool,
-}
-
-impl User {
-    pub const SEED: &'static [u8] = b"user";
-    pub const SIZE: usize = 8 + 32 + 1;
-}
-
-#[account]
-pub struct WhitelistedUserInfo {
-    /// User wallet address
-    pub user_wallet: Pubkey,
-    /// Pair address
-    pub pair: Pubkey,
-}
-
-impl WhitelistedUserInfo {
-    pub const SEED: &'static [u8] = b"whitelist";
-    pub const SIZE: usize = 8 + 32 + 32;
-}
-
-#[account]
+#[derive(InitSpace)]
 pub struct Pair {
-    /// Manager wallet address
-    pub manager_wallet: Pubkey,
+    /// Manager authority
+    pub authority: Pubkey,
     /// Security token mint address
     pub token_a: Pubkey,
     /// Utility token mint address
@@ -72,14 +21,92 @@ pub struct Pair {
     pub unlock_fee: u16,
     /// Wallet that will receive fee
     pub fee_receiver: Pubkey,
+    /// Albus policy
+    pub policy: Option<Pubkey>,
 }
 
 impl Pair {
     pub const SEED: &'static [u8] = b"pair";
-    pub const SIZE: usize = 8 + 32 + 32 + 32 + 8 + 16 + 1 + 2 + 2 + 32;
+
+    #[inline]
+    pub fn space() -> usize {
+        8 + Self::INIT_SPACE
+    }
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+#[account]
+#[derive(InitSpace)]
+pub struct Admin {
+    /// Manager wallet address
+    pub authority: Pubkey,
+    /// Indicates if platform is paused or not
+    pub is_platform_paused: bool,
+}
+
+impl Admin {
+    pub const SEED: &'static [u8] = b"admin";
+
+    #[inline]
+    pub fn space() -> usize {
+        8 + Self::INIT_SPACE
+    }
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct Manager {
+    /// Manager address
+    pub authority: Pubkey,
+    /// Indicates if manager's pairs are paused or not
+    pub is_all_paused: bool,
+}
+
+impl Manager {
+    pub const SEED: &'static [u8] = b"manager";
+
+    #[inline]
+    pub fn space() -> usize {
+        8 + Self::INIT_SPACE
+    }
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct User {
+    /// User address
+    pub authority: Pubkey,
+    /// Indicates if user is blocked or not
+    pub is_blocked: bool,
+}
+
+impl User {
+    pub const SEED: &'static [u8] = b"user";
+
+    #[inline]
+    pub fn space() -> usize {
+        8 + Self::INIT_SPACE
+    }
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct WhitelistedUserInfo {
+    /// User address
+    pub user: Pubkey,
+    /// Pair address
+    pub pair: Pubkey,
+}
+
+impl WhitelistedUserInfo {
+    pub const SEED: &'static [u8] = b"whitelist";
+
+    #[inline]
+    pub fn space() -> usize {
+        8 + Self::INIT_SPACE
+    }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, InitSpace)]
 pub struct Ratio {
     pub num: u64,
     pub denom: u64,

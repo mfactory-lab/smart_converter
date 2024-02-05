@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 use crate::{
     state::{Admin, Manager},
-    utils, ErrorCode,
+    utils, SmartConverterError,
 };
 
 /// The admin can remove manager.
@@ -10,7 +10,10 @@ pub fn remove_manager(ctx: Context<UpdateManager>) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
 
     // close the manager account
-    utils::close(manager.to_account_info(), ctx.accounts.authority.to_account_info())?;
+    utils::close_account(
+        manager.to_account_info(),
+        ctx.accounts.authority.to_account_info(),
+    )?;
 
     Ok(())
 }
@@ -20,7 +23,7 @@ pub fn pause_pairs(ctx: Context<UpdateManager>) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
 
     if manager.is_all_paused {
-        return Err(ErrorCode::IsPaused.into());
+        return Err(SmartConverterError::IsPaused.into());
     }
 
     manager.is_all_paused = true;
@@ -33,7 +36,7 @@ pub fn resume_pairs(ctx: Context<UpdateManager>) -> Result<()> {
     let manager = &mut ctx.accounts.manager;
 
     if !manager.is_all_paused {
-        return Err(ErrorCode::AlreadyResumed.into());
+        return Err(SmartConverterError::AlreadyResumed.into());
     }
 
     manager.is_all_paused = false;
@@ -46,22 +49,11 @@ pub struct UpdateManager<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(
-        mut,
-        seeds = [Manager::SEED, manager_wallet.key().as_ref()],
-        bump,
-    )]
+    #[account(mut)]
     pub manager: Box<Account<'info, Manager>>,
 
-    #[account(
-        seeds = [Admin::SEED],
-        bump,
-        has_one = authority,
-    )]
+    #[account(seeds = [Admin::SEED], bump, has_one = authority)]
     pub admin: Box<Account<'info, Admin>>,
-
-    /// CHECK: Address of manager's wallet to update
-    pub manager_wallet: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
 }

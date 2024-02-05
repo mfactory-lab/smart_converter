@@ -1,13 +1,13 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::Admin, ErrorCode};
+use crate::{state::Admin, SmartConverterError};
 
 /// The admin can pause platform.
 pub fn pause(ctx: Context<ChangePlatformState>) -> Result<()> {
     let admin = &mut ctx.accounts.admin;
 
     if admin.is_platform_paused {
-        return Err(ErrorCode::IsPaused.into());
+        return Err(SmartConverterError::IsPaused.into());
     }
 
     admin.is_platform_paused = true;
@@ -20,7 +20,7 @@ pub fn resume(ctx: Context<ChangePlatformState>) -> Result<()> {
     let admin = &mut ctx.accounts.admin;
 
     if !admin.is_platform_paused {
-        return Err(ErrorCode::AlreadyResumed.into());
+        return Err(SmartConverterError::AlreadyResumed.into());
     }
 
     admin.is_platform_paused = false;

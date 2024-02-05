@@ -1,37 +1,36 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::Admin, ErrorCode};
+use crate::utils::cmp_pubkeys;
+use crate::{state::Admin, SmartConverterError};
 
 /// The admin can set new admin.
-pub fn handle(ctx: Context<SetAdmin>) -> Result<()> {
+pub fn handle(ctx: Context<SetAdmin>, new_authority: Pubkey) -> Result<()> {
     let admin = &mut ctx.accounts.admin;
-    let admin_wallet = ctx.accounts.admin_wallet.key();
 
-    if admin.authority != Pubkey::default() && admin.authority != ctx.accounts.authority.key() {
-        return Err(ErrorCode::Unauthorized.into());
+    if !cmp_pubkeys(&admin.authority, &Default::default())
+        && !cmp_pubkeys(&admin.authority, &ctx.accounts.authority.key())
+    {
+        return Err(SmartConverterError::Unauthorized.into());
     }
 
-    admin.authority = admin_wallet;
+    admin.authority = new_authority;
 
     Ok(())
 }
 
 #[derive(Accounts)]
 pub struct SetAdmin<'info> {
-    #[account(mut)]
-    pub authority: Signer<'info>,
-
-    /// CHECK: Address of admin's wallet to set
-    pub admin_wallet: AccountInfo<'info>,
-
     #[account(
         init_if_needed,
         seeds = [Admin::SEED],
         bump,
         payer = authority,
-        space = Admin::SIZE,
+        space = Admin::space(),
     )]
     pub admin: Box<Account<'info, Admin>>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }

@@ -7,18 +7,22 @@ use anchor_lang::prelude::*;
 
 use crate::{instructions::*, state::*};
 
-declare_id!("BSP9GP7vACnCKxEXdqsDpGdnqMBafc6rtQozGwRkKqKH");
+declare_id!("JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm");
 
 #[program]
 pub mod smart_converter {
     use super::*;
 
-    pub fn add_manager(ctx: Context<AddManager>) -> Result<()> {
-        add_manager::handle(ctx)
+    pub fn set_admin(ctx: Context<SetAdmin>, key: Pubkey) -> Result<()> {
+        set_admin::handle(ctx, key)
     }
 
-    pub fn add_pair(ctx: Context<AddPair>, ratio: Ratio) -> Result<()> {
-        add_pair::handle(ctx, ratio)
+    pub fn add_manager(ctx: Context<AddManager>, key: Pubkey) -> Result<()> {
+        add_manager::handle(ctx, key)
+    }
+
+    pub fn add_pair(ctx: Context<AddPair>, policy: Option<Pubkey>, ratio: Ratio) -> Result<()> {
+        add_pair::handle(ctx, policy, ratio)
     }
 
     pub fn add_user_to_whitelist(ctx: Context<AddUserToWhitelist>) -> Result<()> {
@@ -39,10 +43,6 @@ pub mod smart_converter {
 
     pub fn lock_tokens(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
         lock_tokens::handle(ctx, amount)
-    }
-
-    pub fn set_admin(ctx: Context<SetAdmin>) -> Result<()> {
-        set_admin::handle(ctx)
     }
 
     pub fn unlock_tokens(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
@@ -83,7 +83,7 @@ pub mod smart_converter {
 }
 
 #[error_code]
-pub enum ErrorCode {
+pub enum SmartConverterError {
     #[msg("Unauthorized action")]
     Unauthorized,
     #[msg("Paused")]

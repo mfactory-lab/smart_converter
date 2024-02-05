@@ -3,11 +3,11 @@ use anchor_spl::token;
 
 use crate::{
     state::{Manager, Pair, Ratio},
-    ErrorCode,
+    SmartConverterError,
 };
 
 /// The manager can add new pair.
-pub fn handle(ctx: Context<AddPair>, ratio: Ratio) -> Result<()> {
+pub fn handle(ctx: Context<AddPair>, policy: Option<Pubkey>, ratio: Ratio) -> Result<()> {
     let manager = &ctx.accounts.manager;
     let pair = &mut ctx.accounts.pair;
     let pair_authority = ctx.accounts.pair_authority.key;
@@ -16,14 +16,15 @@ pub fn handle(ctx: Context<AddPair>, ratio: Ratio) -> Result<()> {
 
     if token_b.mint_authority.is_none() || token_b.mint_authority.unwrap() != *pair_authority {
         msg!("Invalid utility token mint authority");
-        return Err(ErrorCode::Unauthorized.into());
+        return Err(SmartConverterError::Unauthorized.into());
     }
 
-    pair.manager_wallet = manager.authority;
+    pair.authority = manager.authority;
     pair.token_a = token_a.key();
     pair.token_b = token_b.key();
     pair.ratio = ratio;
     pair.fee_receiver = pair_authority.key();
+    pair.policy = policy;
 
     Ok(())
 }
@@ -44,7 +45,7 @@ pub struct AddPair<'info> {
         seeds = [Pair::SEED, token_a.key().as_ref(), token_b.key().as_ref()],
         bump,
         payer = authority,
-        space = Pair::SIZE
+        space = Pair::space()
     )]
     pub pair: Box<Account<'info, Pair>>,
 

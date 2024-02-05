@@ -2,19 +2,20 @@ use anchor_lang::prelude::*;
 use anchor_spl::token;
 
 use crate::state::{Manager, Pair, User, WhitelistedUserInfo};
+use crate::utils::cmp_pubkeys;
 
 /// The manager can add user to whitelist for special pair.
 /// After that user can lock and unlock tokens from special pair.
 pub fn handle(ctx: Context<AddUserToWhitelist>) -> Result<()> {
     let user = &mut ctx.accounts.user;
-    let user_wallet = ctx.accounts.user_wallet.key();
+    let user_authority = ctx.accounts.user_authority.key();
     let whitelisted_user_info = &mut ctx.accounts.whitelisted_user_info;
 
-    if user.user_wallet != user_wallet {
-        user.user_wallet = user_wallet;
+    if !cmp_pubkeys(&user.authority, &user_authority) {
+        user.authority = user_authority;
     }
 
-    whitelisted_user_info.user_wallet = user_wallet;
+    whitelisted_user_info.user = user_authority;
     whitelisted_user_info.pair = ctx.accounts.pair.key();
 
     Ok(())
@@ -33,22 +34,22 @@ pub struct AddUserToWhitelist<'info> {
 
     #[account(
         init_if_needed,
-        seeds = [User::SEED, user_wallet.key().as_ref()],
+        seeds = [User::SEED, user_authority.key().as_ref()],
         bump,
         payer = authority,
-        space = User::SIZE,
+        space = User::space(),
     )]
     pub user: Box<Account<'info, User>>,
 
     /// CHECK: Address of user's wallet to add to whitelist
-    pub user_wallet: AccountInfo<'info>,
+    pub user_authority: AccountInfo<'info>,
 
     #[account(
         init,
-        seeds = [WhitelistedUserInfo::SEED, user_wallet.key().as_ref(), pair.key().as_ref()],
+        seeds = [WhitelistedUserInfo::SEED, user_authority.key().as_ref(), pair.key().as_ref()],
         bump,
         payer = authority,
-        space = WhitelistedUserInfo::SIZE,
+        space = WhitelistedUserInfo::space(),
     )]
     pub whitelisted_user_info: Box<Account<'info, WhitelistedUserInfo>>,
 
@@ -56,7 +57,7 @@ pub struct AddUserToWhitelist<'info> {
         mut,
         seeds = [Pair::SEED, token_a.key().as_ref(), token_b.key().as_ref()],
         bump,
-        constraint = pair.manager_wallet == authority.key(),
+        has_one = authority,
     )]
     pub pair: Box<Account<'info, Pair>>,
 
