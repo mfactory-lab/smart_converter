@@ -1,6 +1,6 @@
 [package]
 name = "smart_converter"
-version = "0.0.4"
+version = "0.0.5"
 license = "Apache-2.0"
 description = "Smart-converter Program"
 edition = "2021"
@@ -15,6 +15,6 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = { version = "0.27.0", features = ["init-if-needed"]}
-anchor-spl = "0.27.0"
-albus-verifier = "0.1.0"
+anchor-lang = { version = "0.29.0", features = ["init-if-needed"]}
+anchor-spl = "0.29.0"
+albus-solana-verifier = "0.1.3"
