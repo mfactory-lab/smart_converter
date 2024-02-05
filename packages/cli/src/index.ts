@@ -6,7 +6,7 @@ import * as actions from './actions'
 import { initContext } from './context'
 
 const DEFAULT_LOG_LEVEL = 'info'
-const DEFAULT_CLUSTER = 'devnet' // 'https://devnet.rpcpool.com'
+const DEFAULT_CLUSTER = 'devnet'
 const DEFAULT_KEYPAIR = `${process.env.HOME}/.config/solana/id.json`
 
 cli

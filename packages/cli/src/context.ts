@@ -1,12 +1,12 @@
-import { Buffer } from 'buffer'
-import fs from 'fs'
+import { Buffer } from 'node:buffer'
+import fs from 'node:fs'
 import { SmartConverterClient } from '@smart-converter/sdk'
-import { AnchorProvider, Program, Wallet, web3 } from '@project-serum/anchor'
+import { AnchorProvider, web3 } from '@coral-xyz/anchor'
 import type { Cluster } from '@solana/web3.js'
 import { Keypair } from '@solana/web3.js'
 import { clusterUrl } from './utils'
 
-export interface Context {
+export type Context = {
   cluster: Cluster | string
   provider: AnchorProvider
   client: SmartConverterClient
@@ -16,24 +16,17 @@ export interface Context {
 const context: Context = {
   cluster: 'devnet',
   // @ts-expect-error ...
-  provider: undefined,
-  // @ts-expect-error ...
   client: undefined,
 }
 
-export function initContext({ cluster, keypair }: { cluster: Cluster; keypair: string }) {
+export function initContext({ cluster, keypair }: { cluster: Cluster, keypair: string }) {
   const opts = AnchorProvider.defaultOptions()
   const endpoint = cluster.startsWith('http') ? cluster : clusterUrl(cluster)
   const connection = new web3.Connection(endpoint, opts.commitment)
   const walletKeypair = Keypair.fromSecretKey(Buffer.from(JSON.parse(fs.readFileSync(keypair).toString())))
-  const wallet = new Wallet(walletKeypair)
 
   context.cluster = cluster
-  context.provider = new AnchorProvider(connection, wallet, opts)
-  context.client = new SmartConverterClient({
-    program: new Program(SmartConverterClient.IDL, SmartConverterClient.programId, context.provider),
-    wallet: context.provider.wallet,
-  })
+  context.client = SmartConverterClient.fromKeypair(connection, walletKeypair)
   context.keypair = walletKeypair
 
   return context

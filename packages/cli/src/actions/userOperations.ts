@@ -1,24 +1,22 @@
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import log from 'loglevel'
 import { useContext } from '../context'
 
-interface WhitelistOpts {
+type WhitelistOpts = {
   userWallet: string
   tokenA: string
   tokenB: string
 }
 
 export async function addUserToWhitelist(opts: WhitelistOpts) {
-  const { provider, client, cluster } = useContext()
-
-  const { tx, user } = await client.addUserToWhitelist({
-    tokenA: new web3.PublicKey(opts.tokenA),
-    tokenB: new web3.PublicKey(opts.tokenB),
-    userWallet: new web3.PublicKey(opts.userWallet),
-  })
+  const { client, cluster } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, user } = await client.addUserToWhitelist({
+      tokenA: new web3.PublicKey(opts.tokenA),
+      tokenB: new web3.PublicKey(opts.tokenB),
+      userWallet: new web3.PublicKey(opts.userWallet),
+    })
     log.info(`Signature: ${signature}`)
     log.info(`User: ${user}`)
     log.info(`See available pairs: "pnpm cli -c ${cluster} user show-available ${opts.userWallet}"`)
@@ -30,16 +28,15 @@ export async function addUserToWhitelist(opts: WhitelistOpts) {
 }
 
 export async function removeUserFromWhitelist(opts: WhitelistOpts) {
-  const { provider, client } = useContext()
-
-  const { tx, user } = await client.removeUserFromWhitelist({
-    tokenA: new web3.PublicKey(opts.tokenA),
-    tokenB: new web3.PublicKey(opts.tokenB),
-    userWallet: new web3.PublicKey(opts.userWallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, user } = await client.removeUserFromWhitelist({
+      tokenA: new web3.PublicKey(opts.tokenA),
+      tokenB: new web3.PublicKey(opts.tokenB),
+      userWallet: new web3.PublicKey(opts.userWallet),
+    })
+
     log.info(`Signature: ${signature}`)
     log.info(`User: ${user}`)
     log.info('OK')
@@ -50,14 +47,13 @@ export async function removeUserFromWhitelist(opts: WhitelistOpts) {
 }
 
 export async function blockUser(wallet: string) {
-  const { provider, client } = useContext()
-
-  const { tx, user } = await client.blockUser({
-    userWallet: new web3.PublicKey(wallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, user } = await client.blockUser({
+      userWallet: new web3.PublicKey(wallet),
+    })
+
     log.info(`Signature: ${signature}`)
     log.info(`User: ${user}`)
     log.info('OK')
@@ -68,14 +64,12 @@ export async function blockUser(wallet: string) {
 }
 
 export async function unblockUser(wallet: string) {
-  const { provider, client } = useContext()
-
-  const { tx, user } = await client.unblockUser({
-    userWallet: new web3.PublicKey(wallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, user } = await client.unblockUser({
+      userWallet: new web3.PublicKey(wallet),
+    })
     log.info(`Signature: ${signature}`)
     log.info(`User: ${user}`)
     log.info('OK')
@@ -93,23 +87,23 @@ export async function showUserInfo(address: string) {
 
   log.info('--------------------------------------------------------------------------')
   log.info(`User: ${user}`)
-  log.info(`User wallet: ${userData.userWallet}`)
+  log.info(`User wallet: ${userData.authority}`)
   log.info(`Is user blocked: ${userData.isBlocked}`)
-  log.info(`See available pairs: "pnpm cli -c ${cluster} user show-available ${userData.userWallet}"`)
+  log.info(`See available pairs: "pnpm cli -c ${cluster} user show-available ${userData.authority}"`)
   log.info('--------------------------------------------------------------------------')
 }
 
 export async function findUserInfo(wallet: string) {
   const { client, cluster } = useContext()
 
-  const [user] = await client.pda.user(new web3.PublicKey(wallet))
+  const [user] = client.pda.user(wallet)
   const userData = await client.fetchUser(user)
 
   log.info('--------------------------------------------------------------------------')
   log.info(`User: ${user}`)
-  log.info(`User wallet: ${userData.userWallet}`)
+  log.info(`User wallet: ${userData.authority}`)
   log.info(`Is user blocked: ${userData.isBlocked}`)
-  log.info(`See available pairs: "pnpm cli -c ${cluster} user show-available ${userData.userWallet}"`)
+  log.info(`See available pairs: "pnpm cli -c ${cluster} user show-available ${userData.authority}"`)
   log.info('--------------------------------------------------------------------------')
 }
 

@@ -1,21 +1,21 @@
-import { BN, web3 } from '@project-serum/anchor'
+import { BN, web3 } from '@coral-xyz/anchor'
 import log from 'loglevel'
 import { getOrCreateAssociatedTokenAccount } from '@solana/spl-token'
 import { useContext } from '../context'
 
-interface AddPairOpts {
+type AddPairOpts = {
   num: string
   denom: string
   tokenA: string
   tokenB: string
 }
 
-interface RemovePairOpts {
+type RemovePairOpts = {
   tokenA: string
   tokenB: string
 }
 
-interface UpdatePairOpts {
+type UpdatePairOpts = {
   tokenA: string
   tokenB: string
   managerWallet?: string
@@ -27,7 +27,7 @@ interface UpdatePairOpts {
   unlockFee?: number
 }
 
-interface WithdrawFeeOpts {
+type WithdrawFeeOpts = {
   tokenA: string
   tokenB: string
   amount: string
@@ -42,18 +42,17 @@ export async function addPair(opts: AddPairOpts) {
   const tokenA = new web3.PublicKey(opts.tokenA)
   const tokenB = new web3.PublicKey(opts.tokenB)
 
-  const [pair] = await client.pda.pair(tokenA, tokenB)
-  const [pairAuthority] = await client.pda.pairAuthority(pair)
+  const [pair] = client.pda.pair(tokenA, tokenB)
+  const [pairAuthority] = client.pda.pairAuthority(pair)
   await getOrCreateAssociatedTokenAccount(provider.connection, keypair, tokenA, pairAuthority, true)
 
-  const { tx } = await client.addPair({
-    ratio: { num, denom },
-    tokenA,
-    tokenB,
-  })
-
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature } = await client.addPair({
+      ratio: { num, denom },
+      tokenA,
+      tokenB,
+    })
+
     log.info(`Signature: ${signature}`)
     log.info(`Pair: ${pair}`)
     log.info('OK')
@@ -64,15 +63,13 @@ export async function addPair(opts: AddPairOpts) {
 }
 
 export async function removePair(opts: RemovePairOpts) {
-  const { provider, client } = useContext()
-
-  const { tx } = await client.removePair({
-    tokenA: new web3.PublicKey(opts.tokenA),
-    tokenB: new web3.PublicKey(opts.tokenB),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature } = await client.removePair({
+      tokenA: new web3.PublicKey(opts.tokenA),
+      tokenB: new web3.PublicKey(opts.tokenB),
+    })
     log.info(`Signature: ${signature}`)
     log.info('OK')
   } catch (e) {
@@ -82,7 +79,7 @@ export async function removePair(opts: RemovePairOpts) {
 }
 
 export async function updatePair(opts: UpdatePairOpts) {
-  const { provider, client } = useContext()
+  const { client } = useContext()
 
   let managerWallet
   if (opts.managerWallet !== undefined) {
@@ -103,19 +100,18 @@ export async function updatePair(opts: UpdatePairOpts) {
     isPaused = opts.isPaused.includes('true')
   }
 
-  const { tx, pair } = await client.updatePair({
-    tokenA: new web3.PublicKey(opts.tokenA),
-    tokenB: new web3.PublicKey(opts.tokenB),
-    managerWallet,
-    feeReceiver,
-    lockFee: opts.lockFee,
-    unlockFee: opts.unlockFee,
-    ratio,
-    isPaused,
-  })
-
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, pair } = await client.updatePair({
+      tokenA: new web3.PublicKey(opts.tokenA),
+      tokenB: new web3.PublicKey(opts.tokenB),
+      newAuthority: managerWallet,
+      feeReceiver,
+      lockFee: opts.lockFee,
+      unlockFee: opts.unlockFee,
+      ratio,
+      isPaused,
+    })
+
     log.info(`Signature: ${signature}`)
     log.info(`Pair: ${pair}`)
     log.info('OK')
@@ -126,17 +122,16 @@ export async function updatePair(opts: UpdatePairOpts) {
 }
 
 export async function withdrawFee(opts: WithdrawFeeOpts) {
-  const { provider, client } = useContext()
-
-  const { tx } = await client.withdrawFee({
-    amount: new BN(opts.amount),
-    destination: new web3.PublicKey(opts.destination),
-    tokenA: new web3.PublicKey(opts.tokenA),
-    tokenB: new web3.PublicKey(opts.tokenB),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature } = await client.withdrawFee({
+      amount: new BN(opts.amount),
+      destination: new web3.PublicKey(opts.destination),
+      tokenA: new web3.PublicKey(opts.tokenA),
+      tokenB: new web3.PublicKey(opts.tokenB),
+    })
+
     log.info(`Signature: ${signature}`)
     log.info('OK')
   } catch (e) {
@@ -150,14 +145,14 @@ export async function showPairInfo(address: string) {
 
   const pair = new web3.PublicKey(address)
   const pairData = await client.fetchPair(pair)
-  const [pairAuthority] = await client.pda.pairAuthority(pair)
+  const [pairAuthority] = client.pda.pairAuthority(pair)
   const feeBalance = await provider.connection.getBalance(pairAuthority)
 
   log.info('--------------------------------------------------------------------------')
   log.info(`Pair: ${pair}`)
   log.info(`Token A: ${pairData.tokenA} - TokenB: ${pairData.tokenB}`)
   log.info(`Ratio: ${pairData.ratio.num}/${pairData.ratio.denom}`)
-  log.info(`Manager wallet: ${pairData.managerWallet}`)
+  log.info(`Manager wallet: ${pairData.authority}`)
   log.info(`Fee receiver: ${pairData.feeReceiver}`)
   log.info(`Is pair paused: ${pairData.isPaused}`)
   log.info(`Locked amount: ${pairData.lockedAmount}`)
@@ -171,16 +166,17 @@ export async function showPairInfo(address: string) {
 export async function findPairInfo(tokenA: string, tokenB: string) {
   const { client, provider, cluster } = useContext()
 
-  const [pair] = await client.pda.pair(new web3.PublicKey(tokenA), new web3.PublicKey(tokenB))
-  const pairData = await client.fetchPair(pair)
-  const [pairAuthority] = await client.pda.pairAuthority(pair)
+  const [pair] = client.pda.pair(new web3.PublicKey(tokenA), new web3.PublicKey(tokenB))
+  const [pairAuthority] = client.pda.pairAuthority(pair)
   const feeBalance = await provider.connection.getBalance(pairAuthority)
+
+  const pairData = await client.fetchPair(pair)
 
   log.info('--------------------------------------------------------------------------')
   log.info(`Pair: ${pair}`)
   log.info(`Token A: ${pairData.tokenA} - TokenB: ${pairData.tokenB}`)
   log.info(`Ratio: ${pairData.ratio.num}/${pairData.ratio.denom}`)
-  log.info(`Manager wallet: ${pairData.managerWallet}`)
+  log.info(`Manager wallet: ${pairData.authority}`)
   log.info(`Fee receiver: ${pairData.feeReceiver}`)
   log.info(`Is pair paused: ${pairData.isPaused}`)
   log.info(`Locked amount: ${pairData.lockedAmount}`)

@@ -1,23 +1,21 @@
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import log from 'loglevel'
 import { useContext } from '../context'
 
-interface Opts {
+type Opts = {
   adminWallet: string
 }
 
 export async function setAdmin(opts: Opts) {
-  const { provider, client } = useContext()
-
-  const { tx, admin } = await client.setAdmin({
-    adminWallet: new web3.PublicKey(opts.adminWallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature } = await client.setAdmin({
+      authority: new web3.PublicKey(opts.adminWallet),
+    })
+
     log.info(`Signature: ${signature}`)
-    log.info(`Admin: ${admin}`)
-    log.info('OK')
+    log.info('Done')
   } catch (e) {
     log.info('Error')
     console.log(e)
@@ -25,15 +23,12 @@ export async function setAdmin(opts: Opts) {
 }
 
 export async function pausePlatform() {
-  const { provider, client } = useContext()
-
-  const { tx, admin } = await client.pausePlatform()
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature } = await client.pausePlatform()
     log.info(`Signature: ${signature}`)
-    log.info(`Admin: ${admin}`)
-    log.info('OK')
+    log.info('Done')
   } catch (e) {
     log.info('Error')
     console.log(e)
@@ -41,15 +36,12 @@ export async function pausePlatform() {
 }
 
 export async function resumePlatform() {
-  const { provider, client } = useContext()
-
-  const { tx, admin } = await client.resumePlatform()
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature } = await client.resumePlatform()
     log.info(`Signature: ${signature}`)
-    log.info(`Admin: ${admin}`)
-    log.info('OK')
+    log.info('Done')
   } catch (e) {
     log.info('Error')
     console.log(e)
@@ -59,7 +51,7 @@ export async function resumePlatform() {
 export async function showAdminInfo() {
   const { client } = useContext()
 
-  const [admin] = await client.pda.admin()
+  const [admin] = client.pda.admin()
   const adminData = await client.fetchAdmin(admin)
 
   log.info('--------------------------------------------------------------------------')

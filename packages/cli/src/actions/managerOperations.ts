@@ -1,20 +1,19 @@
-import { web3 } from '@project-serum/anchor'
+import { web3 } from '@coral-xyz/anchor'
 import log from 'loglevel'
 import { useContext } from '../context'
 
-interface Opts {
+type Opts = {
   managerWallet: string
 }
 
 export async function addManager(opts: Opts) {
-  const { provider, client } = useContext()
-
-  const { tx, manager } = await client.addManager({
-    managerWallet: new web3.PublicKey(opts.managerWallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, manager } = await client.addManager({
+      managerWallet: new web3.PublicKey(opts.managerWallet),
+    })
+
     log.info(`Signature: ${signature}`)
     log.info(`Manager: ${manager}`)
     log.info('OK')
@@ -25,14 +24,13 @@ export async function addManager(opts: Opts) {
 }
 
 export async function removeManager(opts: Opts) {
-  const { provider, client } = useContext()
-
-  const { tx } = await client.removeManager({
-    managerWallet: new web3.PublicKey(opts.managerWallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature } = await client.removeManager({
+      managerWallet: new web3.PublicKey(opts.managerWallet),
+    })
+
     log.info(`Signature: ${signature}`)
     log.info('OK')
   } catch (e) {
@@ -42,14 +40,13 @@ export async function removeManager(opts: Opts) {
 }
 
 export async function pausePairs(opts: Opts) {
-  const { provider, client } = useContext()
-
-  const { tx, manager } = await client.pausePairs({
-    managerWallet: new web3.PublicKey(opts.managerWallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, manager } = await client.pausePairs({
+      managerWallet: new web3.PublicKey(opts.managerWallet),
+    })
+
     log.info(`Signature: ${signature}`)
     log.info(`Manager: ${manager}`)
     log.info('OK')
@@ -60,14 +57,13 @@ export async function pausePairs(opts: Opts) {
 }
 
 export async function resumePairs(opts: Opts) {
-  const { provider, client } = useContext()
-
-  const { tx, manager } = await client.resumePairs({
-    managerWallet: new web3.PublicKey(opts.managerWallet),
-  })
+  const { client } = useContext()
 
   try {
-    const signature = await provider.sendAndConfirm(tx)
+    const { signature, manager } = await client.resumePairs({
+      managerWallet: new web3.PublicKey(opts.managerWallet),
+    })
+
     log.info(`Signature: ${signature}`)
     log.info(`Manager: ${manager}`)
     log.info('OK')
@@ -94,7 +90,7 @@ export async function showManagerInfo(address: string) {
 export async function findManagerInfo(wallet: string) {
   const { client, cluster } = useContext()
 
-  const [manager] = await client.pda.manager(new web3.PublicKey(wallet))
+  const [manager] = client.pda.manager(new web3.PublicKey(wallet))
   const managerData = await client.fetchManager(manager)
 
   log.info('--------------------------------------------------------------------------')
