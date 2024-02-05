@@ -2,13 +2,7 @@
 
 cwd = $(shell pwd)
 
-#cluster = https://jpoolone.genesysgo.net
-#cluster = https://solana-api.projectserum.com
-#cluster = https://mainnet.rpcpool.com
-#cluster = mainnet
-#cluster = devnet
-cluster = localnet
-
+cluster = devnet
 program = smart_converter
 program_id = $(shell sed -n 's/^ *${program}.*=.*"\([^"]*\)".*/\1/p' Anchor.toml | head -1)
 
@@ -19,6 +13,10 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[32m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 # ----------------------------------------------------------------------------------------------------------------------
+
+.PHONY: sdk
+sdk: build ## Generate sdk
+	pnpm -F sdk generate
 
 .PHONY: build
 build: ## Build program
