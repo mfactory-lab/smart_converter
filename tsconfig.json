@@ -2,22 +2,21 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "types": [
-      "node",
-      "mocha"
-    ],
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
     "lib": ["dom", "esnext"],
     "strict": true,
+    "pretty": true,
+    "noEmitOnError": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "declaration": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+
+    "typeRoots": ["./node_modules/@types/", "./types", "./node_modules"],
+    "types": ["node"]
   },
   "include": [
+    "vitest.config.mts",
     "packages/**/*.ts",
     "tests/**/*.ts"
   ],
