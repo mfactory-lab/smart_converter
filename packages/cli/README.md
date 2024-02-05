@@ -1,4 +1,4 @@
-# smart-converter CLI v.0.0.1
+# smart-converter CLI
 
 CLI with smart-converter program endpoints.
 

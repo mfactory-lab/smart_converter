@@ -1,4 +1,4 @@
-# smart-converter v.0.0.1
+# smart-converter
 
 Smart-converter program.
 
