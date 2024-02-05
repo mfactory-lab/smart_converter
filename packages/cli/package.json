@@ -2,6 +2,7 @@
   "name": "@smart-converter/cli",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "cli": "vite-node ./src/index.ts --"
   },
