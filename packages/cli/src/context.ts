@@ -1,9 +1,9 @@
 import { Buffer } from 'node:buffer'
 import fs from 'node:fs'
 import { SmartConverterClient } from '@smart-converter/sdk'
-import { AnchorProvider, web3 } from '@coral-xyz/anchor'
 import type { Cluster } from '@solana/web3.js'
-import { Keypair } from '@solana/web3.js'
+import { Connection, Keypair } from '@solana/web3.js'
+import { AnchorProvider } from '@coral-xyz/anchor'
 import { clusterUrl } from './utils'
 
 export type Context = {
@@ -22,7 +22,7 @@ const context: Context = {
 export function initContext({ cluster, keypair }: { cluster: Cluster, keypair: string }) {
   const opts = AnchorProvider.defaultOptions()
   const endpoint = cluster.startsWith('http') ? cluster : clusterUrl(cluster)
-  const connection = new web3.Connection(endpoint, opts.commitment)
+  const connection = new Connection(endpoint, opts.commitment)
   const walletKeypair = Keypair.fromSecretKey(Buffer.from(JSON.parse(fs.readFileSync(keypair).toString())))
 
   context.cluster = cluster

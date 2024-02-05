@@ -1,8 +1,8 @@
 import { Buffer } from 'node:buffer'
-import type { Address, BN } from '@coral-xyz/anchor'
+import type { Address } from '@coral-xyz/anchor'
 import type { ConfirmOptions, Connection, Keypair } from '@solana/web3.js'
 import { PublicKey, Transaction } from '@solana/web3.js'
-import { AnchorProvider, Program, web3 } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program, web3 } from '@coral-xyz/anchor'
 import type { Admin, Manager, Pair, Ratio, User, WhitelistedUserInfo } from './generated'
 import {
   PROGRAM_ID,
@@ -287,7 +287,7 @@ export class SmartConverterClient {
         tokenB,
       },
       {
-        amount: props.amount,
+        amount: new BN(props.amount),
       },
     )
     const tx = new Transaction().add(ix)
@@ -450,7 +450,7 @@ export class SmartConverterClient {
         destination: props.destination,
       },
       {
-        amount: props.amount,
+        amount: new BN(props.amount),
       },
     )
     const tx = new Transaction().add(ix)
@@ -514,7 +514,7 @@ export class SmartConverterClient {
         tokenB,
       },
       {
-        amount: props.amount,
+        amount: new BN(props.amount),
       },
     )
     const tx = new Transaction().add(ix)
@@ -629,7 +629,7 @@ type LockTokensProps = {
   sourceA: PublicKey
   destinationA: PublicKey
   destinationB: PublicKey
-  amount: BN
+  amount: number | BN
   feePayer?: PublicKey
   proofRequest?: PublicKey
 }
@@ -651,7 +651,7 @@ type WithdrawFeeProps = {
   tokenA: PublicKey
   tokenB: PublicKey
   destination: PublicKey
-  amount: BN
+  amount: number | BN
 }
 
 type UnlockTokensProps = {
@@ -660,7 +660,7 @@ type UnlockTokensProps = {
   sourceA: PublicKey
   sourceB: PublicKey
   destinationA: PublicKey
-  amount: BN
+  amount: number | BN
   feePayer?: PublicKey
   proofRequest?: PublicKey
 }

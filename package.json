@@ -3,16 +3,17 @@
   "type": "module",
   "packageManager": "pnpm@8.14.0",
   "scripts": {
+    "cli": "pnpm -F cli run cli",
     "sdk:gen": "pnpm -F sdk generate",
     "lint:fix": "eslint --fix ./packages",
     "test": "npx vitest --pool=forks"
   },
   "dependencies": {
-    "@albus-finance/sdk": "../albus/packages/albus-sdk",
     "@coral-xyz/anchor": "^0.29.0",
     "@smart-converter/sdk": "workspace:*"
   },
   "devDependencies": {
+    "@albus-finance/sdk": "../albus/packages/albus-sdk",
     "@antfu/eslint-config": "^2.6.3",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",

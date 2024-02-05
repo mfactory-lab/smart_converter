@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "cli": "ts-node ./src/index.ts"
+    "cli": "vite-node ./src/index.ts --"
   },
   "dependencies": {
     "@smart-converter/sdk": "workspace:*",

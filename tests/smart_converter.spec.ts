@@ -1,4 +1,3 @@
-import { BN, web3 } from '@coral-xyz/anchor'
 import { afterAll, assert, beforeAll, describe, it } from 'vitest'
 import { SmartConverterClient } from '@smart-converter/sdk'
 import {
@@ -8,7 +7,8 @@ import {
   getOrCreateAssociatedTokenAccount,
   mintTo,
 } from '@solana/spl-token'
-import { Keypair } from '@solana/web3.js'
+import type { PublicKey } from '@solana/web3.js'
+import { Keypair, LAMPORTS_PER_SOL, SystemProgram, Transaction } from '@solana/web3.js'
 import { AlbusClient, ProofRequestStatus } from '@albus-finance/sdk'
 import { AlbusTester, airdrop, assertErrorCode, newProvider } from './utils'
 
@@ -19,8 +19,8 @@ export const payer = Keypair.fromSecretKey(Uint8Array.from([
   148, 253, 191, 58, 219, 119, 104, 89, 225, 26, 244, 119, 160, 6, 156, 227,
 ]))
 
-const managerKeypair = web3.Keypair.generate()
-const userKeypair = web3.Keypair.generate()
+const managerKeypair = Keypair.generate()
+const userKeypair = Keypair.generate()
 
 const providerAdmin = newProvider(payer)
 const providerManager = newProvider(managerKeypair)
@@ -34,13 +34,13 @@ describe('smartConverter', () => {
   const clientAlbusAdmin = new AlbusClient(providerAdmin).local()
   const clientAlbusUser = new AlbusClient(providerUser).local()
 
-  let mintA: web3.PublicKey
-  let mintB: web3.PublicKey
-  let userA: web3.PublicKey
-  let userB: web3.PublicKey
-  let pairA: web3.PublicKey
+  let mintA: PublicKey
+  let mintB: PublicKey
+  let userA: PublicKey
+  let userB: PublicKey
+  let pairA: PublicKey
 
-  let policy: web3.PublicKey
+  let policy: PublicKey
 
   const albusTester = new AlbusTester(clientAlbusAdmin)
 
@@ -196,8 +196,8 @@ describe('smartConverter', () => {
         throw e
       }
 
-      const tokenAKeypair = web3.Keypair.generate()
-      const tokenBKeypair = web3.Keypair.generate()
+      const tokenAKeypair = Keypair.generate()
+      const tokenBKeypair = Keypair.generate()
 
       const [pair] = clientManager.pda.pair(tokenAKeypair.publicKey, tokenBKeypair.publicKey)
       const [pairAuthority] = clientManager.pda.pairAuthority(pair)
@@ -378,11 +378,11 @@ describe('smartConverter', () => {
       const [pair] = clientManager.pda.pair(mintA, mintB)
       const [pairAuthority] = clientManager.pda.pairAuthority(pair)
 
-      const transaction = new web3.Transaction().add(
-        web3.SystemProgram.transfer({
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
           fromPubkey: providerManager.wallet.publicKey,
           toPubkey: pairAuthority,
-          lamports: web3.LAMPORTS_PER_SOL,
+          lamports: LAMPORTS_PER_SOL,
         }),
       )
 
@@ -395,7 +395,7 @@ describe('smartConverter', () => {
 
       try {
         await clientManager.withdrawFee({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destination: providerManager.wallet.publicKey,
           tokenA: mintA,
           tokenB: mintB,
@@ -414,11 +414,11 @@ describe('smartConverter', () => {
       const [pair] = clientUser.pda.pair(mintA, mintB)
       const [pairAuthority] = clientUser.pda.pairAuthority(pair)
       pairA = (await getOrCreateAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, pairAuthority, true)).address
-      await mintTo(providerManager.connection, managerKeypair, mintA, userA, providerManager.wallet.publicKey, 6 * web3.LAMPORTS_PER_SOL, [], undefined, TOKEN_PROGRAM_ID)
+      await mintTo(providerManager.connection, managerKeypair, mintA, userA, providerManager.wallet.publicKey, 6 * LAMPORTS_PER_SOL, [], undefined, TOKEN_PROGRAM_ID)
 
       try {
         await clientUser.lockTokens({
-          amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+          amount: 5 * LAMPORTS_PER_SOL,
           destinationA: pairA,
           destinationB: userB,
           sourceA: userA,
@@ -434,7 +434,7 @@ describe('smartConverter', () => {
     it('can not unlock tokens if user is not whitelisted and Proof Request is not created', async () => {
       try {
         await clientUser.unlockTokens({
-          amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+          amount: 5 * LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -452,7 +452,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.unlockTokens({
-          amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+          amount: 5 * LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -478,7 +478,7 @@ describe('smartConverter', () => {
 
       try {
         const { pair } = await clientUser.lockTokens({
-          amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+          amount: 5 * LAMPORTS_PER_SOL,
           destinationA: pairA,
           destinationB: userB,
           sourceA: userA,
@@ -495,7 +495,7 @@ describe('smartConverter', () => {
         assert.equal(destinationBBalance.value.amount, '50000000000')
 
         const pairData = await clientManager.fetchPair(pair)
-        assert.equal(pairData.lockedAmount, 5 * web3.LAMPORTS_PER_SOL)
+        assert.equal(pairData.lockedAmount, 5 * LAMPORTS_PER_SOL)
       } catch (e: any) {
         console.log(e)
         throw e
@@ -503,7 +503,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.unlockTokens({
-          amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+          amount: 5 * LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -533,7 +533,7 @@ describe('smartConverter', () => {
 
       try {
         const { pair } = await clientUser.lockTokens({
-          amount: new BN(5 * web3.LAMPORTS_PER_SOL),
+          amount: 5 * LAMPORTS_PER_SOL,
           destinationA: pairA,
           destinationB: userB,
           sourceA: userA,
@@ -542,7 +542,7 @@ describe('smartConverter', () => {
         })
 
         const pairData = await clientManager.fetchPair(pair)
-        assert.equal(pairData.lockedAmount, 5 * web3.LAMPORTS_PER_SOL)
+        assert.equal(pairData.lockedAmount, 5 * LAMPORTS_PER_SOL)
       } catch (e: any) {
         console.log(e)
         throw e
@@ -568,7 +568,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.lockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: pairA,
           destinationB: userB,
           sourceA: userA,
@@ -604,7 +604,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.lockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: pairA,
           destinationB: userB,
           sourceA: userA,
@@ -640,7 +640,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.lockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: pairA,
           destinationB: userB,
           sourceA: userA,
@@ -673,7 +673,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.lockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: pairA,
           destinationB: userB,
           sourceA: userA,
@@ -703,7 +703,7 @@ describe('smartConverter', () => {
 
       try {
         const { pair } = await clientUser.unlockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -711,7 +711,7 @@ describe('smartConverter', () => {
           tokenB: mintB,
         })
         const pairData = await clientManager.fetchPair(pair)
-        assert.equal(pairData.lockedAmount, 4 * web3.LAMPORTS_PER_SOL)
+        assert.equal(pairData.lockedAmount, 4 * LAMPORTS_PER_SOL)
       } catch (e: any) {
         console.log(e)
         throw e
@@ -737,7 +737,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.unlockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -773,7 +773,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.unlockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -809,7 +809,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.unlockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -841,7 +841,7 @@ describe('smartConverter', () => {
 
       try {
         await clientUser.unlockTokens({
-          amount: new BN(web3.LAMPORTS_PER_SOL),
+          amount: LAMPORTS_PER_SOL,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
@@ -864,7 +864,7 @@ describe('smartConverter', () => {
     it('can not unlock tokens if wished amount is greater than pair`s locked amount', async () => {
       try {
         await clientUser.unlockTokens({
-          amount: new BN(4 * web3.LAMPORTS_PER_SOL + 1),
+          amount: 4 * LAMPORTS_PER_SOL + 1,
           destinationA: userA,
           sourceB: userB,
           sourceA: pairA,
