@@ -37,7 +37,7 @@ export class SmartConverterClient {
 
   private program: Program<SmartConverter>
 
-  constructor(private readonly provider: AnchorProvider) {
+  constructor(readonly provider: AnchorProvider) {
     this.program = new Program<SmartConverter>(IDL, PROGRAM_ID, provider)
   }
 
