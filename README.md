@@ -1,4 +1,4 @@
-# Smart-converter v.0.0.1
+# Smart-converter v.0.0.5
 
 ## Introduction
 
@@ -20,4 +20,4 @@ Albus is our proprietary protocol that enables DeFi services to verify that user
 
 ## TODO
 
-- fix manager block/unlock
+- Fix manager block/unlock
