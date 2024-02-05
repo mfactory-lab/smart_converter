@@ -56,7 +56,7 @@ export async function showAdminInfo() {
 
   log.info('--------------------------------------------------------------------------')
   log.info(`Admin: ${admin}`)
-  log.info(`Admin wallet: ${adminData.authority}`)
-  log.info(`Is platform paused: ${adminData.isPlatformPaused}`)
+  log.info(`Admin wallet: ${adminData?.authority ?? '-'}`)
+  log.info(`Is platform paused: ${adminData?.isPlatformPaused ?? false}`)
   log.info('--------------------------------------------------------------------------')
 }

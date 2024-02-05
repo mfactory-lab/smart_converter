@@ -18,10 +18,13 @@ cli
   .hook('preAction', async (command: Command) => {
     const opts = command.opts() as any
     log.setLevel(opts.logLevel)
-    const { provider, cluster } = initContext(opts)
+    const { client, cluster } = initContext(opts)
     log.info(`# CLI version: ${version}`)
-    log.info(`# Keypair: ${provider.wallet.publicKey}`)
+    log.info(`# Keypair: ${client.provider.publicKey}`)
     log.info(`# Cluster: ${cluster}`)
+  })
+  .hook('postAction', (_c: Command) => {
+    process.exit()
   })
 
 // -------------------------------------------------------
