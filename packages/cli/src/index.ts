@@ -107,6 +107,7 @@ pair.command('add')
   .requiredOption('-d, --denom <DENOM>', 'Denominator for ratio')
   .requiredOption('-ta, --token-a <TOKEN_A>', 'Token A in pair')
   .requiredOption('-tb, --token-b <TOKEN_B>', 'Token B in pair')
+  .option('-p, --policy <POLICY_ADDR>', 'Service policy')
   .action(actions.addPair)
 
 pair.command('remove')
@@ -226,7 +227,7 @@ cli.command('unlock')
   .action(actions.unlockTokens)
 
 cli.parseAsync(process.argv).then(
-  () => {},
+  () => { },
   (e: unknown) => {
     throw e
   },
