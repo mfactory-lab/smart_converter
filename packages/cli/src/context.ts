@@ -8,7 +8,6 @@ import { clusterUrl } from './utils'
 
 export type Context = {
   cluster: Cluster | string
-  provider: AnchorProvider
   client: SmartConverterClient
   keypair: Keypair
 }

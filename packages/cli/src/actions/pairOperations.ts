@@ -36,7 +36,7 @@ type WithdrawFeeOpts = {
 }
 
 export async function addPair(opts: AddPairOpts) {
-  const { provider, client, keypair } = useContext()
+  const { client, keypair } = useContext()
 
   const num = new BN(opts.num)
   const denom = new BN(opts.denom)
@@ -46,7 +46,7 @@ export async function addPair(opts: AddPairOpts) {
 
   const [pair] = client.pda.pair(tokenA, tokenB)
   const [pairAuthority] = client.pda.pairAuthority(pair)
-  await getOrCreateAssociatedTokenAccount(provider.connection, keypair, tokenA, pairAuthority, true)
+  await getOrCreateAssociatedTokenAccount(client.provider.connection, keypair, tokenA, pairAuthority, true)
 
   try {
     const { signature } = await client.addPair({
@@ -144,12 +144,12 @@ export async function withdrawFee(opts: WithdrawFeeOpts) {
 }
 
 export async function showPairInfo(address: string) {
-  const { client, provider, cluster } = useContext()
+  const { client, cluster } = useContext()
 
   const pair = new web3.PublicKey(address)
   const pairData = await client.fetchPair(pair)
   const [pairAuthority] = client.pda.pairAuthority(pair)
-  const feeBalance = await provider.connection.getBalance(pairAuthority)
+  const feeBalance = await client.provider.connection.getBalance(pairAuthority)
 
   log.info('--------------------------------------------------------------------------')
   log.info(`Pair: ${pair}`)
@@ -167,11 +167,11 @@ export async function showPairInfo(address: string) {
 }
 
 export async function findPairInfo(tokenA: string, tokenB: string) {
-  const { client, provider, cluster } = useContext()
+  const { client, cluster } = useContext()
 
   const [pair] = client.pda.pair(new web3.PublicKey(tokenA), new web3.PublicKey(tokenB))
   const [pairAuthority] = client.pda.pairAuthority(pair)
-  const feeBalance = await provider.connection.getBalance(pairAuthority)
+  const feeBalance = await client.provider.connection.getBalance(pairAuthority)
 
   const pairData = await client.fetchPair(pair)
 
