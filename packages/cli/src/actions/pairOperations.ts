@@ -8,6 +8,7 @@ type AddPairOpts = {
   denom: string
   tokenA: string
   tokenB: string
+  policy: string
 }
 
 type RemovePairOpts = {
@@ -41,6 +42,7 @@ export async function addPair(opts: AddPairOpts) {
   const denom = new BN(opts.denom)
   const tokenA = new web3.PublicKey(opts.tokenA)
   const tokenB = new web3.PublicKey(opts.tokenB)
+  const policy = new web3.PublicKey(opts.policy)
 
   const [pair] = client.pda.pair(tokenA, tokenB)
   const [pairAuthority] = client.pda.pairAuthority(pair)
@@ -51,6 +53,7 @@ export async function addPair(opts: AddPairOpts) {
       ratio: { num, denom },
       tokenA,
       tokenB,
+      policy,
     })
 
     log.info(`Signature: ${signature}`)
