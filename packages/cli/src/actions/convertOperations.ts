@@ -1,6 +1,5 @@
-import { BN, web3 } from '@coral-xyz/anchor'
 import log from 'loglevel'
-import { getAssociatedTokenAddress, getOrCreateAssociatedTokenAccount } from '@solana/spl-token'
+import { PublicKey } from '@solana/web3.js'
 import { useContext } from '../context'
 
 type Opts = {
@@ -11,29 +10,20 @@ type Opts = {
 }
 
 export async function lockTokens(opts: Opts) {
-  const { client, keypair } = useContext()
+  const { client } = useContext()
 
-  const tokenA = new web3.PublicKey(opts.tokenA)
-  const tokenB = new web3.PublicKey(opts.tokenB)
-  const [pair] = client.pda.pair(tokenA, tokenB)
-  const [pairAuthority] = client.pda.pairAuthority(pair)
+  const tokenA = new PublicKey(opts.tokenA)
+  const tokenB = new PublicKey(opts.tokenB)
 
   let feePayer
   if (opts.feePayer !== undefined) {
-    feePayer = new web3.PublicKey(opts.feePayer)
+    feePayer = new PublicKey(opts.feePayer)
   }
 
-  const sourceA = await getAssociatedTokenAddress(tokenA, client.provider.publicKey)
-  const destinationA = await getAssociatedTokenAddress(tokenA, pairAuthority, true)
-  const destinationB = (await getOrCreateAssociatedTokenAccount(client.provider.connection, keypair, tokenB, client.provider.publicKey)).address
-
   try {
-    const { signature } = await client.lockTokens({
-      amount: new BN(opts.amount),
-      destinationA,
-      destinationB,
+    const { pair, signature } = await client.lockTokens({
+      amount: Number(opts.amount),
       feePayer,
-      sourceA,
       tokenA,
       tokenB,
     })
@@ -49,27 +39,18 @@ export async function lockTokens(opts: Opts) {
 export async function unlockTokens(opts: Opts) {
   const { client } = useContext()
 
-  const tokenA = new web3.PublicKey(opts.tokenA)
-  const tokenB = new web3.PublicKey(opts.tokenB)
-  const [pair] = client.pda.pair(tokenA, tokenB)
-  const [pairAuthority] = client.pda.pairAuthority(pair)
+  const tokenA = new PublicKey(opts.tokenA)
+  const tokenB = new PublicKey(opts.tokenB)
 
   let feePayer
   if (opts.feePayer !== undefined) {
-    feePayer = new web3.PublicKey(opts.feePayer)
+    feePayer = new PublicKey(opts.feePayer)
   }
 
-  const sourceA = await getAssociatedTokenAddress(tokenA, pairAuthority, true)
-  const destinationA = await getAssociatedTokenAddress(tokenA, client.provider.publicKey)
-  const sourceB = await getAssociatedTokenAddress(tokenB, client.provider.publicKey)
-
   try {
-    const { signature } = await client.unlockTokens({
-      amount: new BN(opts.amount),
-      destinationA,
-      sourceB,
+    const { pair, signature } = await client.unlockTokens({
+      amount: Number(opts.amount),
       feePayer,
-      sourceA,
       tokenA,
       tokenB,
     })

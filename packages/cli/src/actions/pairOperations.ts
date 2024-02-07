@@ -1,59 +1,17 @@
-import { BN, web3 } from '@coral-xyz/anchor'
+import { BN } from '@coral-xyz/anchor'
 import log from 'loglevel'
-import { getOrCreateAssociatedTokenAccount } from '@solana/spl-token'
+import { PublicKey } from '@solana/web3.js'
 import { useContext } from '../context'
 
-type AddPairOpts = {
-  num: string
-  denom: string
-  tokenA: string
-  tokenB: string
-  policy: string
-}
-
-type RemovePairOpts = {
-  tokenA: string
-  tokenB: string
-}
-
-type UpdatePairOpts = {
-  tokenA: string
-  tokenB: string
-  managerWallet?: string
-  isPaused?: string
-  num?: number
-  denom?: number
-  feeReceiver?: string
-  lockFee?: number
-  unlockFee?: number
-}
-
-type WithdrawFeeOpts = {
-  tokenA: string
-  tokenB: string
-  amount: string
-  destination: string
-}
-
 export async function addPair(opts: AddPairOpts) {
-  const { client, keypair } = useContext()
-
-  const num = new BN(opts.num)
-  const denom = new BN(opts.denom)
-  const tokenA = new web3.PublicKey(opts.tokenA)
-  const tokenB = new web3.PublicKey(opts.tokenB)
-  const policy = new web3.PublicKey(opts.policy)
-
-  const [pair] = client.pda.pair(tokenA, tokenB)
-  const [pairAuthority] = client.pda.pairAuthority(pair)
-  await getOrCreateAssociatedTokenAccount(client.provider.connection, keypair, tokenA, pairAuthority, true)
+  const { client } = useContext()
 
   try {
-    const { signature } = await client.addPair({
-      ratio: { num, denom },
-      tokenA,
-      tokenB,
-      policy,
+    const { pair, signature } = await client.addPair({
+      ratio: { num: new BN(opts.num), denom: new BN(opts.denom) },
+      tokenA: new PublicKey(opts.tokenA),
+      tokenB: opts.tokenB ? new PublicKey(opts.tokenB) : undefined,
+      policy: opts.policy ? new PublicKey(opts.policy) : undefined,
     })
 
     log.info(`Signature: ${signature}`)
@@ -70,8 +28,8 @@ export async function removePair(opts: RemovePairOpts) {
 
   try {
     const { signature } = await client.removePair({
-      tokenA: new web3.PublicKey(opts.tokenA),
-      tokenB: new web3.PublicKey(opts.tokenB),
+      tokenA: new PublicKey(opts.tokenA),
+      tokenB: new PublicKey(opts.tokenB),
     })
     log.info(`Signature: ${signature}`)
     log.info('OK')
@@ -86,11 +44,11 @@ export async function updatePair(opts: UpdatePairOpts) {
 
   let managerWallet
   if (opts.managerWallet !== undefined) {
-    managerWallet = new web3.PublicKey(opts.managerWallet)
+    managerWallet = new PublicKey(opts.managerWallet)
   }
   let feeReceiver
   if (opts.feeReceiver !== undefined) {
-    feeReceiver = new web3.PublicKey(opts.feeReceiver)
+    feeReceiver = new PublicKey(opts.feeReceiver)
   }
   let ratio
   if (opts.num !== undefined && opts.denom !== undefined) {
@@ -105,8 +63,8 @@ export async function updatePair(opts: UpdatePairOpts) {
 
   try {
     const { signature, pair } = await client.updatePair({
-      tokenA: new web3.PublicKey(opts.tokenA),
-      tokenB: new web3.PublicKey(opts.tokenB),
+      tokenA: new PublicKey(opts.tokenA),
+      tokenB: new PublicKey(opts.tokenB),
       newAuthority: managerWallet,
       feeReceiver,
       lockFee: opts.lockFee,
@@ -130,9 +88,9 @@ export async function withdrawFee(opts: WithdrawFeeOpts) {
   try {
     const { signature } = await client.withdrawFee({
       amount: new BN(opts.amount),
-      destination: new web3.PublicKey(opts.destination),
-      tokenA: new web3.PublicKey(opts.tokenA),
-      tokenB: new web3.PublicKey(opts.tokenB),
+      destination: new PublicKey(opts.destination),
+      tokenA: new PublicKey(opts.tokenA),
+      tokenB: new PublicKey(opts.tokenB),
     })
 
     log.info(`Signature: ${signature}`)
@@ -146,7 +104,7 @@ export async function withdrawFee(opts: WithdrawFeeOpts) {
 export async function showPairInfo(address: string) {
   const { client, cluster } = useContext()
 
-  const pair = new web3.PublicKey(address)
+  const pair = new PublicKey(address)
   const pairData = await client.fetchPair(pair)
   const [pairAuthority] = client.pda.pairAuthority(pair)
   const feeBalance = await client.provider.connection.getBalance(pairAuthority)
@@ -169,7 +127,7 @@ export async function showPairInfo(address: string) {
 export async function findPairInfo(tokenA: string, tokenB: string) {
   const { client, cluster } = useContext()
 
-  const [pair] = client.pda.pair(new web3.PublicKey(tokenA), new web3.PublicKey(tokenB))
+  const [pair] = client.pda.pair(new PublicKey(tokenA), new PublicKey(tokenB))
   const [pairAuthority] = client.pda.pairAuthority(pair)
   const feeBalance = await client.provider.connection.getBalance(pairAuthority)
 
@@ -207,11 +165,43 @@ export async function showAllPairs() {
 export async function showWhitelistedUsers(address: string) {
   const { client, cluster } = useContext()
 
-  const accounts = await client.findWhitelistedUsers(new web3.PublicKey(address))
+  const accounts = await client.findWhitelistedUsers(new PublicKey(address))
   for (const account of accounts) {
     log.info('--------------------------------------------------------------------------')
     log.info(`User address: ${account.publicKey}`)
     log.info(`See all info: "pnpm cli -c ${cluster} user show ${account.publicKey}"`)
   }
   log.info('--------------------------------------------------------------------------')
+}
+
+type AddPairOpts = {
+  num: string
+  denom: string
+  tokenA: string
+  tokenB?: string
+  policy?: string
+}
+
+type RemovePairOpts = {
+  tokenA: string
+  tokenB: string
+}
+
+type UpdatePairOpts = {
+  tokenA: string
+  tokenB: string
+  managerWallet?: string
+  isPaused?: string
+  num?: number
+  denom?: number
+  feeReceiver?: string
+  lockFee?: number
+  unlockFee?: number
+}
+
+type WithdrawFeeOpts = {
+  tokenA: string
+  tokenB: string
+  amount: string
+  destination: string
 }
