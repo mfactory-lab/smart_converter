@@ -1,8 +1,19 @@
 import { Buffer } from 'node:buffer'
 import type { Address } from '@coral-xyz/anchor'
-import type { ConfirmOptions, Connection, Keypair } from '@solana/web3.js'
-import { PublicKey, Transaction } from '@solana/web3.js'
+import type { ConfirmOptions, Connection } from '@solana/web3.js'
+import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import { AnchorProvider, BN, Program, web3 } from '@coral-xyz/anchor'
+import {
+  MINT_SIZE,
+  TOKEN_PROGRAM_ID,
+  TokenAccountNotFoundError,
+  TokenInvalidAccountOwnerError,
+  createAssociatedTokenAccountInstruction,
+  createInitializeMint2Instruction,
+  getAccount,
+  getAssociatedTokenAddressSync,
+  getMinimumBalanceForRentExemptMint,
+} from '@solana/spl-token'
 import type { Admin, Manager, Pair, Ratio, User, WhitelistedUserInfo } from './generated'
 import {
   PROGRAM_ID,
@@ -20,7 +31,9 @@ import {
   createResumePlatformInstruction,
   createSetAdminInstruction,
   createUnblockUserInstruction,
-  createUnlockTokensInstruction, createUpdatePairInstruction, createWithdrawFeeInstruction,
+  createUnlockTokensInstruction,
+  createUpdatePairInstruction,
+  createWithdrawFeeInstruction,
 } from './generated'
 import type { SmartConverter } from './idl/smart_converter'
 import { IDL } from './idl/smart_converter'
@@ -90,6 +103,11 @@ export class SmartConverterClient {
     return this.program.account.whitelistedUserInfo.fetchNullable(address) as unknown as Promise<WhitelistedUserInfo>
   }
 
+  fetchWhitelistedUserInfoByUserAndPair(user: Address, pair: Address) {
+    const [addr] = this.pda.whitelistedUserInfo(user, pair)
+    return this.fetchWhitelistedUserInfo(addr)
+  }
+
   findManagers() {
     return this.program.account.manager.all()
   }
@@ -145,11 +163,43 @@ export class SmartConverterClient {
     const payer = this.provider.publicKey
     const [manager] = this.pda.manager(payer)
     const tokenA = props.tokenA
-    const tokenB = props.tokenB
-    const [pair] = this.pda.pair(tokenA, tokenB)
-    const [pairAuthority] = this.pda.pairAuthority(pair)
+    let tokenB = props.tokenB
 
-    const ix = createAddPairInstruction(
+    const tx = new Transaction()
+    const signers = []
+
+    let pair: PublicKey
+    let pairAuthority: PublicKey
+
+    if (!tokenB) {
+      const keypair = props.tokenBKeypair ?? Keypair.generate()
+      tokenB = keypair.publicKey
+      signers.push(keypair)
+
+      pair = this.pda.pair(tokenA, tokenB)[0]
+      pairAuthority = this.pda.pairAuthority(pair)[0]
+
+      const lamports = await getMinimumBalanceForRentExemptMint(this.provider.connection)
+
+      tx.add(...[
+        SystemProgram.createAccount({
+          fromPubkey: payer,
+          newAccountPubkey: keypair.publicKey,
+          space: MINT_SIZE,
+          lamports,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeMint2Instruction(keypair.publicKey, 9, pairAuthority, null, TOKEN_PROGRAM_ID),
+      ])
+    } else {
+      pair = this.pda.pair(tokenA, tokenB)[0]
+      pairAuthority = this.pda.pairAuthority(pair)[0]
+    }
+
+    await this.handleMissingTokenAccount(tx, tokenA, pairAuthority)
+    await this.handleMissingTokenAccount(tx, tokenB, pairAuthority)
+
+    tx.add(createAddPairInstruction(
       {
         authority: payer,
         manager,
@@ -159,16 +209,116 @@ export class SmartConverterClient {
         tokenB,
       },
       {
-        ratio: props.ratio,
+        ratio: props.ratio ?? { num: 1, denom: 1 },
         policy: props.policy ?? null,
       },
-    )
-    const tx = new Transaction().add(ix)
+    ))
+
+    const signature = await this.provider.sendAndConfirm(tx, signers)
+
+    return {
+      signature,
+      pair,
+    }
+  }
+
+  async lockTokens(props: LockTokensProps) {
+    const payer = this.provider.publicKey
+    const tokenA = props.tokenA
+    const tokenB = props.tokenB
+    const [user] = this.pda.user(payer)
+    const [pair] = this.pda.pair(tokenA, tokenB)
+    const pairData = await this.fetchPair(pair)
+
+    const [admin] = this.pda.admin()
+    const [manager] = this.pda.manager(pairData.authority)
+    const [pairAuthority] = this.pda.pairAuthority(pair)
+    const [whitelistedUserInfo] = this.pda.whitelistedUserInfo(payer, pair)
+
+    const tx = new Transaction()
+
+    const sourceA = getAssociatedTokenAddressSync(tokenA, payer)
+    const destinationA = await this.handleMissingTokenAccount(tx, tokenA, pairAuthority)
+    const destinationB = await this.handleMissingTokenAccount(tx, tokenB, payer)
+
+    tx.add(createLockTokensInstruction(
+      {
+        proofRequest: props.proofRequest,
+        user,
+        userAuthority: payer,
+        pair,
+        pairAuthority,
+        admin,
+        manager,
+        whitelistedUserInfo,
+        feePayer: props.feePayer ?? payer,
+        feeReceiver: pairData.feeReceiver,
+        sourceA,
+        destinationA,
+        destinationB,
+        tokenA,
+        tokenB,
+      },
+      {
+        amount: new BN(props.amount),
+      },
+    ))
     const signature = await this.provider.sendAndConfirm(tx)
 
     return {
       signature,
       pair,
+    }
+  }
+
+  async unlockTokens(props: UnlockTokensProps) {
+    const payer = this.provider.publicKey
+    const tokenA = props.tokenA
+    const tokenB = props.tokenB
+    const [admin] = this.pda.admin()
+    const [user] = this.pda.user(payer)
+    const [pair] = this.pda.pair(tokenA, tokenB)
+    const [pairAuthority] = this.pda.pairAuthority(pair)
+    const [whitelistedUserInfo] = this.pda.whitelistedUserInfo(payer, pair)
+    const pairData = await this.fetchPair(pair)
+    const [manager] = this.pda.manager(pairData.authority)
+
+    const tx = new Transaction()
+
+    // const sourceB = getAssociatedTokenAddressSync(tokenB, payer)
+    const sourceB = await this.handleMissingTokenAccount(tx, tokenB, payer)
+    const sourceA = await this.handleMissingTokenAccount(tx, tokenA, pairAuthority)
+    const destinationA = await this.handleMissingTokenAccount(tx, tokenA, payer)
+
+    tx.add(createUnlockTokensInstruction(
+      {
+        proofRequest: props.proofRequest,
+        user,
+        userAuthority: payer,
+        pair,
+        pairAuthority,
+        feePayer: props.feePayer ?? payer,
+        feeReceiver: pairData.feeReceiver,
+        whitelistedUserInfo,
+        admin,
+        destinationA,
+        manager,
+        sourceA,
+        sourceB,
+        tokenA,
+        tokenB,
+      },
+      {
+        amount: new BN(props.amount),
+      },
+    ))
+
+    const signature = await this.provider.sendAndConfirm(tx)
+
+    return {
+      signature,
+      pair,
+      user,
     }
   }
 
@@ -251,43 +401,17 @@ export class SmartConverterClient {
     }
   }
 
-  async lockTokens(props: LockTokensProps) {
-    const payer = this.provider.publicKey
-    const tokenA = props.tokenA
-    const tokenB = props.tokenB
-    const [user] = this.pda.user(payer)
-    const [pair] = this.pda.pair(tokenA, tokenB)
-    const pairData = await this.fetchPair(pair)
+  async unblockUser(props: UpdateUserProps) {
+    const authority = this.provider.publicKey
+    const userWallet = props.userWallet
+    const [manager] = this.pda.manager(authority)
+    const [user] = this.pda.user(userWallet)
 
-    const [admin] = this.pda.admin()
-    const [manager] = this.pda.manager(pairData.authority)
-    const [pairAuthority] = this.pda.pairAuthority(pair)
-    const [whitelistedUserInfo] = this.pda.whitelistedUserInfo(payer, pair)
-
-    const data = await this.fetchWhitelistedUserInfo(whitelistedUserInfo)
-
-    console.log('whitelistedUserInfo', data)
-
-    const ix = createLockTokensInstruction(
+    const ix = createUnblockUserInstruction(
       {
-        proofRequest: props.proofRequest,
-        user,
-        userAuthority: payer,
-        pair,
-        pairAuthority,
-        admin,
+        authority,
         manager,
-        whitelistedUserInfo,
-        feePayer: props.feePayer ?? payer,
-        feeReceiver: pairData.feeReceiver,
-        destinationA: props.destinationA,
-        destinationB: props.destinationB,
-        sourceA: props.sourceA,
-        tokenA,
-        tokenB,
-      },
-      {
-        amount: new BN(props.amount),
+        user,
       },
     )
     const tx = new Transaction().add(ix)
@@ -295,7 +419,7 @@ export class SmartConverterClient {
 
     return {
       signature,
-      pair,
+      user,
     }
   }
 
@@ -461,72 +585,6 @@ export class SmartConverterClient {
     }
   }
 
-  async unblockUser(props: UpdateUserProps) {
-    const authority = this.provider.publicKey
-    const userWallet = props.userWallet
-    const [manager] = this.pda.manager(authority)
-    const [user] = this.pda.user(userWallet)
-
-    const ix = createUnblockUserInstruction(
-      {
-        authority,
-        manager,
-        user,
-      },
-    )
-    const tx = new Transaction().add(ix)
-    const signature = await this.provider.sendAndConfirm(tx)
-
-    return {
-      signature,
-      user,
-    }
-  }
-
-  async unlockTokens(props: UnlockTokensProps) {
-    const payer = this.provider.publicKey
-    const tokenA = props.tokenA
-    const tokenB = props.tokenB
-    const [admin] = this.pda.admin()
-    const [user] = this.pda.user(payer)
-    const [pair] = this.pda.pair(tokenA, tokenB)
-    const [pairAuthority] = this.pda.pairAuthority(pair)
-    const [whitelistedUserInfo] = this.pda.whitelistedUserInfo(payer, pair)
-    const pairData = await this.fetchPair(pair)
-    const [manager] = this.pda.manager(pairData.authority)
-
-    const ix = createUnlockTokensInstruction(
-      {
-        proofRequest: props.proofRequest,
-        user,
-        userAuthority: payer,
-        pair,
-        pairAuthority,
-        feePayer: props.feePayer ?? payer,
-        feeReceiver: pairData.feeReceiver,
-        whitelistedUserInfo,
-        admin,
-        destinationA: props.destinationA,
-        manager,
-        sourceA: props.sourceA,
-        sourceB: props.sourceB,
-        tokenA,
-        tokenB,
-      },
-      {
-        amount: new BN(props.amount),
-      },
-    )
-    const tx = new Transaction().add(ix)
-    const signature = await this.provider.sendAndConfirm(tx)
-
-    return {
-      signature,
-      pair,
-      user,
-    }
-  }
-
   async updatePair(props: UpdatePairProps) {
     const authority = this.provider.publicKey
     const tokenA = props.tokenA
@@ -556,6 +614,26 @@ export class SmartConverterClient {
       signature,
       pair,
     }
+  }
+
+  private async handleMissingTokenAccount(tx: Transaction, mint: PublicKey, owner?: PublicKey) {
+    const _owner = owner ?? this.provider.publicKey
+    const account = getAssociatedTokenAddressSync(mint, _owner, true)
+    try {
+      await getAccount(this.provider.connection, account)
+    } catch (error: unknown) {
+      if (error instanceof TokenAccountNotFoundError || error instanceof TokenInvalidAccountOwnerError) {
+        tx.add(
+          createAssociatedTokenAccountInstruction(
+            this.provider.publicKey,
+            account,
+            _owner,
+            mint,
+          ),
+        )
+      }
+    }
+    return account
   }
 }
 
@@ -606,9 +684,10 @@ type AddPairProps = {
   /// Security token mint address
   tokenA: PublicKey
   /// Utility token mint address
-  tokenB: PublicKey
+  tokenB?: PublicKey
+  tokenBKeypair?: Keypair
   /// Ratio of token A to token B
-  ratio: Ratio
+  ratio?: Ratio
   /// Albus policy
   policy?: PublicKey
 }
@@ -624,11 +703,16 @@ type UpdateUserProps = {
 }
 
 type LockTokensProps = {
+  /// Mint A
   tokenA: PublicKey
+  /// Mint B
   tokenB: PublicKey
-  sourceA: PublicKey
-  destinationA: PublicKey
-  destinationB: PublicKey
+  // /// User Token A
+  // sourceA: PublicKey
+  // /// Pair Token A
+  // destinationA: PublicKey
+  // /// User Token B
+  // destinationB: PublicKey
   amount: number | BN
   feePayer?: PublicKey
   proofRequest?: PublicKey
@@ -657,9 +741,6 @@ type WithdrawFeeProps = {
 type UnlockTokensProps = {
   tokenA: PublicKey
   tokenB: PublicKey
-  sourceA: PublicKey
-  sourceB: PublicKey
-  destinationA: PublicKey
   amount: number | BN
   feePayer?: PublicKey
   proofRequest?: PublicKey
