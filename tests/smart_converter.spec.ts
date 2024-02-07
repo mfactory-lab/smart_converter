@@ -1,11 +1,8 @@
 import { afterAll, assert, beforeAll, describe, it } from 'vitest'
 import { SmartConverterClient } from '@smart-converter/sdk'
 import {
-  TOKEN_PROGRAM_ID,
   createAssociatedTokenAccount,
-  createMint,
-  getOrCreateAssociatedTokenAccount,
-  mintTo,
+  createMint, getAssociatedTokenAddressSync, mintTo,
 } from '@solana/spl-token'
 import type { PublicKey } from '@solana/web3.js'
 import { Keypair, LAMPORTS_PER_SOL, SystemProgram, Transaction } from '@solana/web3.js'
@@ -34,15 +31,17 @@ describe('smartConverter', () => {
   const clientAlbusAdmin = new AlbusClient(providerAdmin).local()
   const clientAlbusUser = new AlbusClient(providerUser).local()
 
-  let mintA: PublicKey
-  let mintB: PublicKey
-  let userA: PublicKey
-  let userB: PublicKey
-  let pairA: PublicKey
+  const albusTester = new AlbusTester(clientAlbusAdmin)
 
   let policy: PublicKey
 
-  const albusTester = new AlbusTester(clientAlbusAdmin)
+  let userA: PublicKey
+  let userB: PublicKey
+
+  const tokenAKeypair = Keypair.generate()
+  const tokenBKeypair = Keypair.generate()
+  const mintA = tokenAKeypair.publicKey
+  const mintB = tokenBKeypair.publicKey
 
   beforeAll(async () => {
     await airdrop(providerAdmin.connection, providerAdmin.publicKey, 10)
@@ -51,6 +50,10 @@ describe('smartConverter', () => {
 
     const testData = await albusTester.init()
     policy = testData.policy
+
+    await createMint(providerManager.connection, managerKeypair, providerManager.publicKey, null, 9, tokenAKeypair)
+    userA = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, providerUser.publicKey)
+    await mintTo(providerManager.connection, managerKeypair, mintA, userA, providerManager.publicKey, 6 * LAMPORTS_PER_SOL)
   })
 
   afterAll(async () => {
@@ -122,7 +125,7 @@ describe('smartConverter', () => {
     it('can not add manager from non-admin wallet', async () => {
       try {
         const { manager } = await clientManager.addManager({
-          managerWallet: providerManager.wallet.publicKey,
+          managerWallet: providerManager.publicKey,
         })
         const managerData = await clientManager.fetchManager(manager)
         assert.equal(managerData, null)
@@ -135,10 +138,10 @@ describe('smartConverter', () => {
     it('can add manager', async () => {
       try {
         const { manager } = await clientAdmin.addManager({
-          managerWallet: providerManager.wallet.publicKey,
+          managerWallet: providerManager.publicKey,
         })
         const managerData = await clientAdmin.fetchManager(manager)
-        assert.equal(managerData.authority.equals(providerManager.wallet.publicKey), true)
+        assert.equal(managerData.authority.equals(providerManager.publicKey), true)
       } catch (e) {
         console.log(e)
         throw e
@@ -148,7 +151,7 @@ describe('smartConverter', () => {
     it('can pause manager pairs', async () => {
       try {
         const { manager } = await clientAdmin.pausePairs({
-          managerWallet: providerManager.wallet.publicKey,
+          managerWallet: providerManager.publicKey,
         })
         const managerData = await clientAdmin.fetchManager(manager)
         assert.equal(managerData.isAllPaused, true)
@@ -161,7 +164,7 @@ describe('smartConverter', () => {
     it('can resume manager pairs', async () => {
       try {
         const { manager } = await clientAdmin.resumePairs({
-          managerWallet: providerManager.wallet.publicKey,
+          managerWallet: providerManager.publicKey,
         })
         const managerData = await clientAdmin.fetchManager(manager)
         assert.equal(managerData.isAllPaused, false)
@@ -174,7 +177,7 @@ describe('smartConverter', () => {
     it('can remove manager', async () => {
       try {
         const { manager } = await clientAdmin.removeManager({
-          managerWallet: providerManager.wallet.publicKey,
+          managerWallet: providerManager.publicKey,
         })
         const managerData = await clientAdmin.fetchManager(manager)
         assert.equal(managerData, null)
@@ -189,42 +192,32 @@ describe('smartConverter', () => {
     it('can add pair', async () => {
       try {
         await clientAdmin.addManager({
-          managerWallet: providerManager.wallet.publicKey,
+          managerWallet: providerManager.publicKey,
         })
       } catch (e) {
         console.log(e)
         throw e
       }
 
-      const tokenAKeypair = Keypair.generate()
-      const tokenBKeypair = Keypair.generate()
+      // mintB = await createMint(providerManager.connection, managerKeypair, pairAuthority, null, 9, tokenBKeypair, undefined, TOKEN_PROGRAM_ID)
 
-      const [pair] = clientManager.pda.pair(tokenAKeypair.publicKey, tokenBKeypair.publicKey)
-      const [pairAuthority] = clientManager.pda.pairAuthority(pair)
-
-      mintA = await createMint(providerManager.connection, managerKeypair, providerManager.wallet.publicKey, null, 9, tokenAKeypair, undefined, TOKEN_PROGRAM_ID)
-      mintB = await createMint(providerManager.connection, managerKeypair, pairAuthority, null, 9, tokenBKeypair, undefined, TOKEN_PROGRAM_ID)
-
-      try {
-        await clientManager.addPair({
-          ratio: {
-            num: 10,
-            denom: 1,
-          },
-          tokenA: mintA,
-          tokenB: mintB,
-          policy,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      const { pair } = await clientManager.addPair({
+        ratio: {
+          num: 10,
+          denom: 1,
+        },
+        tokenA: mintA,
+        tokenBKeypair,
+        // tokenB: mintB,
+        policy,
+      })
 
       const pairData = await clientManager.fetchPair(pair)
+      const [pairAuthority] = clientManager.pda.pairAuthority(pair)
 
-      assert.equal(pairData.authority.equals(providerManager.wallet.publicKey), true)
+      assert.equal(pairData.authority.equals(providerManager.publicKey), true)
       assert.equal(pairData.tokenA.equals(mintA), true)
-      assert.equal(pairData.tokenB.equals(mintB), true)
+      // assert.equal(pairData.tokenB.equals(mintB), true)
       assert.equal(pairData.feeReceiver.equals(pairAuthority), true)
       assert.equal(pairData.ratio.num, 10)
       assert.equal(pairData.ratio.denom, 1)
@@ -253,10 +246,10 @@ describe('smartConverter', () => {
     it('can update pair', async () => {
       try {
         const { pair } = await clientManager.updatePair({
-          feeReceiver: providerManager.wallet.publicKey,
+          feeReceiver: providerManager.publicKey,
           isPaused: true,
           lockFee: 10,
-          newAuthority: providerManager.wallet.publicKey,
+          newAuthority: providerManager.publicKey,
           ratio: {
             num: 100,
             denom: 1,
@@ -267,10 +260,10 @@ describe('smartConverter', () => {
         })
 
         const pairData = await clientManager.fetchPair(pair)
-        assert.equal(pairData.authority.equals(providerManager.wallet.publicKey), true)
+        assert.equal(pairData.authority.equals(providerManager.publicKey), true)
         assert.equal(pairData.tokenA.equals(mintA), true)
         assert.equal(pairData.tokenB.equals(mintB), true)
-        assert.equal(pairData.feeReceiver.equals(providerManager.wallet.publicKey), true)
+        assert.equal(pairData.feeReceiver.equals(providerManager.publicKey), true)
         assert.equal(pairData.ratio.num, 100)
         assert.equal(pairData.ratio.denom, 1)
         assert.equal(pairData.lockedAmount, 0)
@@ -303,14 +296,14 @@ describe('smartConverter', () => {
         const { user, whitelistedUserInfo } = await clientManager.addUserToWhitelist({
           tokenA: mintA,
           tokenB: mintB,
-          userWallet: providerUser.wallet.publicKey,
+          userWallet: providerUser.publicKey,
         })
         const [pair] = clientManager.pda.pair(mintA, mintB)
         const userData = await clientManager.fetchUser(user)
         const whitelistedUserInfoData = await clientManager.fetchWhitelistedUserInfo(whitelistedUserInfo)
-        assert.equal(userData.authority.equals(providerUser.wallet.publicKey), true)
+        assert.equal(userData.authority.equals(providerUser.publicKey), true)
         assert.equal(userData.isBlocked, false)
-        assert.equal(whitelistedUserInfoData.user.equals(providerUser.wallet.publicKey), true)
+        assert.equal(whitelistedUserInfoData.user.equals(providerUser.publicKey), true)
         assert.equal(whitelistedUserInfoData.pair.equals(pair), true)
       } catch (e) {
         console.log(e)
@@ -323,11 +316,11 @@ describe('smartConverter', () => {
         const { user, whitelistedUserInfo } = await clientManager.removeUserFromWhitelist({
           tokenA: mintA,
           tokenB: mintB,
-          userWallet: providerUser.wallet.publicKey,
+          userWallet: providerUser.publicKey,
         })
         const userData = await clientManager.fetchUser(user)
         const whitelistedUserInfoData = await clientManager.fetchWhitelistedUserInfo(whitelistedUserInfo)
-        assert.equal(userData.authority.equals(providerUser.wallet.publicKey), true)
+        assert.equal(userData.authority.equals(providerUser.publicKey), true)
         assert.equal(userData.isBlocked, false)
         assert.equal(whitelistedUserInfoData, null)
       } catch (e) {
@@ -339,7 +332,7 @@ describe('smartConverter', () => {
     it('can block user', async () => {
       try {
         const { user } = await clientManager.blockUser({
-          userWallet: providerUser.wallet.publicKey,
+          userWallet: providerUser.publicKey,
         })
         const userData = await clientManager.fetchUser(user)
         assert.equal(userData.isBlocked, true)
@@ -352,7 +345,7 @@ describe('smartConverter', () => {
     it('can unblock user', async () => {
       try {
         const { user } = await clientManager.unblockUser({
-          userWallet: providerUser.wallet.publicKey,
+          userWallet: providerUser.publicKey,
         })
         const userData = await clientManager.fetchUser(user)
         assert.equal(userData.isBlocked, false)
@@ -365,7 +358,7 @@ describe('smartConverter', () => {
     it('can not call manager instruction from non-manager wallet', async () => {
       try {
         await clientAdmin.blockUser({
-          userWallet: providerUser.wallet.publicKey,
+          userWallet: providerUser.publicKey,
         })
 
         assert.ok(false)
@@ -380,7 +373,7 @@ describe('smartConverter', () => {
 
       const transaction = new Transaction().add(
         SystemProgram.transfer({
-          fromPubkey: providerManager.wallet.publicKey,
+          fromPubkey: providerManager.publicKey,
           toPubkey: pairAuthority,
           lamports: LAMPORTS_PER_SOL,
         }),
@@ -396,7 +389,7 @@ describe('smartConverter', () => {
       try {
         await clientManager.withdrawFee({
           amount: LAMPORTS_PER_SOL,
-          destination: providerManager.wallet.publicKey,
+          destination: providerManager.publicKey,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -408,25 +401,22 @@ describe('smartConverter', () => {
   })
 
   describe('user instructions', async () => {
-    it('can not lock tokens if user is not whitelisted and Proof Request is not created', async () => {
-      userA = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, providerUser.wallet.publicKey)
-      userB = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintB, providerUser.wallet.publicKey)
-      const [pair] = clientUser.pda.pair(mintA, mintB)
-      const [pairAuthority] = clientUser.pda.pairAuthority(pair)
-      pairA = (await getOrCreateAssociatedTokenAccount(providerUser.connection, userKeypair, mintA, pairAuthority, true)).address
-      await mintTo(providerManager.connection, managerKeypair, mintA, userA, providerManager.wallet.publicKey, 6 * LAMPORTS_PER_SOL, [], undefined, TOKEN_PROGRAM_ID)
+    const [pair] = clientManager.pda.pair(mintA, mintB)
+    const [pairAuthority] = clientManager.pda.pairAuthority(pair)
+    const pairA = getAssociatedTokenAddressSync(mintA, pairAuthority, true)
+    // const userB = getAssociatedTokenAddressSync(mintB, providerUser.publicKey)
+    // const pairB = getAssociatedTokenAddressSync(mintB, pairAuthority, true)
 
+    it('can not lock tokens if user is not whitelisted and Proof Request is not created', async () => {
       try {
         await clientUser.lockTokens({
           amount: 5 * LAMPORTS_PER_SOL,
-          destinationA: pairA,
-          destinationB: userB,
-          sourceA: userA,
           tokenA: mintA,
           tokenB: mintB,
         })
         assert.ok(false)
       } catch (e: any) {
+        // console.log(e)
         assertErrorCode(e, 'Unauthorized')
       }
     })
@@ -435,9 +425,6 @@ describe('smartConverter', () => {
       try {
         await clientUser.unlockTokens({
           amount: 5 * LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -453,21 +440,21 @@ describe('smartConverter', () => {
       try {
         await clientUser.unlockTokens({
           amount: 5 * LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
           tokenA: mintA,
           tokenB: mintB,
           proofRequest,
         })
         assert.ok(false)
       } catch (e: any) {
+        console.log(e)
         assertErrorCode(e, 'Custom(3)')
       }
     })
 
     it('can lock/unlock tokens if user is not whitelisted but has verified Proof Request', async () => {
       const proofRequest = await albusTester.createProofRequest(clientAlbusUser)
+
+      userB = await createAssociatedTokenAccount(providerUser.connection, userKeypair, mintB, providerUser.publicKey)
 
       let sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
       let destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
@@ -476,45 +463,29 @@ describe('smartConverter', () => {
       assert.equal(sourceABalance.value.amount, '6000000000')
       assert.equal(destinationBBalance.value.amount, '0')
 
-      try {
-        const { pair } = await clientUser.lockTokens({
-          amount: 5 * LAMPORTS_PER_SOL,
-          destinationA: pairA,
-          destinationB: userB,
-          sourceA: userA,
-          tokenA: mintA,
-          tokenB: mintB,
-          proofRequest,
-        })
+      const { pair } = await clientUser.lockTokens({
+        amount: 5 * LAMPORTS_PER_SOL,
+        tokenA: mintA,
+        tokenB: mintB,
+        proofRequest,
+      })
 
-        sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
-        destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
-        destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
-        assert.equal(destinationABalance.value.amount, '5000000000')
-        assert.equal(sourceABalance.value.amount, '1000000000')
-        assert.equal(destinationBBalance.value.amount, '50000000000')
+      sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
+      destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
+      destinationBBalance = await providerUser.connection.getTokenAccountBalance(userB)
+      assert.equal(destinationABalance.value.amount, '5000000000')
+      assert.equal(sourceABalance.value.amount, '1000000000')
+      assert.equal(destinationBBalance.value.amount, '50000000000')
 
-        const pairData = await clientManager.fetchPair(pair)
-        assert.equal(pairData.lockedAmount, 5 * LAMPORTS_PER_SOL)
-      } catch (e: any) {
-        console.log(e)
-        throw e
-      }
+      const pairData = await clientManager.fetchPair(pair)
+      assert.equal(pairData.lockedAmount, 5 * LAMPORTS_PER_SOL)
 
-      try {
-        await clientUser.unlockTokens({
-          amount: 5 * LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
-          tokenA: mintA,
-          tokenB: mintB,
-          proofRequest,
-        })
-      } catch (e: any) {
-        console.log(e)
-        throw e
-      }
+      await clientUser.unlockTokens({
+        amount: 5 * LAMPORTS_PER_SOL,
+        tokenA: mintA,
+        tokenB: mintB,
+        proofRequest,
+      })
     })
 
     it('can lock tokens if user whitelisted', async () => {
@@ -531,22 +502,14 @@ describe('smartConverter', () => {
       assert.equal(destinationABalance.value.amount, '0')
       assert.equal(destinationBBalance.value.amount, '0')
 
-      try {
-        const { pair } = await clientUser.lockTokens({
-          amount: 5 * LAMPORTS_PER_SOL,
-          destinationA: pairA,
-          destinationB: userB,
-          sourceA: userA,
-          tokenA: mintA,
-          tokenB: mintB,
-        })
+      const { pair } = await clientUser.lockTokens({
+        amount: 5 * LAMPORTS_PER_SOL,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
 
-        const pairData = await clientManager.fetchPair(pair)
-        assert.equal(pairData.lockedAmount, 5 * LAMPORTS_PER_SOL)
-      } catch (e: any) {
-        console.log(e)
-        throw e
-      }
+      const pairData = await clientManager.fetchPair(pair)
+      assert.equal(pairData.lockedAmount, 5 * LAMPORTS_PER_SOL)
 
       sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
       destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
@@ -557,21 +520,13 @@ describe('smartConverter', () => {
     })
 
     it('can not lock tokens if user blocked', async () => {
-      try {
-        await clientManager.blockUser({
-          userWallet: providerUser.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.blockUser({
+        userWallet: providerUser.publicKey,
+      })
 
       try {
         await clientUser.lockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: pairA,
-          destinationB: userB,
-          sourceA: userA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -580,34 +535,21 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsBlocked')
       }
 
-      try {
-        await clientManager.unblockUser({
-          userWallet: providerUser.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.unblockUser({
+        userWallet: providerUser.publicKey,
+      })
     })
 
     it('can not lock tokens if pair paused', async () => {
-      try {
-        await clientManager.updatePair({
-          isPaused: true,
-          tokenA: mintA,
-          tokenB: mintB,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.updatePair({
+        isPaused: true,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
 
       try {
         await clientUser.lockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: pairA,
-          destinationB: userB,
-          sourceA: userA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -616,34 +558,21 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsPaused')
       }
 
-      try {
-        await clientManager.updatePair({
-          isPaused: false,
-          tokenA: mintA,
-          tokenB: mintB,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.updatePair({
+        isPaused: false,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
     })
 
     it('can not lock tokens if all manager`s pairs paused', async () => {
-      try {
-        await clientAdmin.pausePairs({
-          managerWallet: providerManager.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.pausePairs({
+        managerWallet: providerManager.publicKey,
+      })
 
       try {
         await clientUser.lockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: pairA,
-          destinationB: userB,
-          sourceA: userA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -653,30 +582,17 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsPaused')
       }
 
-      try {
-        await clientAdmin.resumePairs({
-          managerWallet: providerManager.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.resumePairs({
+        managerWallet: providerManager.publicKey,
+      })
     })
 
     it('can not lock tokens if platform paused', async () => {
-      try {
-        await clientAdmin.pausePlatform()
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.pausePlatform()
 
       try {
         await clientUser.lockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: pairA,
-          destinationB: userB,
-          sourceA: userA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -685,12 +601,7 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsPaused')
       }
 
-      try {
-        await clientAdmin.resumePlatform()
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.resumePlatform()
     })
 
     it('can unlock tokens if user whitelisted', async () => {
@@ -701,21 +612,13 @@ describe('smartConverter', () => {
       assert.equal(sourceABalance.value.amount, '1000000000')
       assert.equal(destinationBBalance.value.amount, '50000000000')
 
-      try {
-        const { pair } = await clientUser.unlockTokens({
-          amount: LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
-          tokenA: mintA,
-          tokenB: mintB,
-        })
-        const pairData = await clientManager.fetchPair(pair)
-        assert.equal(pairData.lockedAmount, 4 * LAMPORTS_PER_SOL)
-      } catch (e: any) {
-        console.log(e)
-        throw e
-      }
+      const { pair } = await clientUser.unlockTokens({
+        amount: LAMPORTS_PER_SOL,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
+      const pairData = await clientManager.fetchPair(pair)
+      assert.equal(pairData.lockedAmount, 4 * LAMPORTS_PER_SOL)
 
       sourceABalance = await providerUser.connection.getTokenAccountBalance(userA)
       destinationABalance = await providerUser.connection.getTokenAccountBalance(pairA)
@@ -726,21 +629,13 @@ describe('smartConverter', () => {
     })
 
     it('can not unlock tokens if user blocked', async () => {
-      try {
-        await clientManager.blockUser({
-          userWallet: providerUser.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.blockUser({
+        userWallet: providerUser.publicKey,
+      })
 
       try {
         await clientUser.unlockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -749,34 +644,21 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsBlocked')
       }
 
-      try {
-        await clientManager.unblockUser({
-          userWallet: providerUser.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.unblockUser({
+        userWallet: providerUser.publicKey,
+      })
     })
 
     it('can not unlock tokens if pair paused', async () => {
-      try {
-        await clientManager.updatePair({
-          isPaused: true,
-          tokenA: mintA,
-          tokenB: mintB,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.updatePair({
+        isPaused: true,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
 
       try {
         await clientUser.unlockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -785,34 +667,21 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsPaused')
       }
 
-      try {
-        await clientManager.updatePair({
-          isPaused: false,
-          tokenA: mintA,
-          tokenB: mintB,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientManager.updatePair({
+        isPaused: false,
+        tokenA: mintA,
+        tokenB: mintB,
+      })
     })
 
     it('can not unlock tokens if all manager`s pairs paused', async () => {
-      try {
-        await clientAdmin.pausePairs({
-          managerWallet: providerManager.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.pausePairs({
+        managerWallet: providerManager.publicKey,
+      })
 
       try {
         await clientUser.unlockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -821,30 +690,17 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsPaused')
       }
 
-      try {
-        await clientAdmin.resumePairs({
-          managerWallet: providerManager.wallet.publicKey,
-        })
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.resumePairs({
+        managerWallet: providerManager.publicKey,
+      })
     })
 
     it('can not unlock tokens if platform paused', async () => {
-      try {
-        await clientAdmin.pausePlatform()
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.pausePlatform()
 
       try {
         await clientUser.unlockTokens({
           amount: LAMPORTS_PER_SOL,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
           tokenA: mintA,
           tokenB: mintB,
         })
@@ -853,21 +709,13 @@ describe('smartConverter', () => {
         assertErrorCode(e, 'IsPaused')
       }
 
-      try {
-        await clientAdmin.resumePlatform()
-      } catch (e) {
-        console.log(e)
-        throw e
-      }
+      await clientAdmin.resumePlatform()
     })
 
     it('can not unlock tokens if wished amount is greater than pair`s locked amount', async () => {
       try {
         await clientUser.unlockTokens({
           amount: 4 * LAMPORTS_PER_SOL + 1,
-          destinationA: userA,
-          sourceB: userB,
-          sourceA: pairA,
           tokenA: mintA,
           tokenB: mintB,
         })
