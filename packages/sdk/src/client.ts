@@ -13,6 +13,8 @@ import {
   getAccount,
   getAssociatedTokenAddressSync,
   getMinimumBalanceForRentExemptMint,
+  createSetAuthorityInstruction,
+  AuthorityType
 } from '@solana/spl-token'
 import type { Admin, Manager, Pair, Ratio, User, WhitelistedUserInfo } from './generated'
 import {
@@ -194,6 +196,13 @@ export class SmartConverterClient {
     } else {
       pair = this.pda.pair(tokenA, tokenB)[0]
       pairAuthority = this.pda.pairAuthority(pair)[0]
+
+      tx.add(createSetAuthorityInstruction(
+        tokenB,
+        this.provider.publicKey,
+        AuthorityType.MintTokens,
+        pairAuthority
+      ))
     }
 
     await this.handleMissingTokenAccount(tx, tokenA, pairAuthority)
