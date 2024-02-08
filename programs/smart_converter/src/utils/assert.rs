@@ -9,23 +9,35 @@ use crate::{state::WhitelistedUserInfo, SmartConverterError};
 /// or has a verified Proof Request via Albus program.
 pub fn assert_authorized(
     pair: &Account<Pair>,
-    user: &Account<User>,
-    whitelisted_user_info: &AccountInfo,
-    proof_request_account_info: Option<&AccountInfo>,
+    user_address: &Pubkey,
+    user_account: &AccountInfo,
+    whitelist_account: &AccountInfo,
+    proof_request_account: Option<&AccountInfo>,
 ) -> Result<()> {
-    if user.is_blocked {
-        return Err(SmartConverterError::IsBlocked.into());
+    // User account exists
+    if !user_account.data_is_empty() {
+        let mut data = &user_account
+            .data
+            .try_borrow_mut()
+            .map_err(|_| SmartConverterError::Unauthorized)?[..];
+
+        let user = User::try_deserialize(&mut data)?;
+
+        if user.is_blocked {
+            return Err(SmartConverterError::IsBlocked.into());
+        }
     }
 
-    if !whitelisted_user_info.data_is_empty() {
-        let mut data = &whitelisted_user_info
+    // Whitelist account exists
+    if !whitelist_account.data_is_empty() {
+        let mut data = &whitelist_account
             .data
             .try_borrow_mut()
             .map_err(|_| SmartConverterError::Unauthorized)?[..];
 
         let info = WhitelistedUserInfo::try_deserialize(&mut data)?;
 
-        if !cmp_pubkeys(&info.user, &user.authority) {
+        if !cmp_pubkeys(&info.user, &user_address) {
             msg!("Error: Invalid whitelisted user account");
             return Err(SmartConverterError::Unauthorized.into());
         }
@@ -39,11 +51,11 @@ pub fn assert_authorized(
     }
 
     if let Some(policy) = pair.policy {
-        if let Some(proof_request) = proof_request_account_info {
+        if let Some(proof_request) = proof_request_account {
             msg!("User is not in whitelist! Trying to verify Proof request");
             AlbusVerifier::new(proof_request)
                 .check_policy(policy)
-                .check_owner(user.authority)
+                .check_owner(*user_address)
                 .run()?;
         } else {
             msg!("User is not in whitelist! Proof request is not provided");

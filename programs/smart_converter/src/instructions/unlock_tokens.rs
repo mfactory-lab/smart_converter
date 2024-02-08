@@ -11,9 +11,8 @@ use crate::{
 /// The user can unlock security tokens in special pair.
 /// After that user burns utility tokens and gets locked tokens back.
 pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
-    let user = &ctx.accounts.user;
-    let manager = &ctx.accounts.manager;
     let admin = &ctx.accounts.admin;
+    let manager = &ctx.accounts.manager;
     let pair = &mut ctx.accounts.pair;
     let pair_key = pair.key();
 
@@ -24,7 +23,8 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
     // Check if user have access to unlock tokens
     assert_authorized(
         pair,
-        user,
+        &ctx.accounts.user_authority.key(),
+        &ctx.accounts.user,
         &ctx.accounts.whitelisted_user_info,
         ctx.accounts.proof_request.as_ref(),
     )?;
@@ -89,8 +89,8 @@ pub fn handle(ctx: Context<UnlockTokens>, amount: u64) -> Result<()> {
 
     emit!(UnlockTokensEvent {
         pair: pair_key,
-        user: user.key(),
-        user_wallet: user.authority,
+        user: ctx.accounts.user.key(),
+        user_authority: ctx.accounts.user_authority.key(),
         amount,
         timestamp: clock.unix_timestamp,
     });
@@ -103,13 +103,9 @@ pub struct UnlockTokens<'info> {
     /// CHECK: will be checked in code
     pub proof_request: Option<AccountInfo<'info>>,
 
-    #[account(
-        mut,
-        seeds = [User::SEED, user_authority.key().as_ref()],
-        bump,
-        constraint = user.authority == user_authority.key(),
-    )]
-    pub user: Box<Account<'info, User>>,
+    /// CHECK: will be checked in code
+    #[account(seeds = [User::SEED, user_authority.key().as_ref()], bump)]
+    pub user: AccountInfo<'info>,
 
     #[account(mut)]
     pub user_authority: Signer<'info>,

@@ -3,7 +3,7 @@ use anchor_spl::token;
 
 use crate::{
     events::LockTokensEvent,
-    state::{Admin, Manager, Pair, User},
+    state::{Admin, Manager, Pair, User, WhitelistedUserInfo},
     utils::assert_authorized,
     SmartConverterError,
 };
@@ -13,7 +13,6 @@ use crate::{
 pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     let admin = &ctx.accounts.admin;
     let manager = &ctx.accounts.manager;
-    let user = &ctx.accounts.user;
     let pair = &mut ctx.accounts.pair;
     let pair_key = pair.key();
 
@@ -24,12 +23,11 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
     // Check if user have access to lock tokens
     assert_authorized(
         pair,
-        user,
+        &ctx.accounts.user_authority.key(),
+        &ctx.accounts.user,
         &ctx.accounts.whitelisted_user_info,
         ctx.accounts.proof_request.as_ref(),
     )?;
-
-    let user_authority = ctx.accounts.user_authority.key();
 
     if pair.lock_fee > 0 {
         let fee = amount
@@ -88,8 +86,8 @@ pub fn handle(ctx: Context<LockTokens>, amount: u64) -> Result<()> {
 
     emit!(LockTokensEvent {
         pair: pair_key,
-        user: user.key(),
-        user_wallet: user_authority,
+        user: ctx.accounts.user.key(),
+        user_authority: ctx.accounts.user_authority.key(),
         amount,
         timestamp: clock.unix_timestamp,
     });
@@ -104,17 +102,6 @@ pub struct LockTokens<'info> {
 
     #[account(
         mut,
-        seeds = [User::SEED, user_authority.key().as_ref()],
-        bump,
-        constraint = user.authority == user_authority.key(),
-    )]
-    pub user: Box<Account<'info, User>>,
-
-    #[account(mut)]
-    pub user_authority: Signer<'info>,
-
-    #[account(
-        mut,
         seeds = [Pair::SEED, token_a.key().as_ref(), token_b.key().as_ref()],
         bump,
         constraint = pair.authority == manager.authority,
@@ -126,6 +113,14 @@ pub struct LockTokens<'info> {
     pub pair_authority: AccountInfo<'info>,
 
     /// CHECK: will be checked in code
+    #[account(seeds = [User::SEED, user_authority.key().as_ref()], bump)]
+    pub user: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub user_authority: Signer<'info>,
+
+    /// CHECK: will be checked in code
+    #[account(seeds = [WhitelistedUserInfo::SEED, user_authority.key().as_ref(), pair.key().as_ref()], bump)]
     pub whitelisted_user_info: AccountInfo<'info>,
 
     #[account(seeds = [Admin::SEED], bump)]
