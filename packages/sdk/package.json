@@ -1,8 +1,8 @@
 {
   "name": "@smart-converter/sdk",
-  "version": "0.0.5",
-  "private": true,
   "type": "module",
+  "version": "0.0.6",
+  "private": true,
   "main": "src/index.ts",
   "scripts": {
     "generate": "DEBUG='(solita|rustbin):(info|error)' solita"

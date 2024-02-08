@@ -1,8 +1,8 @@
 import { Buffer } from 'node:buffer'
 import type { Address } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program, web3 } from '@coral-xyz/anchor'
 import type { ConfirmOptions, Connection } from '@solana/web3.js'
 import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
-import { AnchorProvider, BN, Program, web3 } from '@coral-xyz/anchor'
 import {
   MINT_SIZE,
   TOKEN_PROGRAM_ID,

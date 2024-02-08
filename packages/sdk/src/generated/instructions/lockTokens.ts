@@ -31,16 +31,16 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['amount', beet.u64],
   ],
-  'LockTokensInstructionArgs'
+  'LockTokensInstructionArgs',
 )
 /**
  * Accounts required by the _lockTokens_ instruction
  *
  * @property [] proofRequest (optional)
- * @property [_writable_] user
- * @property [_writable_, **signer**] userAuthority
  * @property [_writable_] pair
  * @property [] pairAuthority
+ * @property [] user
+ * @property [_writable_, **signer**] userAuthority
  * @property [] whitelistedUserInfo
  * @property [] admin
  * @property [] manager
@@ -57,10 +57,10 @@ export const lockTokensStruct = new beet.BeetArgsStruct<
  */
 export type LockTokensInstructionAccounts = {
   proofRequest?: web3.PublicKey
-  user: web3.PublicKey
-  userAuthority: web3.PublicKey
   pair: web3.PublicKey
   pairAuthority: web3.PublicKey
+  user: web3.PublicKey
+  userAuthority: web3.PublicKey
   whitelistedUserInfo: web3.PublicKey
   admin: web3.PublicKey
   manager: web3.PublicKey
@@ -96,7 +96,7 @@ export const lockTokensInstructionDiscriminator = [
 export function createLockTokensInstruction(
   accounts: LockTokensInstructionAccounts,
   args: LockTokensInstructionArgs,
-  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm'),
 ) {
   const [data] = lockTokensStruct.serialize({
     instructionDiscriminator: lockTokensInstructionDiscriminator,
@@ -109,16 +109,6 @@ export function createLockTokensInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.user,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.userAuthority,
-      isWritable: true,
-      isSigner: true,
-    },
-    {
       pubkey: accounts.pair,
       isWritable: true,
       isSigner: false,
@@ -127,6 +117,16 @@ export function createLockTokensInstruction(
       pubkey: accounts.pairAuthority,
       isWritable: false,
       isSigner: false,
+    },
+    {
+      pubkey: accounts.user,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.userAuthority,
+      isWritable: true,
+      isSigner: true,
     },
     {
       pubkey: accounts.whitelistedUserInfo,

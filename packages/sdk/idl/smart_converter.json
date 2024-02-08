@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6",
   "name": "smart_converter",
   "instructions": [
     {
@@ -242,16 +242,6 @@
           "isOptional": true
         },
         {
-          "name": "user",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "userAuthority",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
           "name": "pair",
           "isMut": true,
           "isSigner": false
@@ -260,6 +250,16 @@
           "name": "pairAuthority",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": true,
+          "isSigner": true
         },
         {
           "name": "whitelistedUserInfo",
@@ -340,7 +340,7 @@
         },
         {
           "name": "user",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -890,10 +890,10 @@
         {
           "name": "user",
           "type": "publicKey",
-          "index": true
+          "index": false
         },
         {
-          "name": "userWallet",
+          "name": "userAuthority",
           "type": "publicKey",
           "index": false
         },
@@ -920,10 +920,10 @@
         {
           "name": "user",
           "type": "publicKey",
-          "index": true
+          "index": false
         },
         {
-          "name": "userWallet",
+          "name": "userAuthority",
           "type": "publicKey",
           "index": false
         },

@@ -31,13 +31,13 @@ export const unlockTokensStruct = new beet.BeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['amount', beet.u64],
   ],
-  'UnlockTokensInstructionArgs'
+  'UnlockTokensInstructionArgs',
 )
 /**
  * Accounts required by the _unlockTokens_ instruction
  *
  * @property [] proofRequest (optional)
- * @property [_writable_] user
+ * @property [] user
  * @property [_writable_, **signer**] userAuthority
  * @property [_writable_] pair
  * @property [] pairAuthority
@@ -96,7 +96,7 @@ export const unlockTokensInstructionDiscriminator = [
 export function createUnlockTokensInstruction(
   accounts: UnlockTokensInstructionAccounts,
   args: UnlockTokensInstructionArgs,
-  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm')
+  programId = new web3.PublicKey('JDe51ZjpQ3tZzL6QTVPHt5VT5NzaDuJnrTmJJUFrC3vm'),
 ) {
   const [data] = unlockTokensStruct.serialize({
     instructionDiscriminator: unlockTokensInstructionDiscriminator,
@@ -110,7 +110,7 @@ export function createUnlockTokensInstruction(
     },
     {
       pubkey: accounts.user,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {
