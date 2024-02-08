@@ -28,16 +28,16 @@
 import antfu from '@antfu/eslint-config'
 
 export default antfu({
-  stylistic: true, // enable stylistic formatting rules
+  stylistic: true,
   typescript: true,
-  yml: false,
+  yaml: false,
   vue: false,
   rules: {
-    'antfu/consistent-list-newline': 'off',
     'style/brace-style': ['error', '1tbs', { allowSingleLine: true }],
     'ts/consistent-type-definitions': ['error', 'type'],
     'curly': ['error', 'all'],
     'node/prefer-global/process': 'off',
     'no-console': 'off',
+    'antfu/consistent-list-newline': 'off',
   },
 })

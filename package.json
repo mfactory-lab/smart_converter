@@ -1,11 +1,14 @@
 {
+  "type": "module",
   "private": true,
-  "packageManager": "pnpm@8.14.0",
+  "packageManager": "pnpm@8.15.1",
   "scripts": {
     "cli": "pnpm -F cli run cli",
-    "sdk:gen": "pnpm -F sdk generate",
-    "lint:fix": "eslint --fix ./packages",
-    "test": "npx vitest --pool=forks"
+    "sdk:gen": "pnpm -F sdk generate && eslint ./packages/sdk --fix --cache",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --fix --cache",
+    "test": "vitest --pool=forks",
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.29.0",
@@ -16,8 +19,16 @@
     "@antfu/eslint-config": "^2.6.3",
     "@types/bn.js": "^5.1.0",
     "@types/bs58": "^4.0.1",
-    "eslint": "8.55.0",
+    "eslint": "npm:eslint-ts-patch@8.56.0-0",
+    "lint-staged": "^15.2.2",
+    "simple-git-hooks": "^2.9.0",
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
   }
 }
