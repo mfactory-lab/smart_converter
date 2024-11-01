@@ -13,9 +13,8 @@ Albus is our proprietary protocol that enables DeFi services to verify that user
 
 ## Components
 
-[Program](./programs/smart_converter/Readme.md): smart-converter program.
-
-[CLI](./packages/cli/Readme.md): CLI with smart-converter program endpoints.
+* [Smart Converter program](./programs/smart_converter/Readme.md).
+* [CLI with Smart Converter endpoints](./packages/cli/Readme.md).
 
 
 ## TODO

@@ -1,8 +1,8 @@
-# smart-converter CLI
+# Smart Converter CLI
 
-CLI with smart-converter program endpoints.
+CLI with Smart Converter endpoints.
 
-# Commands
+## Commands
 
 ```bash
 pnpm cli -c <CLUSTER> -k <PATH_TO_PRIVATE_KEY> -l <LOG_LEVEL> <COMMAND>

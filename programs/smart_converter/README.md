@@ -1,8 +1,6 @@
-# smart-converter
+# Smart Converter program
 
-Smart-converter program.
-
-# Setup
+## Setup
 
 1. Build the program:
 
